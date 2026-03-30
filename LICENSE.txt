@@ -1,0 +1,18 @@
+LICENSE
+
+```
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+Esto significa que eres libre de:
+
+- Compartir: copiar y redistribuir el material en cualquier medio o formato
+- Adaptar: remezclar, transformar y crear a partir del material
+
+Bajo las siguientes condiciones:
+
+- Atribución: Debes dar crédito adecuadamente
+- No comercial: No puedes usar el material para fines comerciales
+
+Más información: https://creativecommons.org/licenses/by-nc/4.0/
+```
+
