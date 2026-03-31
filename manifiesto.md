@@ -1,3 +1,4 @@
+[manifiesto.md](https://github.com/user-attachments/files/26385267/manifiesto.md)
 docs/manifiesto.md
 
 ```markdown
