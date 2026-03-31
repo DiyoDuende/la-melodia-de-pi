@@ -1,5 +1,5 @@
 // ============================================================
-// CONFIGURACIÓN DE TRADUCCIÓN
+// IDIOMAS (sin romper si translate falla)
 // ============================================================
 
 function cambiarIdioma(idioma) {
@@ -10,7 +10,10 @@ function cambiarIdioma(idioma) {
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.remove('activo');
   });
-  event.target.closest('.lang-btn').classList.add('activo');
+
+  if (event && event.target) {
+    event.target.closest('.lang-btn').classList.add('activo');
+  }
 }
 
 // ============================================================
@@ -60,7 +63,7 @@ setInterval(actualizarCountdown, 1000);
 actualizarCountdown();
 
 // ============================================================
-// PENTAGRAMA INICIAL
+// PENTAGRAMA INICIAL (CORREGIDO)
 // ============================================================
 
 function generarPentagramaInicial() {
@@ -69,7 +72,7 @@ function generarPentagramaInicial() {
 
   let html = '';
   digitos.forEach((d, i) => {
-    const esActual = (i === 2);
+    const esActual = (i === 0); // 👈 AHORA EMPIEZA EN LA PRIMERA NOTA
     const notaNombre = NOTAS[d] || '·';
 
     html += `
