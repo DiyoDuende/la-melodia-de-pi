@@ -51,9 +51,9 @@ function actualizarPentagrama() {
   const ahora = Date.now();
   const segundoGlobal = Math.floor((ahora - INICIO) / 1000);
 
-  // Mostramos 6 notas: 3 anteriores (o ·), actual, y 2 siguientes
+  // Mostramos 5 notas: 2 anteriores (o ·), actual, y 2 siguientes
   const indices = [
-    segundoGlobal - 3, segundoGlobal - 2, segundoGlobal - 1,
+    segundoGlobal - 2, segundoGlobal - 1,
     segundoGlobal,
     segundoGlobal + 1, segundoGlobal + 2
   ];
