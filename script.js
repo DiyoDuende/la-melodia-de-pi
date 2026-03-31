@@ -1,154 +1,123 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+// ============================================================
+// MAPEO DE NOTAS
+// ============================================================
+
+const NOTAS = {
+  '0': 'Mi⁸',
+  '1': 'Do',
+  '2': 'Re',
+  '3': 'Mi',
+  '4': 'Fa',
+  '5': 'Sol',
+  '6': 'La',
+  '7': 'Si',
+  '8': 'Do⁸',
+  '9': 'Re⁸'
+};
+
+// POSICIÓN REAL EN PENTAGRAMA
+const POSICION_NOTAS = {
+  'Do': 150,
+  'Re': 140,
+  'Mi': 130,
+  'Fa': 120,
+  'Sol': 110,
+  'La': 100,
+  'Si': 90,
+  'Do⁸': 80,
+  'Re⁸': 70,
+  'Mi⁸': 60
+};
+
+// ============================================================
+// CUENTA ATRÁS
+// ============================================================
+
+const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
+
+function actualizarCountdown() {
+  const ahora = new Date();
+  const diff = INICIO_MELODIA - ahora;
+
+  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutos = Math.floor((diff / (1000 * 60)) % 60);
+  const segundos = Math.floor((diff / 1000) % 60);
+
+  document.getElementById('countdown').innerHTML =
+    `${dias} ${horas} ${minutos} ${segundos}`;
 }
 
-body {
-  background: #0a0c10;
-  color: #eef3f9;
-  font-family: 'Inter', 'Courier New', monospace;
-  line-height: 1.5;
-  padding: 20px;
-}
+setInterval(actualizarCountdown, 1000);
+actualizarCountdown();
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  border: 2px solid #2a3a4a;
-  padding: 30px;
-}
+// ============================================================
+// π BASE
+// ============================================================
 
-/* HEADER */
-.header-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-  gap: 20px;
-}
+const PI = ['3','1','4','1','5','9','2','6','5','3','5'];
 
-.logo {
-  font-size: 1.5rem;
-  letter-spacing: 2px;
-  color: #b0c9e8;
-  font-weight: 300;
-}
+// ============================================================
+// PENTAGRAMA
+// ============================================================
 
-/* CUENTA ATRÁS */
-.countdown-grande {
-  text-align: center;
-  margin: 40px 0;
-  padding: 30px;
-  background: #0f141c;
-  border: 1px solid #2a3a4a;
-}
+const CENTRO = 2;
+const TAM = 6;
 
-.countdown-numeros {
-  font-family: monospace;
-  font-size: 3rem;
-  color: #ffd966;
-}
-
-/* VIDEOS */
-.videos {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-}
-
-.video-box {
-  border: 2px solid #3a4a5a;
-  background: #0f141c;
-  aspect-ratio: 16/9;
-}
-
-/* PENTAGRAMA */
-.pentagrama-section {
-  border: 2px solid #3a4a5a;
-  padding: 30px;
-  margin: 30px 0;
-  background: #0f141c;
-}
-
-.pentagrama-lineas {
-  position: relative;
-  height: 180px;
-}
-
-.linea {
-  height: 2px;
-  background: #3a4a5a;
-  margin: 18px 0;
-}
-
-/* CONTENEDOR NOTAS */
-.notas-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-}
-
-/* CADA NOTA */
-.nota {
-  position: relative;
-  width: 60px;
-  height: 180px;
-}
-
-/* FIGURA MUSICAL */
-.nota-simbolo {
-  position: absolute;
-  font-size: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #b0c9e8;
-}
-
-.nota-simbolo.actual {
-  color: #ffd966;
-  transform: translateX(-50%) scale(1.2);
-}
-
-/* NOMBRE DE LA NOTA */
-.nota-nombre {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #7f8fa3;
-}
-
-/* DÍGITO PI */
-.nota-digito {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  font-size: 1.2rem;
-  font-family: monospace;
-  color: #5f7faf;
-}
-
-.nota-digito.actual {
-  color: #ffd966;
-}
-
-/* TIEMPO */
-.tiempo-info {
-  text-align: right;
-  margin-top: 10px;
-  color: #5f7faf;
-}
-
-/* RESPONSIVE */
-@media (max-width: 700px) {
-  .videos {
-    grid-template-columns: 1fr;
+function obtenerVentana(t) {
+  let arr = [];
+  for (let i = 0; i < TAM; i++) {
+    let idx = t - CENTRO + i;
+    if (idx < 0) arr.push(null);
+    else arr.push(PI[idx % PI.length]);
   }
+  return arr;
 }
+
+function render(t) {
+  const datos = obtenerVentana(t);
+  const cont = document.getElementById('notasPentagrama');
+
+  let html = '';
+
+  datos.forEach((d, i) => {
+    let nota = '';
+    let simbolo = '';
+    let top = 130;
+
+    if (d !== null) {
+      nota = NOTAS[d];
+      simbolo = '♩';
+      top = POSICION_NOTAS[nota];
+    }
+
+    const actual = (i === CENTRO);
+
+    html += `
+      <div class="nota">
+        <div class="nota-simbolo ${actual ? 'actual' : ''}" style="top:${top}px;">
+          ${simbolo}
+        </div>
+        <div class="nota-nombre">${nota}</div>
+        <div class="nota-digito ${actual ? 'actual' : ''}">${d || ''}</div>
+      </div>
+    `;
+  });
+
+  cont.innerHTML = html;
+
+  document.getElementById('tiempoActual').innerHTML =
+    `⏱️ segundo ${t}`;
+}
+
+// ============================================================
+// INICIO
+// ============================================================
+
+let t = 0;
+render(t);
+
+setInterval(() => {
+  t++;
+  render(t);
+}, 1000);
