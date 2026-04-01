@@ -215,6 +215,7 @@ body {
   background: #1e2a36;
   padding: 4px 12px;
   border-radius: 20px;
+  margin-top: 25px;
 }
 
 .nota-digito {
@@ -222,6 +223,7 @@ body {
   color: #7f8fa3;
   font-family: monospace;
   font-weight: bold;
+  margin-top: 5px;
 }
 
 .nota-digito.actual {
