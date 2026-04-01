@@ -3,14 +3,11 @@
 // ============================================================
 
 if (typeof translate !== 'undefined') {
-  translate.setUseVersion2();
-  translate.selectiveTranslate.setExcludeTag('translate', 'no');
-  translate.execute();
+ 
 }
 
 function cambiarIdioma(idioma, el) {
-  if (typeof translate !== 'undefined') {
-    translate.changeLanguage(idioma);
+  alert("Traducción temporalmente desactivada");
   }
 
   document.querySelectorAll('.lang-btn').forEach(btn => {
