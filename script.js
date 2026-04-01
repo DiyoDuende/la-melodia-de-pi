@@ -1,10 +1,6 @@
 // ============================================================
-// CONFIGURACIÓN DE TRADUCCIÓN (SEGURA)
+// CONFIGURACIÓN DE TRADUCCIÓN (simple y sin romper)
 // ============================================================
-
-if (typeof translate !== 'undefined') {
- 
-}
 
 function cambiarIdioma(idioma, el) {
   alert("Traducción temporalmente desactivada");
@@ -20,19 +16,6 @@ function cambiarIdioma(idioma, el) {
 // MAPEO DE NOTAS
 // ============================================================
 
-const POSICION_NOTA = {
-  'Do': 140,
-  'Re': 130,
-  'Mi': 120,
-  'Fa': 110,
-  'Sol': 100,
-  'La': 90,
-  'Si': 80,
-  'Do⁸': 70,
-  'Re⁸': 60,
-  'Mi⁸': 50
-};
-
 const NOTAS = {
   '0': 'Mi⁸',
   '1': 'Do',
@@ -44,6 +27,20 @@ const NOTAS = {
   '7': 'Si',
   '8': 'Do⁸',
   '9': 'Re⁸'
+};
+
+// 🎼 POSICIÓN REAL EN EL PENTAGRAMA
+const ALTURAS = {
+  'Do': 110,
+  'Re': 100,
+  'Mi': 90,   // línea correcta
+  'Fa': 80,
+  'Sol': 70,
+  'La': 60,
+  'Si': 50,
+  'Do⁸': 40,
+  'Re⁸': 30,
+  'Mi⁸': 20
 };
 
 // ============================================================
@@ -77,32 +74,39 @@ function actualizarCountdown() {
   document.getElementById('segundos').textContent = formato(segundos);
 }
 
-// ✔ orden correcto
+// ✔ ARRANQUE CORRECTO
 actualizarCountdown();
 setInterval(actualizarCountdown, 1000);
 
 // ============================================================
-// PENTAGRAMA INICIAL
+// PENTAGRAMA INICIAL (FIJO)
 // ============================================================
 
 function generarPentagramaInicial() {
-  const digitos = ['3', '1', '4', '1', '5', '9'];
+  const digitos = ['·', '·', '3', '1', '4']; // 👈 correcto
   const container = document.getElementById('notasPentagrama');
+
+  if (!container) return;
 
   let html = '';
 
   digitos.forEach((d, i) => {
     const esActual = (i === 2);
-    const notaNombre = NOTAS[d] || '';
+    const nota = NOTAS[d] || '·';
+    const top = ALTURAS[nota] ?? 90;
 
     html += `
-      <div class="nota" style="position: relative;">
-        <div class="nota-simbolo ${esActual ? 'actual' : ''}" 
-             style="top:${POSICION_NOTA[notaNombre] || 120}px;">
-          ♩
+      <div class="nota-columna">
+
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
+
+        <div class="nota-nombre">${nota !== '·' ? nota : ''}</div>
+
+        <div class="nota-digito ${esActual ? 'actual' : ''}">
+          ${d !== '·' ? d : ''}
         </div>
-        <div class="nota-nombre">${notaNombre}</div>
-        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
+
       </div>
     `;
   });
@@ -110,10 +114,8 @@ function generarPentagramaInicial() {
   container.innerHTML = html;
 }
 
-generarPentagramaInicial();
-
 // ============================================================
-// MODO EN VIVO
+// MODO EN VIVO (preparado pero NO molesta ahora)
 // ============================================================
 
 let modoVivo = false;
@@ -125,6 +127,7 @@ if (typeof Worker !== 'undefined') {
 
 function verificarInicio() {
   const ahora = new Date();
+
   if (ahora >= INICIO_MELODIA && !modoVivo) {
     modoVivo = true;
     iniciarModoVivo();
@@ -134,9 +137,14 @@ function verificarInicio() {
 function iniciarModoVivo() {
   console.log('🎵 π HA EMPEZADO');
 
-  document.getElementById('countdownContainer').style.display = 'none';
-  document.getElementById('estadoPrincipal').innerHTML = '🔴 LIVE';
-  document.getElementById('lugarPrincipal').innerHTML = 'π está sonando ahora';
+  const countdown = document.getElementById('countdownContainer');
+  if (countdown) countdown.style.display = 'none';
+
+  const estado = document.getElementById('estadoPrincipal');
+  if (estado) estado.innerHTML = '🔴 LIVE';
+
+  const lugar = document.getElementById('lugarPrincipal');
+  if (lugar) lugar.innerHTML = 'π está sonando ahora';
 
   if (worker) {
     actualizarPentagramaVivo();
@@ -153,13 +161,14 @@ function actualizarPentagramaVivo() {
   worker.postMessage({
     id: 'pentagrama',
     inicio: segundoGlobal - 2,
-    cantidad: 6
+    cantidad: 5
   });
 }
 
 if (worker) {
   worker.onmessage = function(e) {
     if (e.data.id === 'pentagrama' && modoVivo) {
+
       const digitos = e.data.digitos;
       const container = document.getElementById('notasPentagrama');
 
@@ -167,16 +176,21 @@ if (worker) {
 
       digitos.forEach((d, i) => {
         const esActual = (i === 2);
-        const notaNombre = NOTAS[d] || '';
+        const nota = NOTAS[d] || '·';
+        const top = ALTURAS[nota] ?? 90;
 
         html += `
-          <div class="nota">
-            <div class="nota-simbolo ${esActual ? 'actual' : ''}" 
-                 style="top:${POSICION_NOTA[notaNombre] || 120}px;">
-              ♩
+          <div class="nota-columna">
+
+            <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+                 style="top:${top}px;"></div>
+
+            <div class="nota-nombre">${nota}</div>
+
+            <div class="nota-digito ${esActual ? 'actual' : ''}">
+              ${d}
             </div>
-            <div class="nota-nombre">${notaNombre}</div>
-            <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
+
           </div>
         `;
       });
@@ -184,102 +198,22 @@ if (worker) {
       container.innerHTML = html;
 
       const segundoActual = e.data.inicio + 2;
-      document.getElementById('tiempoActual').innerHTML =
-        `⏱️ segundo #${segundoActual.toLocaleString()} · π: ${digitos[2]} · 60 bpm`;
+
+      const tiempo = document.getElementById('tiempoActual');
+      if (tiempo) {
+        tiempo.innerHTML =
+          `⏱️ segundo #${segundoActual.toLocaleString()} · π: ${digitos[2]} · 60 bpm`;
+      }
     }
   };
 }
 
-setInterval(verificarInicio, 1000);
-verificarInicio();
-
 // ============================================================
-// PENTAGRAMA VISUAL (modo prueba limpio)
+// ARRANQUE GLOBAL
 // ============================================================
 
-// ⚠️ NO usamos NOTAS global → evitamos conflictos
-const NOTAS_PENTA = {
-  '0': 'Mi⁸', '1': 'Do', '2': 'Re', '3': 'Mi',
-  '4': 'Fa', '5': 'Sol', '6': 'La', '7': 'Si',
-  '8': 'Do⁸', '9': 'Re⁸'
-};
-
-const ALTURAS = {
-  'Do': 110,
-  'Re': 100,
-  'Mi': 90,
-  'Fa': 80,
-  'Sol': 70,
-  'La': 60,
-  'Si': 50,
-  'Do⁸': 40,
-  'Re⁸': 30,
-  'Mi⁸': 20
-};
-
-const PI_TEST = "3141592653589793238462643383279";
-
-let segundoVisual = 0;
-
-function obtenerDigitoPi(n) {
-  if (n < 0 || n >= PI_TEST.length) return '·';
-  return PI_TEST[n];
-}
-
-function actualizarPentagramaVisual() {
-  const container = document.getElementById('notasPentagrama');
-  if (!container) return;
-
-  const posiciones = [
-    segundoVisual - 2,
-    segundoVisual - 1,
-    segundoVisual,
-    segundoVisual + 1,
-    segundoVisual + 2
-  ];
-
-  let html = '';
-
-  posiciones.forEach((pos, i) => {
-
-    const esActual = (i === 2);
-    const digito = obtenerDigitoPi(pos);
-    const nota = NOTAS_PENTA[digito] || '·';
-    const top = ALTURAS[nota] ?? 80;
-
-    html += `
-      <div class="nota-columna">
-
-        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-             style="top:${top}px;"></div>
-
-        <div class="nota-nombre">${nota}</div>
-        <div class="nota-digito ${esActual ? 'actual' : ''}">
-          ${digito}
-        </div>
-
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-
-  const digitoCentro = obtenerDigitoPi(segundoVisual);
-
-  const tiempo = document.getElementById('tiempoActual');
-  if (tiempo) {
-    tiempo.innerHTML =
-      `⏱️ segundo #${segundoVisual} · π: ${digitoCentro} · 60 bpm`;
-  }
-}
-
-function tickPentagrama() {
-  segundoVisual++;
-  actualizarPentagramaVisual();
-}
-
-// ⏱️ ARRANQUE SEGURO
 document.addEventListener("DOMContentLoaded", function () {
-  actualizarPentagramaVisual();
-  setInterval(tickPentagrama, 1000);
+  generarPentagramaInicial(); // 👈 SOLO esto ahora
+  verificarInicio();
+  setInterval(verificarInicio, 1000);
 });
