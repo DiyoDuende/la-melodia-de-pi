@@ -192,3 +192,94 @@ if (worker) {
 
 setInterval(verificarInicio, 1000);
 verificarInicio();
+
+// ============================================================
+// PENTAGRAMA VISUAL (modo prueba limpio)
+// ============================================================
+
+// ⚠️ NO usamos NOTAS global → evitamos conflictos
+const NOTAS_PENTA = {
+  '0': 'Mi⁸', '1': 'Do', '2': 'Re', '3': 'Mi',
+  '4': 'Fa', '5': 'Sol', '6': 'La', '7': 'Si',
+  '8': 'Do⁸', '9': 'Re⁸'
+};
+
+const ALTURAS = {
+  'Do': 100,
+  'Re': 90,
+  'Mi': 80,
+  'Fa': 70,
+  'Sol': 60,
+  'La': 50,
+  'Si': 40,
+  'Do⁸': 30,
+  'Re⁸': 20,
+  'Mi⁸': 10
+};
+
+const PI_TEST = "3141592653589793238462643383279";
+
+let segundoVisual = 0;
+
+function obtenerDigitoPi(n) {
+  if (n < 0 || n >= PI_TEST.length) return '·';
+  return PI_TEST[n];
+}
+
+function actualizarPentagramaVisual() {
+  const container = document.getElementById('notasPentagrama');
+  if (!container) return;
+
+  const posiciones = [
+    segundoVisual - 2,
+    segundoVisual - 1,
+    segundoVisual,
+    segundoVisual + 1,
+    segundoVisual + 2
+  ];
+
+  let html = '';
+
+  posiciones.forEach((pos, i) => {
+
+    const esActual = (i === 2);
+    const digito = obtenerDigitoPi(pos);
+    const nota = NOTAS_PENTA[digito] || '·';
+    const top = ALTURAS[nota] ?? 80;
+
+    html += `
+      <div class="nota-columna">
+
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
+
+        <div class="nota-nombre">${nota}</div>
+        <div class="nota-digito ${esActual ? 'actual' : ''}">
+          ${digito}
+        </div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  const digitoCentro = obtenerDigitoPi(segundoVisual);
+
+  const tiempo = document.getElementById('tiempoActual');
+  if (tiempo) {
+    tiempo.innerHTML =
+      `⏱️ segundo #${segundoVisual} · π: ${digitoCentro} · 60 bpm`;
+  }
+}
+
+function tickPentagrama() {
+  segundoVisual++;
+  actualizarPentagramaVisual();
+}
+
+// ⏱️ ARRANQUE SEGURO
+document.addEventListener("DOMContentLoaded", function () {
+  actualizarPentagramaVisual();
+  setInterval(tickPentagrama, 1000);
+});
