@@ -163,98 +163,28 @@ body {
   font-size: 0.8rem;
 }
 
-/* PENTAGRAMA */
-.pentagrama-section {
-  border: 2px solid #3a4a5a;
-  padding: 30px 20px;
-  margin: 30px 0;
-  background: #0f141c;
-}
+<!-- PENTAGRAMA -->
+<div class="pentagrama-section">
 
-.pentagrama-lineas {
-  position: relative;
-  height: 180px;
-  margin: 20px 0;
-}
+  <div class="pentagrama-con-lineas">
 
-.linea {
-  height: 2px;
-  background: #3a4a5a;
-  margin: 18px 0;
-  width: 100%;
-}
+    <svg class="pentagrama-svg" viewBox="0 0 500 140" preserveAspectRatio="none">
+      <line x1="0" y1="20" x2="500" y2="20" class="linea"/>
+      <line x1="0" y1="40" x2="500" y2="40" class="linea"/>
+      <line x1="0" y1="60" x2="500" y2="60" class="linea"/>
+      <line x1="0" y1="80" x2="500" y2="80" class="linea"/>
+      <line x1="0" y1="100" x2="500" y2="100" class="linea"/>
+    </svg>
 
-.notas-container {
-  display: flex;
-  justify-content: space-around;
-  position: relative;
-  top: -150px;
-  margin: 0 20px;
-}
+    <div class="notas-wrapper" id="notasPentagrama"></div>
 
-.nota {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
+  </div>
 
-.nota-simbolo {
-  font-size: 2.5rem;
-  color: #b0c9e8;
-  margin-bottom: 10px;
-}
+  <div class="tiempo-info">
+    <span id="tiempoActual">⏱️ segundo #0 · π: 3 · 60 bpm</span>
+  </div>
 
-.nota-simbolo.actual {
-  color: #ffd966;
-  transform: scale(1.2);
-}
-
-.notas-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 140px;
-
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-}
-
-.nota-nombre {
-  font-size: 1.2rem;
-  background: #1e2a36;
-  padding: 4px 12px;
-  border-radius: 20px;
-  margin-top: 25px;
-}
-
-.nota-digito {
-  font-size: 1.5rem;
-  color: #7f8fa3;
-  font-family: monospace;
-  font-weight: bold;
-  margin-top: 5px;
-}
-
-.nota-digito.actual {
-  color: #ffd966;
-}
-
-.tiempo-info {
-  text-align: right;
-  margin-top: 15px;
-  color: #5f7faf;
-  font-size: 1.1rem;
-  border-top: 1px solid #2a3a4a;
-  padding-top: 15px;
-}
-
-.no-traducir {
-  font-family: monospace;
-  font-weight: bold;
-}
+</div>
 
 /* MENÚ */
 .menu {
