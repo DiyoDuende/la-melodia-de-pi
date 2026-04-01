@@ -1,6 +1,3 @@
-index.html
-
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,7 +17,7 @@ index.html
   <!-- Favicon -->
   <link rel="icon" href="favicon.ico">
   
-  <!-- Fuente Google (rápida) -->
+  <!-- Fuente Google -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
@@ -28,36 +25,36 @@ index.html
 <body>
 <div class="container">
 
-  <!-- HEADER CON IDIOMAS -->
+  <!-- HEADER -->
   <div class="header-top">
     <div class="logo" translate="yes">La melodía de π</div>
     
     <div class="language-selector" id="selectorIdiomas">
-      <button class="lang-btn activo" onclick="cambiarIdioma('es')">
+      <button class="lang-btn activo" onclick="cambiarIdioma('es', this)">
         <span class="lang-flag">🇪🇸</span> Español
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('en')">
+      <button class="lang-btn" onclick="cambiarIdioma('en', this)">
         <span class="lang-flag">🇬🇧</span> English
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('fr')">
+      <button class="lang-btn" onclick="cambiarIdioma('fr', this)">
         <span class="lang-flag">🇫🇷</span> Français
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('de')">
+      <button class="lang-btn" onclick="cambiarIdioma('de', this)">
         <span class="lang-flag">🇩🇪</span> Deutsch
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('it')">
+      <button class="lang-btn" onclick="cambiarIdioma('it', this)">
         <span class="lang-flag">🇮🇹</span> Italiano
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('pt')">
+      <button class="lang-btn" onclick="cambiarIdioma('pt', this)">
         <span class="lang-flag">🇵🇹</span> Português
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('ja')">
+      <button class="lang-btn" onclick="cambiarIdioma('ja', this)">
         <span class="lang-flag">🇯🇵</span> 日本語
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('zh')">
+      <button class="lang-btn" onclick="cambiarIdioma('zh', this)">
         <span class="lang-flag">🇨🇳</span> 中文
       </button>
-      <button class="lang-btn" onclick="cambiarIdioma('ar')">
+      <button class="lang-btn" onclick="cambiarIdioma('ar', this)">
         <span class="lang-flag">🇸🇦</span> العربية
       </button>
     </div>
@@ -66,13 +63,14 @@ index.html
   <!-- CUENTA ATRÁS -->
   <div class="countdown-grande" id="countdownContainer">
     <div class="countdown-titulo" translate="yes">⏳ TIEMPO PARA QUE π EMPIECE A SONAR</div>
-   <div class="countdown-grid no-traducir">
-  <div><span id="dias">--</span><label>DÍAS</label></div>
-  <div><span id="horas">--</span><label>HORAS</label></div>
-  <div><span id="minutos">--</span><label>MIN</label></div>
-  <div><span id="segundos">--</span><label>SEG</label></div>
-</div>
-    
+
+    <div class="countdown-grid no-traducir">
+      <div><span id="dias">--</span><label>DÍAS</label></div>
+      <div><span id="horas">--</span><label>HORAS</label></div>
+      <div><span id="minutos">--</span><label>MIN</label></div>
+      <div><span id="segundos">--</span><label>SEG</label></div>
+    </div>
+  </div>
 
   <!-- VIDEOS -->
   <div class="videos">
@@ -83,6 +81,7 @@ index.html
       </div>
       <div class="lugar" id="lugarPrincipal" translate="yes">Desde el 14/03/2027</div>
     </div>
+
     <div class="video-box small">
       <div class="estado" translate="yes">⏳ ESPERA</div>
       <div class="video-placeholder">
@@ -100,7 +99,7 @@ index.html
       <div class="linea"></div>
       <div class="linea"></div>
       <div class="linea"></div>
-      
+
       <div class="notas-container" id="notasPentagrama"></div>
     </div>
 
@@ -109,7 +108,7 @@ index.html
     </div>
   </div>
 
-  <!-- MENÚ (con enlace real a inscripción) -->
+  <!-- MENÚ -->
   <div class="menu">
     <a class="menu-item" href="inscripcion.html" translate="yes">📝 Inscripción</a>
     <a class="menu-item" href="#" onclick="alert('Normas: respeto, π, y una nota por segundo')" translate="yes">📜 Normas</a>
@@ -119,10 +118,12 @@ index.html
   <!-- FOOTER -->
   <div class="footer">
     <div class="gran-fecha no-traducir">14 · 03 · 2027 · 00:00 UTC</div>
+
     <div translate="yes">
       <p>Una melodía infinita, tocada por personas finitas,</p>
       <p>unidas por un mismo pulso, en un mismo ahora.</p>
     </div>
+
     <div style="margin-top: 20px; font-size: 0.7rem;" class="no-traducir">
       π · 3.141592653589793...
     </div>
@@ -134,5 +135,3 @@ index.html
 <script src="script.js"></script>
 </body>
 </html>
-```
-
