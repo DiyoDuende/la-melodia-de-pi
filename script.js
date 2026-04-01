@@ -22,6 +22,18 @@ function cambiarIdioma(idioma) {
 // MAPEO DE NOTAS
 // ============================================================
 
+const POSICION_NOTA = {
+  'Do': 140,
+  'Re': 130,
+  'Mi': 120,
+  'Fa': 110,
+  'Sol': 100,
+  'La': 90,
+  'Si': 80,
+  'Do⁸': 70,
+  'Re⁸': 60,
+  'Mi⁸': 50
+};
 const NOTAS = {
   '0': 'Mi⁸',
   '1': 'Do',
@@ -77,10 +89,12 @@ function generarPentagramaInicial() {
   digitos.forEach((d, i) => {
     const esActual = (i === 2);
     const notaNombre = NOTAS[d] || '·';
+  
     
     html += `
-      <div class="nota">
-        <div class="nota-simbolo ${esActual ? 'actual' : ''}">♩</div>
+      <div class="nota" style="position: relative;">
+        <div class="nota-simbolo ${esActual ? 'actual' : ''}" 
+     style="top:${POSICION_NOTA[notaNombre] || 120}px;">
         <div class="nota-nombre" translate="yes">${notaNombre}</div>
         <div class="nota-digito ${esActual ? 'actual' : ''} no-traducir">${d}</div>
       </div>
