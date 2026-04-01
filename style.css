@@ -284,5 +284,27 @@ body {
   .countdown-numeros { font-size: 2rem; }
   .videos { grid-template-columns: 1fr; }
 }
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.countdown-grid div {
+  text-align: center;
+}
+
+.countdown-grid span {
+  display: block;
+  font-size: 2.5rem;
+  color: #ffd966;
+  font-family: monospace;
+}
+
+.countdown-grid label {
+  font-size: 0.7rem;
+  color: #5f7faf;
+}
 ```
 
