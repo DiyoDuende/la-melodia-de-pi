@@ -127,7 +127,8 @@ body {
 }
 
 .video-box.small {
-  aspect-ratio: 4/3;
+  aspect-ratio: 1/1;
+  max-height: 250px;
 }
 
 .video-placeholder {
