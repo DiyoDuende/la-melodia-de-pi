@@ -57,10 +57,17 @@ function actualizarCountdown() {
   const ahora = new Date();
   const diff = INICIO_MELODIA - ahora;
 
-  if (diff <= 0) {
-    document.getElementById('countdown').innerHTML = '¡YA HA EMPEZADO!';
-    return;
-  }
+ if (diff <= 0) {
+  document.getElementById('dias').textContent = '00';
+  document.getElementById('horas').textContent = '00';
+  document.getElementById('minutos').textContent = '00';
+  document.getElementById('segundos').textContent = '00';
+  return;
+} {
+    document.getElementById('dias').textContent = dias;
+document.getElementById('horas').textContent = formato(horas);
+document.getElementById('minutos').textContent = formato(minutos);
+document.getElementById('segundos').textContent = formato(segundos);
 
   const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
   const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
