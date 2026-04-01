@@ -57,9 +57,10 @@ function actualizarCountdown() {
 
   const formato = (n) => n.toString().padStart(2, '0');
   
-  document.getElementById('countdown').innerHTML = 
-    `${dias} ${formato(horas)} ${formato(minutos)} ${formato(segundos)}`;
-}
+  document.getElementById('dias').textContent = dias;
+document.getElementById('horas').textContent = formato(horas);
+document.getElementById('minutos').textContent = formato(minutos);
+document.getElementById('segundos').textContent = formato(segundos);
 
 actualizarCountdown();
 setInterval(actualizarCountdown, 1000);
