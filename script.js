@@ -61,8 +61,8 @@ function actualizarCountdown() {
     `${dias} ${formato(horas)} ${formato(minutos)} ${formato(segundos)}`;
 }
 
-actualizarCountdown();
 setInterval(actualizarCountdown, 1000);
+actualizarCountdown();
 
 // ============================================================
 // PENTAGRAMA INICIAL
