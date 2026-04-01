@@ -309,5 +309,43 @@ body {
   font-size: 0.7rem;
   color: #5f7faf;
 }
+
+.nota-columna {
+  width: 60px;
+  text-align: center;
+  position: relative;
+  height: 140px;
+}
+
+.nota-cabeza {
+  width: 18px;
+  height: 18px;
+  background: #b0c9e8;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nota-cabeza.actual {
+  background: #ffd966;
+  box-shadow: 0 0 8px #ffd966;
+  transform: translateX(-50%) scale(1.2);
+}
+
+.nota-nombre {
+  margin-top: 110px;
+  font-size: 0.8rem;
+}
+
+.nota-digito {
+  font-size: 1.1rem;
+  color: #7f8fa3;
+}
+
+.nota-digito.actual {
+  color: #ffd966;
+  font-weight: bold;
+}
 ```
 
