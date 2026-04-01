@@ -8,7 +8,6 @@ if (typeof translate !== 'undefined') {
 
 function cambiarIdioma(idioma, el) {
   alert("Traducción temporalmente desactivada");
-  }
 
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.remove('activo');
