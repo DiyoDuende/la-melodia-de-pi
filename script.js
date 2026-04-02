@@ -175,6 +175,8 @@ if (worker) {
       const digitos = e.data.digitos;
       const container = document.getElementById('notasPentagrama');
 
+      if (!container) return;
+
       let html = '';
 
       digitos.forEach((d, i) => {
