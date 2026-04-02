@@ -200,11 +200,12 @@ body {
 
 .nota-columna {
   width: 60px;
-  height: 140px;
+  height: 190px; /*
   position: relative;
 }
 
 .nota-cabeza {
+  top: 90px; /*
   width: 18px;
   height: 18px;
   background: #b0c9e8;
