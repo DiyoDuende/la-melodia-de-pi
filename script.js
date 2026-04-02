@@ -29,17 +29,19 @@ const NOTAS = {
   '9': 'Re⁸'
 };
 
+const BASE_Y = 120;
+
 const ALTURAS = {
-  'Do': 118,
-  'Re': 108,
-  'Mi': 98,
-  'Fa': 88,
-  'Sol': 78,
-  'La': 68,
-  'Si': 58,
-  'Do⁸': 48,
-  'Re⁸': 38,
-  'Mi⁸': 28
+  'Do': BASE_Y - 0,
+  'Re': BASE_Y - 10,
+  'Mi': BASE_Y - 20,
+  'Fa': BASE_Y - 30,
+  'Sol': BASE_Y - 40,
+  'La': BASE_Y - 50,
+  'Si': BASE_Y - 60,
+  'Do⁸': BASE_Y - 70,
+  'Re⁸': BASE_Y - 80,
+  'Mi⁸': BASE_Y - 90
 };
 // ============================================================
 // CUENTA ATRÁS
