@@ -95,25 +95,6 @@ function generarPentagramaInicial() {
     const nota = NOTAS[d] || '·';
     const top = ALTURAS[nota] ?? 90;
 
-    html += `
-      <div class="nota-columna">
-
-        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-             style="top:${top}px;"></div>
-
-        <div class="nota-nombre">${nota !== '·' ? nota : ''}</div>
-
-        <div class="nota-digito ${esActual ? 'actual' : ''}">
-          ${d !== '·' ? d : ''}
-        </div>
-
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
 html += `
   <div class="nota-columna">
 
@@ -131,6 +112,8 @@ html += `
 
   </div>
 `;
+
+
 
 // ============================================================
 // MODO EN VIVO (preparado pero NO molesta ahora)
