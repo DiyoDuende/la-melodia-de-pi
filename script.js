@@ -180,22 +180,23 @@ if (worker) {
         const nota = NOTAS[d] || '·';
         const top = ALTURAS[nota] ?? 90;
 
-        html += `
-          <div class="nota-columna">
+       html += `
+  <div class="nota-columna">
 
-            <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-                 style="top:${top}px;"></div>
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
 
-            <div class="nota-nombre">${nota}</div>
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 9}px;"></div>
+    ` : ''}
 
-            <div class="nota-digito ${esActual ? 'actual' : ''}">
-              ${d}
-            </div>
+    <div class="nota-nombre">${nota}</div>
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${digito}
+    </div>
 
-          </div>
-        `;
-      });
-
+  </div>
+`;
       container.innerHTML = html;
 
       const segundoActual = e.data.inicio + 2;
