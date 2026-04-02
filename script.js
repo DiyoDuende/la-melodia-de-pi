@@ -34,7 +34,7 @@ const BASE_Y = 120;
 const ALTURAS = {
   'Do': BASE_Y - 0,
   'Re': BASE_Y - 10,
-  'Mi': BASE_Y - 20,
+  'Mi': BASE_Y - 25,
   'Fa': BASE_Y - 30,
   'Sol': BASE_Y - 40,
   'La': BASE_Y - 50,
