@@ -220,6 +220,15 @@ body {
   transform: translateX(-50%) scale(1.2);
 }
 
+.linea-adicional {
+  position: absolute;
+  width: 22px;
+  height: 2px;
+  background: #b0c9e8;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .nota-nombre {
   position: absolute;
   bottom: -20px;
