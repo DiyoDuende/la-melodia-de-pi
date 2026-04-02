@@ -166,25 +166,23 @@ body {
 
 /* PENTAGRAMA NUEVO */
 .pentagrama-section {
-  border: 2px solid #3a4a5a;
-  padding: 30px 20px;
-  margin: 30px 0;
-  background: #0f141c;
+  margin-top: 50px;
 }
 
 .pentagrama-con-lineas {
   position: relative;
-  height: 190px;
+  height: 180px;
 }
 
 .pentagrama-svg {
+  position: absolute;
   width: 100%;
   height: 140px;
 }
 
 .linea {
-  stroke: #3a4a5a;
-  stroke-width: 1.5;
+  stroke: #2a3a4d;
+  stroke-width: 1;
 }
 
 .notas-wrapper {
@@ -192,7 +190,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 190px;
+  height: 180px;
 
   display: flex;
   justify-content: space-around;
@@ -200,34 +198,22 @@ body {
 
 .nota-columna {
   width: 60px;
-  height: 190px; /*
+  height: 180px;
   position: relative;
 }
 
 .nota-cabeza {
-  top: 90px; /*
-  width: 18px;
-  height: 18px;
-  background: #b0c9e8;
-  border-radius: 50%;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: #e0e6ef;
+  border-radius: 50%;
 }
 
 .nota-cabeza.actual {
   background: #ffd966;
-  box-shadow: 0 0 8px #ffd966;
-  transform: translateX(-50%) scale(1.2);
-}
-
-.linea-adicional {
-  position: absolute;
-  width: 22px;
-  height: 2px;
-  background: #b0c9e8;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .nota-nombre {
@@ -240,7 +226,7 @@ body {
 
 .nota-digito {
   position: absolute;
-  bottom: -60px;
+  bottom: -50px;
   width: 100%;
   text-align: center;
   font-size: 1.1rem;
@@ -253,12 +239,8 @@ body {
 }
 
 .tiempo-info {
-  text-align: right;
-  margin-top: 50px;
-  color: #5f7faf;
-  font-size: 1.1rem;
-  border-top: 1px solid #2a3a4a;
-  padding-top: 15px;
+  margin-top: 40px;
+  text-align: center;
 }
 
 /* MENÚ */
