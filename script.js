@@ -120,7 +120,7 @@ html += `
     <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
          style="top:${top}px;"></div>
 
-    ${nota === 'Do' ? `
+    ${nota === 'Do'  `
       <div class="linea-adicional" style="top:${top + 10}px;"></div>
     ` : ''}
 
