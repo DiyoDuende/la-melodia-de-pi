@@ -222,7 +222,7 @@ body {
 
 .nota-nombre {
   position: absolute;
-  bottom: -25px;
+  bottom: -20px;
   width: 100%;
   text-align: center;
   font-size: 0.8rem;
@@ -230,7 +230,7 @@ body {
 
 .nota-digito {
   position: absolute;
-  bottom: -40px;
+  bottom: -60px;
   width: 100%;
   text-align: center;
   font-size: 1.1rem;
