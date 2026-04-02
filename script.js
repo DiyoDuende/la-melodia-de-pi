@@ -1,5 +1,5 @@
 // ============================================================
-// CONFIGURACIÓN DE TRADUCCIÓN (simple y sin romper)
+// CONFIGURACIÓN DE TRADUCCIÓN
 // ============================================================
 
 function cambiarIdioma(idioma, el) {
@@ -29,11 +29,10 @@ const NOTAS = {
   '9': 'Re⁸'
 };
 
-// 🎼 POSICIÓN REAL EN EL PENTAGRAMA
 const ALTURAS = {
   'Do': 110,
   'Re': 100,
-  'Mi': 90,   // línea correcta
+  'Mi': 90,
   'Fa': 80,
   'Sol': 70,
   'La': 60,
@@ -66,7 +65,7 @@ function actualizarCountdown() {
   const minutos = Math.floor((diff / (1000 * 60)) % 60);
   const segundos = Math.floor((diff / 1000) % 60);
 
-  const formato = (n) => n.toString().padStart(2, '0');
+  const formato = n => n.toString().padStart(2, '0');
 
   document.getElementById('dias').textContent = dias;
   document.getElementById('horas').textContent = formato(horas);
@@ -74,16 +73,15 @@ function actualizarCountdown() {
   document.getElementById('segundos').textContent = formato(segundos);
 }
 
-// ✔ ARRANQUE CORRECTO
 actualizarCountdown();
 setInterval(actualizarCountdown, 1000);
 
 // ============================================================
-// PENTAGRAMA INICIAL (FIJO)
+// PENTAGRAMA INICIAL
 // ============================================================
 
 function generarPentagramaInicial() {
-  const digitos = ['·', '·', '3', '1', '4']; // 👈 correcto
+  const digitos = ['·', '·', '3', '1', '4'];
   const container = document.getElementById('notasPentagrama');
 
   if (!container) return;
@@ -91,26 +89,36 @@ function generarPentagramaInicial() {
   let html = '';
 
   digitos.forEach((d, i) => {
+
     const esActual = (i === 2);
     const nota = NOTAS[d] || '·';
     const top = ALTURAS[nota] ?? 90;
 
-html += `
-  <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-     style="top:${top}px;"></div>
+    html += `
+      <div class="nota-columna">
 
-    <div class="nota-nombre">${nota}</div>
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${digito}
-    </div>
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
 
-  </div>
-`;
+        ${nota === 'Do' ? `
+          <div class="linea-adicional" style="top:${top + 9}px;"></div>
+        ` : ''}
 
+        <div class="nota-nombre">${nota}</div>
 
+        <div class="nota-digito ${esActual ? 'actual' : ''}">
+          ${d}
+        </div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
 
 // ============================================================
-// MODO EN VIVO (preparado pero NO molesta ahora)
+// MODO EN VIVO
 // ============================================================
 
 let modoVivo = false;
@@ -170,26 +178,31 @@ if (worker) {
       let html = '';
 
       digitos.forEach((d, i) => {
+
         const esActual = (i === 2);
         const nota = NOTAS[d] || '·';
         const top = ALTURAS[nota] ?? 90;
 
-       html += `
-  <div class="nota-columna">
+        html += `
+          <div class="nota-columna">
 
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
-   ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 9}px;"></div>
-    ` : ''}
-    <div class="nota-nombre">${nota}</div>
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${digito}
-    </div>
+            <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+                 style="top:${top}px;"></div>
 
-  </div>
-`;
-        
+            ${nota === 'Do' ? `
+              <div class="linea-adicional" style="top:${top + 9}px;"></div>
+            ` : ''}
+
+            <div class="nota-nombre">${nota}</div>
+
+            <div class="nota-digito ${esActual ? 'actual' : ''}">
+              ${d}
+            </div>
+
+          </div>
+        `;
+      });
+
       container.innerHTML = html;
 
       const segundoActual = e.data.inicio + 2;
@@ -208,7 +221,7 @@ if (worker) {
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
-  generarPentagramaInicial(); // 👈 SOLO esto ahora
+  generarPentagramaInicial();
   verificarInicio();
   setInterval(verificarInicio, 1000);
 });
