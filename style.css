@@ -174,7 +174,7 @@ body {
 
 .pentagrama-con-lineas {
   position: relative;
-  height: 140px;
+  height: 190px;
 }
 
 .pentagrama-svg {
@@ -192,7 +192,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 140px;
+  height: 190px;
 
   display: flex;
   justify-content: space-around;
