@@ -41,7 +41,6 @@ const ALTURAS = {
   'Re⁸': 30,
   'Mi⁸': 20
 };
-
 // ============================================================
 // CUENTA ATRÁS
 // ============================================================
@@ -100,10 +99,6 @@ function generarPentagramaInicial() {
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
              style="top:${top}px;"></div>
 
-        ${nota === 'Do' ? `
-          <div class="linea-adicional" style="top:${top + 9}px;"></div>
-        ` : ''}
-
         <div class="nota-nombre">${nota}</div>
 
         <div class="nota-digito ${esActual ? 'actual' : ''}">
@@ -116,6 +111,10 @@ function generarPentagramaInicial() {
 
   container.innerHTML = html;
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  generarPentagramaInicial();
+});
 
 // ============================================================
 // MODO EN VIVO
