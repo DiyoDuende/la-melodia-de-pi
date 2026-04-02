@@ -114,6 +114,24 @@ function generarPentagramaInicial() {
   container.innerHTML = html;
 }
 
+html += `
+  <div class="nota-columna">
+
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
+
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 9}px;"></div>
+    ` : ''}
+
+    <div class="nota-nombre">${nota}</div>
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${digito}
+    </div>
+
+  </div>
+`;
+
 // ============================================================
 // MODO EN VIVO (preparado pero NO molesta ahora)
 // ============================================================
