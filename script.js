@@ -185,11 +185,9 @@ if (worker) {
 
     <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
          style="top:${top}px;"></div>
-
-    ${nota === 'Do' ? `
+   ${nota === 'Do' ? `
       <div class="linea-adicional" style="top:${top + 9}px;"></div>
     ` : ''}
-
     <div class="nota-nombre">${nota}</div>
     <div class="nota-digito ${esActual ? 'actual' : ''}">
       ${digito}
@@ -197,6 +195,7 @@ if (worker) {
 
   </div>
 `;
+        
       container.innerHTML = html;
 
       const segundoActual = e.data.inicio + 2;
