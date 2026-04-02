@@ -226,3 +226,101 @@ document.addEventListener("DOMContentLoaded", function () {
   verificarInicio();
   setInterval(verificarInicio, 1000);
 });
+
+let worker = null;
+
+if (typeof Worker !== 'undefined') {
+  worker = new Worker('worker/worker-pi.js');
+}
+
+let modoVivo = false;
+
+const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
+
+function verificarInicio() {
+  const ahora = new Date();
+
+  if (ahora >= INICIO_MELODIA && !modoVivo) {
+    modoVivo = true;
+    iniciarModoVivo();
+  }
+}
+
+function iniciarModoVivo() {
+  console.log('🎵 LIVE');
+
+  if (worker) {
+    actualizarPentagramaVivo();
+    setInterval(actualizarPentagramaVivo, 1000);
+  }
+}
+
+function actualizarPentagramaVivo() {
+  if (!worker) return;
+
+  const ahora = Date.now();
+  const segundoGlobal = Math.floor((ahora - INICIO_MELODIA) / 1000);
+
+  worker.postMessage({
+    id: 'pentagrama',
+    inicio: segundoGlobal - 2,
+    cantidad: 5
+  });
+}
+
+const NOTAS = {
+  '0': 'Mi⁸',
+  '1': 'Do',
+  '2': 'Re',
+  '3': 'Mi',
+  '4': 'Fa',
+  '5': 'Sol',
+  '6': 'La',
+  '7': 'Si',
+  '8': 'Do⁸',
+  '9': 'Re⁸'
+};
+
+if (worker) {
+  worker.onmessage = function(e) {
+
+    if (e.data.id === 'pentagrama' && modoVivo) {
+
+      const digitos = e.data.digitos;
+      const container = document.getElementById('notasPentagrama');
+
+      let html = '';
+
+      digitos.forEach((d, i) => {
+
+        const esActual = (i === 2);
+        const nota = NOTAS[d] || '·';
+        const top = ALTURAS[nota] ?? 90;
+
+        html += `
+          <div class="nota-columna">
+
+            <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+                 style="top:${top}px;"></div>
+
+            <div class="nota-nombre">${nota}</div>
+
+            <div class="nota-digito ${esActual ? 'actual' : ''}">
+              ${d}
+            </div>
+
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      const tiempo = document.getElementById('tiempoActual');
+      if (tiempo) {
+        const segundoActual = e.data.inicio + 2;
+        tiempo.innerHTML =
+          `⏱️ segundo #${segundoActual} · π: ${digitos[2]} · 60 bpm`;
+      }
+    }
+  };
+}
