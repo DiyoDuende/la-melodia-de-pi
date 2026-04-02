@@ -101,8 +101,8 @@ html += `
     <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
          style="top:${top}px;"></div>
 
-    ${nota === 'Do'  `
-      <div class="linea-adicional" style="top:${top + 10}px;"></div>
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 9}px;"></div>
     ` : ''}
 
     <div class="nota-nombre">${nota}</div>
