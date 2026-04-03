@@ -32,16 +32,16 @@ const NOTAS = {
 const BASE_Y = 120;
 
 const ALTURAS = {
-  'Do': BASE_Y - 0,
-  'Re': BASE_Y - 10,
-  'Mi': BASE_Y - 20,
-  'Fa': BASE_Y - 30,
-  'Sol': BASE_Y - 40,
-  'La': BASE_Y - 50,
-  'Si': BASE_Y - 60,
-  'Do⁸': BASE_Y - 70,
-  'Re⁸': BASE_Y - 80,
-  'Mi⁸': BASE_Y - 90
+  'Do': 110,   // espacio debajo
+  'Re': 105,
+  'Mi': 100,   // 👈 CLAVADO en línea
+  'Fa': 90,
+  'Sol': 80,   // 👈 línea
+  'La': 70,
+  'Si': 60,    // 👈 línea
+  'Do⁸': 50,
+  'Re⁸': 40,   // 👈 línea
+  'Mi⁸': 30
 };
 // ============================================================
 // CUENTA ATRÁS
