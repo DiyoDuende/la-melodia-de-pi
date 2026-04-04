@@ -32,7 +32,7 @@ const NOTAS = {
 const ALTURAS = {
   'Do': 120,
   'Re': 110,
-  'Mi': 98,
+  'Mi': 95,
   'Fa': 90,
   'Sol': 80,
   'La': 70,
