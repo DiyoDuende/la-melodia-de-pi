@@ -216,24 +216,24 @@ body {
   background: #ffd966;
 }
 
-html += `
-  <div class="nota-columna">
+.linea-adicional {
+  position: absolute;
+  width: 22px;
+  height: 3px;
+  background: red; /* temporal */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
 
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
+.nota-cabeza {
+  z-index: 21;
+}
 
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 6}px;"></div>
-    ` : ''}
-
-    <div class="nota-nombre">${nota}</div>
-
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
-
-  </div>
-`;
+.pentagrama-svg {
+  position: absolute;
+  z-index: 1;
+}
 
 .nota-nombre {
   position: absolute;
