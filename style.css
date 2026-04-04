@@ -218,12 +218,12 @@ body {
 
 .linea-adicional {
   position: absolute;
-  width: 22px;
+  width: 24px;
   height: 3px;
-  background: red; /* temporal */
+  background: #ffd966; /* mismo color que nota activa */
   left: 50%;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 5;
 }
 
 .nota-cabeza {
