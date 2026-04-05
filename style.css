@@ -219,8 +219,8 @@ body {
 .linea-adicional {
   position: absolute;
   width: 24px;
-  height: 3px;
-  background: #ffd966; /* mismo color que nota activa */
+  height: 2px;
+  background: #e0e6ef; /* 👈 MISMO COLOR QUE LA NOTA */
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
