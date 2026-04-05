@@ -74,47 +74,6 @@ function actualizarCountdown() {
 }
 
 // ============================================================
-// PENTAGRAMA INICIAL
-// ============================================================
-
-function generarPentagramaInicial() {
-  const digitos = ['·', '·', '3', '1', '4'];
-  const container = document.getElementById('notasPentagrama');
-
-  if (!container) return;
-
-  let html = '';
-
-  digitos.forEach((d, i) => {
-    const esActual = (i === 2);
-    const nota = NOTAS[d] || '·';
-    const top = ALTURAS[nota] ?? 90;
-
-   html += `
-  <div class="nota-columna">
-
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
-
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 5}px;"></div>
-    ` : ''}
-
-    <div class="nota-nombre">${nota}</div>
-
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
-
-  </div>
-`;
-  });
-
-  container.innerHTML = html;
-}
-
-
-// ============================================================
 // AUDIO
 // ============================================================
 
@@ -156,6 +115,52 @@ function tocarNota(nota) {
     piano.play(notaMidi);
   }
 }
+
+// ============================================================
+// PENTAGRAMA INICIAL
+// ============================================================
+
+function generarPentagramaInicial() {
+  const digitos = ['·', '·', '3', '1', '4'];
+  const container = document.getElementById('notasPentagrama');
+
+  if (!container) return;
+
+  let html = '';
+
+  digitos.forEach((d, i) => {
+    const esActual = (i === 2);
+    const nota = NOTAS[d] || '·';
+    const top = ALTURAS[nota] ?? 90;
+
+    // 🎹 SONIDO
+    if (esActual) {
+      tocarNota(nota);
+    }
+
+    html += `
+      <div class="nota-columna">
+
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
+
+        ${nota === 'Do' ? `
+          <div class="linea-adicional" style="top:${top + 5}px;"></div>
+        ` : ''}
+
+        <div class="nota-nombre">${nota}</div>
+
+        <div class="nota-digito ${esActual ? 'actual' : ''}">
+          ${d}
+        </div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
 // ============================================================
 // MODO EN VIVO
 // ============================================================
@@ -225,24 +230,29 @@ if (worker) {
         const nota = NOTAS[d] || '·';
         const top = ALTURAS[nota] ?? 90;
 
+        // 🎹 SONIDO EN VIVO
+        if (esActual) {
+          tocarNota(nota);
+        }
+
         html += `
-  <div class="nota-columna">
+          <div class="nota-columna">
 
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
+            <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+                 style="top:${top}px;"></div>
 
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 5}px;"></div>
-    ` : ''}
+            ${nota === 'Do' ? `
+              <div class="linea-adicional" style="top:${top + 5}px;"></div>
+            ` : ''}
 
-    <div class="nota-nombre">${nota}</div>
+            <div class="nota-nombre">${nota}</div>
 
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
+            <div class="nota-digito ${esActual ? 'actual' : ''}">
+              ${d}
+            </div>
 
-  </div>
-`;
+          </div>
+        `;
       });
 
       container.innerHTML = html;
