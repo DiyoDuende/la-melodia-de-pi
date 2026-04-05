@@ -113,6 +113,49 @@ function generarPentagramaInicial() {
   container.innerHTML = html;
 }
 
+
+// ============================================================
+// AUDIO
+// ============================================================
+
+let audioCtx;
+let piano = null;
+
+function iniciarAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    Soundfont.instrument(audioCtx, 'acoustic_grand_piano')
+      .then(inst => {
+        piano = inst;
+        console.log("🎹 Piano listo");
+      });
+  }
+}
+
+document.addEventListener('click', iniciarAudio);
+
+function tocarNota(nota) {
+  if (!piano) return;
+
+  const mapaMidi = {
+    'Do': 'C4',
+    'Re': 'D4',
+    'Mi': 'E4',
+    'Fa': 'F4',
+    'Sol': 'G4',
+    'La': 'A4',
+    'Si': 'B4',
+    'Do⁸': 'C5',
+    'Re⁸': 'D5',
+    'Mi⁸': 'E5'
+  };
+
+  const notaMidi = mapaMidi[nota];
+  if (notaMidi) {
+    piano.play(notaMidi);
+  }
+}
 // ============================================================
 // MODO EN VIVO
 // ============================================================
