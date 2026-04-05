@@ -97,7 +97,7 @@ function generarPentagramaInicial() {
          style="top:${top}px;"></div>
 
     ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 4}px;"></div>
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
     ` : ''}
 
     <div class="nota-nombre">${nota}</div>
@@ -189,7 +189,7 @@ if (worker) {
          style="top:${top}px;"></div>
 
     ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 4}px;"></div>
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
     ` : ''}
 
     <div class="nota-nombre">${nota}</div>
