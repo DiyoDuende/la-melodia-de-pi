@@ -296,4 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   verificarInicio();
   setInterval(verificarInicio, 1000);
+  if (MODO_PRUEBA) {
+  setInterval(reproducirModoPrueba, 1000);
+}
 });
