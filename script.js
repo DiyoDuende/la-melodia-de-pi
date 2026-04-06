@@ -19,6 +19,11 @@ function cambiarIdioma(idioma, el) {
 const MODO_PRUEBA = true;
 let segundoPrueba = 0;
 
+function obtenerDigito(indice) {
+  const PI = "3141592653589793238462643383279"; // puedes ampliar luego
+  return PI[indice % PI.length];
+}
+
 const NOTAS = {
   '0': 'Mi⁸',
   '1': 'Do',
