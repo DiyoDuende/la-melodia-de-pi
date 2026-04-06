@@ -145,7 +145,16 @@ function generarPentagramaInicial() {
     if (esActual) {
       tocarNota(nota);
     }
+function reproducirModoPrueba() {
+  const digito = obtenerDigito(segundoPrueba);
+  const nota = NOTAS[digito];
 
+  if (nota) {
+    tocarNota(nota);
+  }
+
+  segundoPrueba++;
+}
     html += `
       <div class="nota-columna">
 
