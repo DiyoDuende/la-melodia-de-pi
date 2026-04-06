@@ -16,6 +16,9 @@ function cambiarIdioma(idioma, el) {
 // MAPEO DE NOTAS
 // ============================================================
 
+const MODO_PRUEBA = true;
+let segundoPrueba = 0;
+
 const NOTAS = {
   '0': 'Mi⁸',
   '1': 'Do',
