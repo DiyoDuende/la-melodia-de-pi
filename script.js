@@ -13,16 +13,31 @@ function cambiarIdioma(idioma, el) {
 }
 
 // ============================================================
-// MAPEO DE NOTAS
+// MODO PRUEBA
 // ============================================================
 
 const MODO_PRUEBA = true;
 let segundoPrueba = 0;
 
 function obtenerDigito(indice) {
-  const PI = "3141592653589793238462643383279"; // puedes ampliar luego
+  const PI = "3141592653589793238462643383279";
   return PI[indice % PI.length];
 }
+
+function reproducirModoPrueba() {
+  const digito = obtenerDigito(segundoPrueba);
+  const nota = NOTAS[digito];
+
+  if (nota) {
+    tocarNota(nota);
+  }
+
+  segundoPrueba++;
+}
+
+// ============================================================
+// MAPEO DE NOTAS
+// ============================================================
 
 const NOTAS = {
   '0': 'Mi⁸',
@@ -141,20 +156,6 @@ function generarPentagramaInicial() {
     const nota = NOTAS[d] || '·';
     const top = ALTURAS[nota] ?? 90;
 
-    // 🎹 SONIDO
-    if (esActual) {
-      tocarNota(nota);
-    }
-function reproducirModoPrueba() {
-  const digito = obtenerDigito(segundoPrueba);
-  const nota = NOTAS[digito];
-
-  if (nota) {
-    tocarNota(nota);
-  }
-
-  segundoPrueba++;
-}
     html += `
       <div class="nota-columna">
 
@@ -199,17 +200,6 @@ function verificarInicio() {
 }
 
 function iniciarModoVivo() {
-  console.log('🎵 π HA EMPEZADO');
-
-  const countdown = document.getElementById('countdownContainer');
-  if (countdown) countdown.style.display = 'none';
-
-  const estado = document.getElementById('estadoPrincipal');
-  if (estado) estado.innerHTML = '🔴 LIVE';
-
-  const lugar = document.getElementById('lugarPrincipal');
-  if (lugar) lugar.innerHTML = 'π está sonando ahora';
-
   if (worker) {
     actualizarPentagramaVivo();
     setInterval(actualizarPentagramaVivo, 1000);
@@ -247,7 +237,6 @@ if (worker) {
         const nota = NOTAS[d] || '·';
         const top = ALTURAS[nota] ?? 90;
 
-        // 🎹 SONIDO EN VIVO
         if (esActual) {
           tocarNota(nota);
         }
@@ -273,13 +262,6 @@ if (worker) {
       });
 
       container.innerHTML = html;
-
-      const tiempo = document.getElementById('tiempoActual');
-      if (tiempo) {
-        const segundoActual = e.data.inicio + 2;
-        tiempo.innerHTML =
-          `⏱️ segundo #${segundoActual} · π: ${digitos[2]} · 60 bpm`;
-      }
     }
   };
 }
@@ -296,7 +278,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   verificarInicio();
   setInterval(verificarInicio, 1000);
+
   if (MODO_PRUEBA) {
-  setInterval(reproducirModoPrueba, 1000);
-}
+    setInterval(reproducirModoPrueba, 1000);
+  }
 });
