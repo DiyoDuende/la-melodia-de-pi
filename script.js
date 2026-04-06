@@ -106,11 +106,18 @@ let piano = null;
 function iniciarAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
 
+  audioCtx.resume(); // 🔥 clave
+
+  if (!piano) {
     Soundfont.instrument(audioCtx, 'acoustic_grand_piano')
       .then(inst => {
         piano = inst;
         console.log("🎹 Piano listo");
+      })
+      .catch(err => {
+        console.error("❌ Error cargando piano:", err);
       });
   }
 }
@@ -134,6 +141,7 @@ function tocarNota(nota) {
   };
 
   const notaMidi = mapaMidi[nota];
+
   if (notaMidi) {
     piano.play(notaMidi);
   }
@@ -178,7 +186,6 @@ function generarPentagramaInicial() {
 
   container.innerHTML = html;
 }
-
 
 // ============================================================
 // MODO EN VIVO
@@ -281,6 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setInterval(verificarInicio, 1000);
 
   if (MODO_PRUEBA) {
+    console.log("🧪 Modo prueba activo");
     setInterval(reproducirModoPrueba, 1000);
   }
 });
