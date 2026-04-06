@@ -179,6 +179,10 @@ function generarPentagramaInicial() {
   container.innerHTML = html;
 }
 
+<button onclick="reproducirModoPrueba()" style="margin-top:20px;">
+  ▶️ Probar nota
+</button>
+
 // ============================================================
 // MODO EN VIVO
 // ============================================================
