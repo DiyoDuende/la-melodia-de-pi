@@ -1,42 +1,11 @@
 // ============================================================
-// CONFIGURACIÓN DE TRADUCCIÓN
-// ============================================================
-
-function cambiarIdioma(idioma, el) {
-  alert("Traducción temporalmente desactivada");
-
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('activo');
-  });
-
-  if (el) el.classList.add('activo');
-}
-
-// ============================================================
-// MODO PRUEBA
+// CONFIGURACIÓN
 // ============================================================
 
 const MODO_PRUEBA = true;
-let segundoPrueba = 0;
-
-function obtenerDigito(indice) {
-  const PI = "3141592653589793238462643383279";
-  return PI[indice % PI.length];
-}
-
-function reproducirModoPrueba() {
-  const digito = obtenerDigito(segundoPrueba);
-  const nota = NOTAS[digito];
-
-  if (nota) {
-    tocarNota(nota);
-  }
-
-  segundoPrueba++;
-}
 
 // ============================================================
-// MAPEO DE NOTAS
+// NOTAS Y ALTURAS
 // ============================================================
 
 const NOTAS = {
@@ -65,50 +34,46 @@ const ALTURAS = {
   'Mi⁸': 24
 };
 
+const MAPA_MIDI = {
+  'Do': 'C4',
+  'Re': 'D4',
+  'Mi': 'E4',
+  'Fa': 'F4',
+  'Sol': 'G4',
+  'La': 'A4',
+  'Si': 'B4',
+  'Do⁸': 'C5',
+  'Re⁸': 'D5',
+  'Mi⁸': 'E5'
+};
+
 // ============================================================
-// CUENTA ATRÁS
+// GENERADOR DE DÍGITOS
 // ============================================================
 
-const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
+let indice = 0;
+const DIGITOS_PRUEBA = ['0','1','2','3','4','5','6','7','8','9'];
 
-function actualizarCountdown() {
-  const ahora = new Date();
-  const diff = INICIO_MELODIA - ahora;
-
-  if (diff <= 0) {
-    document.getElementById('dias').textContent = '00';
-    document.getElementById('horas').textContent = '00';
-    document.getElementById('minutos').textContent = '00';
-    document.getElementById('segundos').textContent = '00';
-    return;
-  }
-
-  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutos = Math.floor((diff / (1000 * 60)) % 60);
-  const segundos = Math.floor((diff / 1000) % 60);
-
-  const formato = n => n.toString().padStart(2, '0');
-
-  document.getElementById('dias').textContent = dias;
-  document.getElementById('horas').textContent = formato(horas);
-  document.getElementById('minutos').textContent = formato(minutos);
-  document.getElementById('segundos').textContent = formato(segundos);
+function obtenerDigito() {
+  const d = DIGITOS_PRUEBA[indice % DIGITOS_PRUEBA.length];
+  indice++;
+  return d;
 }
 
 // ============================================================
 // AUDIO
 // ============================================================
 
-let audioCtx;
+let audioCtx = null;
 let piano = null;
+let sonidoActivado = true;
 
 function iniciarAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  audioCtx.resume(); // 🔥 clave
+  audioCtx.resume();
 
   if (!piano) {
     Soundfont.instrument(audioCtx, 'acoustic_grand_piano')
@@ -122,47 +87,40 @@ function iniciarAudio() {
   }
 }
 
-document.addEventListener('click', iniciarAudio);
-
 function tocarNota(nota) {
+  if (!sonidoActivado) return;
   if (!piano) return;
 
-  const mapaMidi = {
-    'Do': 'C4',
-    'Re': 'D4',
-    'Mi': 'E4',
-    'Fa': 'F4',
-    'Sol': 'G4',
-    'La': 'A4',
-    'Si': 'B4',
-    'Do⁸': 'C5',
-    'Re⁸': 'D5',
-    'Mi⁸': 'E5'
-  };
+  const midi = MAPA_MIDI[nota];
+  if (midi) piano.play(midi);
+}
 
-  const notaMidi = mapaMidi[nota];
-
-  if (notaMidi) {
-    piano.play(notaMidi);
+function toggleMute() {
+  sonidoActivado = !sonidoActivado;
+  const btn = document.getElementById("btnMute");
+  if (btn) {
+    btn.textContent = sonidoActivado ? "🔊 Silenciar" : "🔇 Activar sonido";
   }
 }
 
 // ============================================================
-// PENTAGRAMA INICIAL
+// PENTAGRAMA
 // ============================================================
 
-function generarPentagramaInicial() {
-  const digitos = ['·', '·', '3', '1', '4'];
+function actualizarPentagrama(segundo) {
   const container = document.getElementById('notasPentagrama');
-
   if (!container) return;
 
   let html = '';
 
-  digitos.forEach((d, i) => {
-    const esActual = (i === 2);
-    const nota = NOTAS[d] || '·';
-    const top = ALTURAS[nota] ?? 90;
+  for (let i = -2; i <= 2; i++) {
+    const idx = segundo + i;
+    if (idx < 0) continue;
+
+    const digito = DIGITOS_PRUEBA[idx % 10];
+    const nota = NOTAS[digito];
+    const top = ALTURAS[nota];
+    const esActual = (i === 0);
 
     html += `
       <div class="nota-columna">
@@ -177,118 +135,76 @@ function generarPentagramaInicial() {
         <div class="nota-nombre">${nota}</div>
 
         <div class="nota-digito ${esActual ? 'actual' : ''}">
-          ${d}
+          ${digito}
         </div>
 
       </div>
     `;
-  });
+  }
 
   container.innerHTML = html;
 }
 
 // ============================================================
-// MODO EN VIVO
+// REPRODUCCIÓN
 // ============================================================
 
-let modoVivo = false;
-let worker = null;
+let intervalo = null;
+let segundo = 0;
 
-if (typeof Worker !== 'undefined') {
-  worker = new Worker('worker/worker-pi.js');
-}
+function iniciarPrueba() {
+  if (intervalo) return;
 
-function verificarInicio() {
-  const ahora = new Date();
+  iniciarAudio();
 
-  if (ahora >= INICIO_MELODIA && !modoVivo) {
-    modoVivo = true;
-    iniciarModoVivo();
-  }
-}
+  intervalo = setInterval(() => {
+    const digito = obtenerDigito();
+    const nota = NOTAS[digito];
 
-function iniciarModoVivo() {
-  if (worker) {
-    actualizarPentagramaVivo();
-    setInterval(actualizarPentagramaVivo, 1000);
-  }
-}
+    tocarNota(nota);
+    actualizarPentagrama(segundo);
 
-function actualizarPentagramaVivo() {
-  if (!worker) return;
-
-  const ahora = Date.now();
-  const segundoGlobal = Math.floor((ahora - INICIO_MELODIA) / 1000);
-
-  worker.postMessage({
-    id: 'pentagrama',
-    inicio: segundoGlobal - 2,
-    cantidad: 5
-  });
-}
-
-if (worker) {
-  worker.onmessage = function(e) {
-
-    if (e.data.id === 'pentagrama' && modoVivo) {
-
-      const digitos = e.data.digitos;
-      const container = document.getElementById('notasPentagrama');
-
-      if (!container) return;
-
-      let html = '';
-
-      digitos.forEach((d, i) => {
-
-        const esActual = (i === 2);
-        const nota = NOTAS[d] || '·';
-        const top = ALTURAS[nota] ?? 90;
-
-        if (esActual) {
-          tocarNota(nota);
-        }
-
-        html += `
-          <div class="nota-columna">
-
-            <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-                 style="top:${top}px;"></div>
-
-            ${nota === 'Do' ? `
-              <div class="linea-adicional" style="top:${top + 5}px;"></div>
-            ` : ''}
-
-            <div class="nota-nombre">${nota}</div>
-
-            <div class="nota-digito ${esActual ? 'actual' : ''}">
-              ${d}
-            </div>
-
-          </div>
-        `;
-      });
-
-      container.innerHTML = html;
+    const tiempo = document.getElementById('tiempoActual');
+    if (tiempo) {
+      tiempo.innerHTML =
+        `⏱️ segundo #${segundo} · dígito: ${digito} · 60 bpm`;
     }
-  };
+
+    segundo++;
+  }, 1000);
 }
 
 // ============================================================
-// ARRANQUE GLOBAL
+// ARRANQUE
 // ============================================================
 
-document.addEventListener("DOMContentLoaded", function () {
-  actualizarCountdown();
-  setInterval(actualizarCountdown, 1000);
+document.addEventListener("DOMContentLoaded", () => {
 
-  generarPentagramaInicial();
+  actualizarPentagrama(0);
 
-  verificarInicio();
-  setInterval(verificarInicio, 1000);
+  // BOTÓN INICIAR
+  const btn = document.createElement('button');
+  btn.textContent = '🎵 Iniciar prueba';
+  btn.style.display = 'block';
+  btn.style.margin = '20px auto';
+  btn.onclick = () => {
+    iniciarPrueba();
+    btn.disabled = true;
+    btn.textContent = '🎶 Reproduciendo...';
+  };
 
-  if (MODO_PRUEBA) {
-    console.log("🧪 Modo prueba activo");
-    setInterval(reproducirModoPrueba, 1000);
+  // BOTÓN MUTE
+  const btnMute = document.createElement('button');
+  btnMute.id = 'btnMute';
+  btnMute.textContent = '🔊 Silenciar';
+  btnMute.style.display = 'block';
+  btnMute.style.margin = '10px auto';
+  btnMute.onclick = toggleMute;
+
+  const contenedor = document.querySelector('.pentagrama-section');
+  if (contenedor) {
+    contenedor.appendChild(btn);
+    contenedor.appendChild(btnMute);
   }
+
 });
