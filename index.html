@@ -36,7 +36,31 @@
   
   <link rel="stylesheet" href="style.css">
 </head>
+<button onclick="testSonido()" style="font-size:20px; padding:10px;">
+  🔊 TEST SONIDO
+</button>
 
+<script>
+function testSonido() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.value = 440;
+
+  gain.gain.value = 0.2;
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 1);
+
+  console.log("SONIDO TEST");
+}
+</script>
 <body>
 <div class="container">
 
