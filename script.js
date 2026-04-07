@@ -88,11 +88,40 @@ function iniciarAudio() {
 }
 
 function tocarNota(nota) {
-  if (!sonidoActivado) return;
-  if (!piano) return;
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
 
-  const midi = MAPA_MIDI[nota];
-  if (midi) piano.play(midi);
+  const frecuencias = {
+    'Do': 261.63,
+    'Re': 293.66,
+    'Mi': 329.63,
+    'Fa': 349.23,
+    'Sol': 392.00,
+    'La': 440.00,
+    'Si': 493.88,
+    'Do⁸': 523.25,
+    'Re⁸': 587.33,
+    'Mi⁸': 659.25
+  };
+
+  const freq = frecuencias[nota];
+  if (!freq) return;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 1);
 }
 
 function toggleMute() {
