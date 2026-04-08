@@ -240,3 +240,44 @@ btnAudio.onclick = async () => {
 };
 
 document.body.appendChild(btnAudio);
+});
+
+// ============================================================
+// AUDIO SIMPLE (TEST)
+// ============================================================
+
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    console.log("🎧 AudioContext creado");
+  }
+
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().then(() => {
+      console.log("🔊 Audio desbloqueado");
+    });
+  }
+}
+
+function beep() {
+  if (!audioCtx) return;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.frequency.value = 440;
+  osc.type = "sine";
+
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 1);
+
+  console.log("🎵 beep");
+}
