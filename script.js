@@ -71,25 +71,25 @@ let sonidoActivado = true;
 function iniciarAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    console.log("🎧 AudioContext creado");
   }
 
-  audioCtx.resume();
-
-  if (!piano) {
-    Soundfont.instrument(audioCtx, 'acoustic_grand_piano')
-      .then(inst => {
-        piano = inst;
-        console.log("🎹 Piano listo");
-      })
-      .catch(err => {
-        console.error("❌ Error cargando piano:", err);
-      });
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().then(() => {
+      console.log("🔊 AudioContext reanudado");
+    });
+  } else {
+    console.log("✅ AudioContext ya activo");
   }
 }
 
 function tocarNota(nota) {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!sonidoActivado) return; // 🔑 IMPORTANTE
+
+  if (!audioCtx) return;
+
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
   }
 
   const frecuencias = {
@@ -108,6 +108,8 @@ function tocarNota(nota) {
   const freq = frecuencias[nota];
   if (!freq) return;
 
+  console.log("🎵 Sonando:", nota, freq);
+
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
 
@@ -124,6 +126,19 @@ function tocarNota(nota) {
   osc.stop(audioCtx.currentTime + 1);
 }
 
+btn.onclick = async () => {
+  iniciarAudio();
+
+  // 🔑 Esto es CLAVE en navegadores modernos
+  await audioCtx.resume();
+
+  console.log("👆 Usuario interactuó, audio desbloqueado");
+
+  iniciarPrueba();
+
+  btn.disabled = true;
+  btn.textContent = '🎶 Reproduciendo...';
+};
 function toggleMute() {
   sonidoActivado = !sonidoActivado;
   const btn = document.getElementById("btnMute");
