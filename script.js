@@ -227,3 +227,16 @@ document.addEventListener("DOMContentLoaded", function () {
   verificarInicio();
   setInterval(verificarInicio, 1000);
 });
+
+const btnAudio = document.createElement('button');
+btnAudio.textContent = "🔊 Probar sonido";
+btnAudio.style.display = "block";
+btnAudio.style.margin = "20px auto";
+
+btnAudio.onclick = async () => {
+  initAudio();
+  await audioCtx.resume(); // 🔑 CLAVE
+  beep();
+};
+
+document.body.appendChild(btnAudio);
