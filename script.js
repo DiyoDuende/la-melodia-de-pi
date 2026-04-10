@@ -24,6 +24,7 @@ function cargarSoundfontScript() {
     document.head.appendChild(script);
   });
 }
+
 // ============================================================
 // CONFIG
 // ============================================================
@@ -69,28 +70,57 @@ function getDigito() {
 }
 
 // ============================================================
-// AUDIO (CORRECTO)
+// AUDIO (CORRECTO Y ROBUSTO)
 // ============================================================
 
 async function iniciarAudio() {
 
+  // Crear contexto dentro del click
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
   await audioCtx.resume();
-
   console.log("🔊 Audio activo:", audioCtx.state);
 
-  // 🔑 cargar librería SIEMPRE antes
-  await cargarSoundfontScript();
+  // Cargar Soundfont
+  try {
+    await cargarSoundfontScript();
+  } catch (e) {
+    console.error(e);
+    alert("❌ No se pudo cargar Soundfont (CDN bloqueado)");
+    return;
+  }
 
+  if (typeof Soundfont === "undefined") {
+    alert("❌ Soundfont no está disponible");
+    return;
+  }
+
+  // Cargar instrumento
   if (!piano) {
-    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
-    console.log("🎹 Piano listo");
+    try {
+      piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
+      console.log("🎹 Piano listo");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error cargando instrumento piano");
+    }
   }
 }
 
+// ============================================================
+// TOCAR NOTA (AQUÍ ESTABA EL FALLO)
+// ============================================================
+
+function tocarNota(nota) {
+  if (!sonidoActivado || !piano) return;
+
+  const midi = MAPA_MIDI[nota];
+  if (midi) {
+    piano.play(midi, audioCtx.currentTime);
+  }
+}
 
 // ============================================================
 // PENTAGRAMA
@@ -157,10 +187,10 @@ function crearBotones() {
 
   btn.onclick = async () => {
 
-    await iniciarAudio(); // 🔑 AQUÍ ESTÁ TODO
+    await iniciarAudio();
 
     if (!piano) {
-      alert("Error cargando el piano (Soundfont)");
+      alert("❌ Error cargando el piano (Soundfont)");
       return;
     }
 
