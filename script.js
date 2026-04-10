@@ -1,4 +1,30 @@
 // ============================================================
+// CARGA SEGURA DE SOUNDFONT
+// ============================================================
+
+function cargarSoundfontScript() {
+  return new Promise((resolve, reject) => {
+    if (typeof Soundfont !== "undefined") {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js";
+
+    script.onload = () => {
+      console.log("✅ Soundfont cargado");
+      resolve();
+    };
+
+    script.onerror = () => {
+      reject("❌ Error cargando Soundfont");
+    };
+
+    document.head.appendChild(script);
+  });
+}
+// ============================================================
 // CONFIG
 // ============================================================
 
