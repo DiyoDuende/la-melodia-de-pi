@@ -70,12 +70,24 @@ function cargarPiano() {
 }
 
 function tocarNota(nota) {
-  if (!sonidoActivado || !piano) return;
+  if (!sonidoActivado || !audioCtx) return;
 
-  const midi = MAPA_MIDI[nota];
-  if (midi) {
-    piano.play(midi, audioCtx.currentTime, { gain: 1 });
-  }
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "sine";
+  osc.frequency.value = 440;
+
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 1);
+
+  console.log("🎵 beep");
 }
 
 // ============================================================
