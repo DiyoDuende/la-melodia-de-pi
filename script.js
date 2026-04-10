@@ -74,7 +74,6 @@ function getDigito() {
 
 async function iniciarAudio() {
 
-  // 🔑 Crear SIEMPRE dentro del click
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -83,11 +82,8 @@ async function iniciarAudio() {
 
   console.log("🔊 Audio activo:", audioCtx.state);
 
-  // 🔑 Esperar a que Soundfont exista
-  if (typeof Soundfont === "undefined") {
-    console.error("❌ Soundfont NO cargado");
-    return;
-  }
+  // 🔑 cargar librería SIEMPRE antes
+  await cargarSoundfontScript();
 
   if (!piano) {
     piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
@@ -95,12 +91,6 @@ async function iniciarAudio() {
   }
 }
 
-function tocarNota(nota) {
-  if (!sonidoActivado || !piano) return;
-
-  const midi = MAPA_MIDI[nota];
-  if (midi) piano.play(midi, audioCtx.currentTime);
-}
 
 // ============================================================
 // PENTAGRAMA
