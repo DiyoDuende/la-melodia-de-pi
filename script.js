@@ -1,5 +1,5 @@
 // ============================================================
-// TRADUCCIÓN (SIN CAMBIOS)
+// TRADUCCIÓN
 // ============================================================
 
 function cambiarIdioma(idioma, el) {
@@ -13,10 +13,9 @@ function cambiarIdioma(idioma, el) {
 }
 
 // ============================================================
-// PI INFINITO + AUDIO
+// AUDIO + CONTROL
 // ============================================================
 
-// --- Carga dinámica Soundfont ---
 function cargarSoundfontScript() {
   return new Promise((resolve, reject) => {
     if (typeof Soundfont !== "undefined") return resolve();
@@ -31,10 +30,9 @@ function cargarSoundfontScript() {
   });
 }
 
-// --- Audio ---
 let audioCtx = null;
 let piano = null;
-let sonidoActivado = true;
+let sonidoActivado = false; // empieza apagado
 
 async function iniciarAudio() {
   if (!audioCtx) {
@@ -47,12 +45,14 @@ async function iniciarAudio() {
     await cargarSoundfontScript();
   } catch (e) {
     console.error("Error cargando Soundfont");
-    return;
+    return false;
   }
 
   if (!piano) {
     piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
   }
+
+  return true;
 }
 
 function tocarNota(nota) {
@@ -64,13 +64,36 @@ function tocarNota(nota) {
   };
 
   const midi = MAPA_MIDI[nota];
-  if (midi) {
-    piano.play(midi, audioCtx.currentTime, { duration: 0.9 });
-  }
+  if (midi) piano.play(midi, audioCtx.currentTime, { duration: 0.9 });
 }
 
 // ============================================================
-// GENERADOR PI (GIBBONS)
+// BOTÓN AUDIO
+// ============================================================
+
+function setupAudioButton() {
+  const btn = document.getElementById("btnAudio");
+  if (!btn) return;
+
+  btn.onclick = async () => {
+
+    // Primer clic: inicializa audio
+    if (!piano) {
+      const ok = await iniciarAudio();
+      if (!ok) return;
+    }
+
+    // Toggle sonido
+    sonidoActivado = !sonidoActivado;
+
+    btn.textContent = sonidoActivado
+      ? "🔇 Silenciar"
+      : "🔊 Activar sonido";
+  };
+}
+
+// ============================================================
+// GENERADOR PI
 // ============================================================
 
 function* generarPi() {
@@ -107,37 +130,21 @@ function obtenerDigitoPorIndice(idx) {
 }
 
 // ============================================================
-// MAPEO DE NOTAS (SIN CAMBIOS)
+// NOTAS
 // ============================================================
 
 const NOTAS = {
-  '0': 'Mi⁸',
-  '1': 'Do',
-  '2': 'Re',
-  '3': 'Mi',
-  '4': 'Fa',
-  '5': 'Sol',
-  '6': 'La',
-  '7': 'Si',
-  '8': 'Do⁸',
-  '9': 'Re⁸'
+  '0': 'Mi⁸','1': 'Do','2': 'Re','3': 'Mi','4': 'Fa',
+  '5': 'Sol','6': 'La','7': 'Si','8': 'Do⁸','9': 'Re⁸'
 };
 
 const ALTURAS = {
-  'Do': 114,
-  'Re': 104,
-  'Mi': 94,
-  'Fa': 84,
-  'Sol': 74,
-  'La': 64,
-  'Si': 54,
-  'Do⁸': 44,
-  'Re⁸': 34,
-  'Mi⁸': 24
+  'Do':114,'Re':104,'Mi':94,'Fa':84,'Sol':74,
+  'La':64,'Si':54,'Do⁸':44,'Re⁸':34,'Mi⁸':24
 };
 
 // ============================================================
-// CUENTA ATRÁS (SIN CAMBIOS)
+// CUENTA ATRÁS
 // ============================================================
 
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
@@ -146,35 +153,41 @@ function actualizarCountdown() {
   const ahora = new Date();
   const diff = INICIO_MELODIA - ahora;
 
+  const dias = document.getElementById('dias');
+  const horas = document.getElementById('horas');
+  const minutos = document.getElementById('minutos');
+  const segundos = document.getElementById('segundos');
+
+  if (!dias || !horas || !minutos || !segundos) return;
+
   if (diff <= 0) {
-    document.getElementById('dias').textContent = '00';
-    document.getElementById('horas').textContent = '00';
-    document.getElementById('minutos').textContent = '00';
-    document.getElementById('segundos').textContent = '00';
+    dias.textContent = '00';
+    horas.textContent = '00';
+    minutos.textContent = '00';
+    segundos.textContent = '00';
     return;
   }
 
-  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutos = Math.floor((diff / (1000 * 60)) % 60);
-  const segundos = Math.floor((diff / 1000) % 60);
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / (1000 * 60)) % 60);
+  const s = Math.floor((diff / 1000) % 60);
 
-  const formato = n => n.toString().padStart(2, '0');
+  const f = n => n.toString().padStart(2, '0');
 
-  document.getElementById('dias').textContent = dias;
-  document.getElementById('horas').textContent = formato(horas);
-  document.getElementById('minutos').textContent = formato(minutos);
-  document.getElementById('segundos').textContent = formato(segundos);
+  dias.textContent = d;
+  horas.textContent = f(h);
+  minutos.textContent = f(m);
+  segundos.textContent = f(s);
 }
 
 // ============================================================
-// PENTAGRAMA INICIAL (SIN CAMBIOS)
+// PENTAGRAMA INICIAL
 // ============================================================
 
 function generarPentagramaInicial() {
   const digitos = ['·', '·', '3', '1', '4'];
   const container = document.getElementById('notasPentagrama');
-
   if (!container) return;
 
   let html = '';
@@ -187,16 +200,8 @@ function generarPentagramaInicial() {
     html += `
       <div class="nota-columna">
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
-
-        ${nota === 'Do' ? `
-          <div class="linea-adicional" style="top:${top + 5}px;"></div>
-        ` : ''}
-
         <div class="nota-nombre">${nota}</div>
-
-        <div class="nota-digito ${esActual ? 'actual' : ''}">
-          ${d}
-        </div>
+        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
       </div>
     `;
   });
@@ -205,14 +210,13 @@ function generarPentagramaInicial() {
 }
 
 // ============================================================
-// MODO EN VIVO (MODIFICADO)
+// MODO EN VIVO
 // ============================================================
 
 let modoVivo = false;
 
 function verificarInicio() {
   const ahora = new Date();
-
   if (ahora >= INICIO_MELODIA && !modoVivo) {
     modoVivo = true;
     iniciarModoVivo();
@@ -220,8 +224,6 @@ function verificarInicio() {
 }
 
 function iniciarModoVivo() {
-  console.log('🎵 π HA EMPEZADO');
-
   const countdown = document.getElementById('countdownContainer');
   if (countdown) countdown.style.display = 'none';
 
@@ -260,15 +262,8 @@ function actualizarPentagramaVivo() {
     html += `
       <div class="nota-columna">
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
-
-        ${nota === 'Do' ? `
-          <div class="linea-adicional" style="top:${top + 5}px;"></div>
-        ` : ''}
-
         <div class="nota-nombre">${nota}</div>
-        <div class="nota-digito ${esActual ? 'actual' : ''}">
-          ${d}
-        </div>
+        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
       </div>
     `;
   }
@@ -277,17 +272,15 @@ function actualizarPentagramaVivo() {
 
   const tiempo = document.getElementById('tiempoActual');
   if (tiempo) {
-    tiempo.innerHTML =
-      `⏱️ segundo #${segundoGlobal} · π: ${digitos[2]} · 60 bpm`;
+    tiempo.innerHTML = `⏱️ segundo #${segundoGlobal} · π: ${digitos[2]} · 60 bpm`;
   }
 
-  // 🔊 SONIDO
   const notaActual = NOTAS[digitos[2]];
   tocarNota(notaActual);
 }
 
 // ============================================================
-// ARRANQUE GLOBAL
+// INIT
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -300,6 +293,5 @@ document.addEventListener("DOMContentLoaded", function () {
   verificarInicio();
   setInterval(verificarInicio, 1000);
 
-  // Activar audio con interacción
-  document.body.addEventListener('click', iniciarAudio, { once: true });
+  setupAudioButton();
 });
