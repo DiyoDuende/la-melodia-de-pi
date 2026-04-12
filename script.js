@@ -1,4 +1,3 @@
-```javascript
 // ============================================================
 // TRADUCCIÓN (SIN CAMBIOS)
 // ============================================================
@@ -304,4 +303,3 @@ document.addEventListener("DOMContentLoaded", function () {
   // Activar audio con interacción
   document.body.addEventListener('click', iniciarAudio, { once: true });
 });
-```
