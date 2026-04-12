@@ -13,6 +13,137 @@ function cambiarIdioma(idioma, el) {
 }
 
 // ============================================================
+// TRADUCCIÓN
+// ============================================================
+
+function cambiarIdioma(idioma, el) {
+  alert("Traducción temporalmente desactivada");
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.remove('activo');
+  });
+
+  if (el) el.classList.add('activo');
+}
+
+// ============================================================
+// AUDIO + CONTROL
+// ============================================================
+
+function cargarSoundfontScript() {
+  return new Promise((resolve, reject) => {
+    if (typeof Soundfont !== "undefined") return resolve();
+
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js";
+
+    script.onload = resolve;
+    script.onerror = reject;
+
+    document.head.appendChild(script);
+  });
+}
+
+let audioCtx = null;
+let piano = null;
+let sonidoActivado = false; // empieza apagado
+
+async function iniciarAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  await audioCtx.resume();
+
+  try {
+    await cargarSoundfontScript();
+  } catch (e) {
+    console.error("Error cargando Soundfont");
+    return false;
+  }
+
+  if (!piano) {
+    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
+  }
+
+  return true;
+}
+
+function tocarNota(nota) {
+  if (!sonidoActivado || !piano) return;
+
+  const MAPA_MIDI = {
+    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
+    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
+  };
+
+  const midi = MAPA_MIDI[nota];
+  if (midi) piano.play(midi, audioCtx.currentTime, { duration: 0.9 });
+}
+
+// ============================================================
+// BOTÓN AUDIO
+// ============================================================
+
+function setupAudioButton() {
+  const btn = document.getElementById("btnAudio");
+  if (!btn) return;
+
+  btn.onclick = async () => {
+
+    // Primer clic: inicializa audio
+    if (!piano) {
+      const ok = await iniciarAudio();
+      if (!ok) return;
+    }
+
+    // Toggle sonido
+    sonidoActivado = !sonidoActivado;
+
+    btn.textContent = sonidoActivado
+      ? "🔇 Silenciar"
+      : "🔊 Activar sonido";
+  };
+}
+
+// ============================================================
+// GENERADOR PI
+// ============================================================
+
+function* generarPi() {
+  let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
+
+  while (true) {
+    if (4n*q + r - t < n*t) {
+      yield Number(n);
+      let nr = 10n*(r - n*t);
+      n = (10n*(3n*q + r))/t - 10n*n;
+      q = 10n*q;
+      r = nr;
+    } else {
+      let nr = (2n*q + r)*l;
+      let nn = (q*(7n*k) + 2n + r*l)/(t*l);
+      q = q*k;
+      t = t*l;
+      l = l + 2n;
+      k = k + 1n;
+      n = nn;
+      r = nr;
+    }
+  }
+}
+
+let piGen = generarPi();
+const cachePi = [];
+
+function obtenerDigitoPorIndice(idx) {
+  while (cachePi.length <= idx) {
+    cachePi.push(piGen.next().value.toString());
+  }
+  return cachePi[idx];
+}
+
+// ============================================================
 // MAPEO DE NOTAS
 // ============================================================
 
