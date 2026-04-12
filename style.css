@@ -305,6 +305,8 @@ body {
   .videos { grid-template-columns: 1fr; }
 }
 
+/* BOTÓN AUDIO */
+
 .audio-control {
   display: flex;
   justify-content: center;
