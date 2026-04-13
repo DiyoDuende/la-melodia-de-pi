@@ -434,3 +434,4 @@ function activarAudioInterprete() {
     console.log("🎤 Audio activado");
   }
 }
+function conectarAInterprete(codigo) {
