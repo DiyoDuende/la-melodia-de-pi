@@ -1,3 +1,7 @@
+setTimeout(() => {
+  conectarAInterprete("test123");
+}, 3000);
+
 // ============================================================
 // CONFIGURACIÓN DE TRADUCCIÓN
 // ============================================================
@@ -358,3 +362,75 @@ document.addEventListener("DOMContentLoaded", function () {
   verificarInicio();
   setInterval(verificarInicio, 1000);
 });
+
+// ============================================================
+// 🎥 SISTEMA DE INTÉRPRETES (WEBRTC)
+// ============================================================
+
+let currentPeer = null;
+let currentCall = null;
+let currentVideoElement = null;
+
+// 🔌 Conectar con intérprete
+function conectarAInterprete(codigo) {
+
+  console.log("Intentando conectar con:", codigo);
+
+  // Limpiar anterior
+  if (currentCall) currentCall.close();
+  if (currentPeer) currentPeer.destroy();
+
+  const peer = new Peer();
+
+  peer.on('open', () => {
+
+    const call = peer.call(codigo, null);
+
+    if (!call) {
+      console.log("⚠️ No se pudo llamar al intérprete");
+      return;
+    }
+
+    call.on('stream', (remoteStream) => {
+
+      console.log("🎥 Stream recibido");
+
+      const container = document.querySelector('.video-box:first-child .video-placeholder');
+      if (!container) return;
+
+      let video = container.querySelector('video');
+
+      if (!video) {
+        video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true; // 🔇 empieza silenciado
+        video.style.width = '100%';
+        video.style.height = '100%';
+
+        container.innerHTML = '';
+        container.appendChild(video);
+      }
+
+      video.srcObject = remoteStream;
+
+      currentVideoElement = video;
+    });
+
+    call.on('error', (err) => {
+      console.error("Error en la llamada:", err);
+    });
+
+    currentCall = call;
+  });
+
+  currentPeer = peer;
+}
+
+// 🔊 Activar audio en el momento exacto
+function activarAudioInterprete() {
+  if (currentVideoElement) {
+    currentVideoElement.muted = false;
+    console.log("🎤 Audio activado");
+  }
+}
