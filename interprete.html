@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Intérprete - La melodía de π</title>
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+</head>
+
+<body style="background:black; color:white; text-align:center; font-family:sans-serif;">
+
+<h1>🎤 Esperando tu turno...</h1>
+<p>Mantén esta página abierta</p>
+
+<video id="localVideo" autoplay muted playsinline style="width:300px; background:#000;"></video>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const codigo = params.get('code');
+
+if (!codigo) {
+  document.body.innerHTML = '<h1>❌ Código inválido</h1>';
+  throw new Error("No code");
+}
+
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+.then(stream => {
+
+  document.getElementById('localVideo').srcObject = stream;
+
+  const peer = new Peer(codigo);
+
+  peer.on('open', () => {
+    console.log("🎤 Intérprete listo:", codigo);
+  });
+
+  peer.on('call', (call) => {
+    console.log("📞 Llamada recibida");
+    call.answer(stream);
+  });
+
+})
+.catch(err => alert("Error cámara/micrófono: " + err.message));
+</script>
+
+</body>
+</html>
