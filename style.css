@@ -33,6 +33,50 @@ body {
   height: 150px;
 }
 
+.pentagrama-section {
+  position: relative;
+  height: 160px;
+  margin-top: 30px;
+}
+
+/* Líneas del pentagrama */
+.pentagrama-lineas div {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: white;
+}
+
+.pentagrama-lineas div:nth-child(1){ top: 40px; }
+.pentagrama-lineas div:nth-child(2){ top: 60px; }
+.pentagrama-lineas div:nth-child(3){ top: 80px; }
+.pentagrama-lineas div:nth-child(4){ top: 100px; }
+.pentagrama-lineas div:nth-child(5){ top: 120px; }
+
+/* Nota */
+.nota-cabeza {
+  width: 14px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  left: 20px;
+}
+
+/* Nota actual */
+.nota-cabeza.actual {
+  background: red;
+}
+
+/* Línea adicional (DO) */
+.linea-adicional {
+  position: absolute;
+  width: 20px;
+  height: 1px;
+  background: white;
+  left: 17px;
+}
+
 .nota-columna {
   display: inline-block;
   width: 60px;
