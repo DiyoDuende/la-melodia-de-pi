@@ -305,4 +305,25 @@ body {
   .videos { grid-template-columns: 1fr; }
 }
 
+/* BOTÓN AUDIO */
 
+.audio-control {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#btnAudio {
+  background: transparent;
+  border: 1px solid #3a4a5a;
+  color: #b0c9e8;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#btnAudio:hover {
+  border-color: #ffd966;
+  color: #ffd966;
+}
