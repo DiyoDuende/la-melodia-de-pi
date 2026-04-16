@@ -93,31 +93,39 @@ function tocarNota(nota){
 // PENTAGRAMA
 // ============================================================
 
-function actualizarPentagrama(seg){
-  const c=document.getElementById('notasPentagrama');
-  if(!c)return;
+function actualizarPentagrama(seg) {
+  const c = document.getElementById('notasPentagrama');
+  if (!c) return;
 
-  let html='';
+  let html = '';
 
-  for(let j=-2;j<=2;j++){
-    const idx=seg+j;
-    if(idx<0)continue;
+  for (let j = -2; j <= 2; j++) {
+    const idx = seg + j;
+    if (idx < 0) continue;
 
-    const d=obtenerDigito(idx);
-    const nota=NOTAS[d];
-    const top=ALTURAS[nota];
-    const actual=j===0;
+    const d = obtenerDigito(idx);
+    const nota = NOTAS[d];
+    const top = ALTURAS[nota];
+    const actual = j === 0;
 
-    html+=`
+    html += `
       <div class="nota-columna">
-        <div class="nota-cabeza ${actual?'actual':''}" style="top:${top}px;"></div>
+
+        <div class="nota-cabeza ${actual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
+
+        ${nota === 'Do' ? `
+          <div class="linea-adicional" style="top:${top + 5}px;"></div>
+        ` : ''}
+
         <div class="nota-nombre">${nota}</div>
         <div class="nota-digito">${d}</div>
+
       </div>
     `;
   }
 
-  c.innerHTML=html;
+  c.innerHTML = html;
 }
 
 // ============================================================
