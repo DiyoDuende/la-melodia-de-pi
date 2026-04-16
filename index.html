@@ -1,38 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>La melodía de π</title>
+  <meta charset="UTF-8" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="stylesheet" href="style.css">
+  <title>La melodía de π</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <!-- Fuente -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
 <div class="container">
 
-  <h1>La melodía de π</h1>
+  <div class="logo">La melodía de π</div>
 
-  <!-- 🔊 AUDIO -->
-  <div class="audio-control">
-    <button id="btnAudio">🔊 Activar sonido</button>
+  <!-- PENTAGRAMA -->
+  <div class="pentagrama-section">
+    <div class="pentagrama-con-lineas">
+
+      <svg class="pentagrama-svg" viewBox="0 0 500 140">
+        <line x1="0" y1="20" x2="500" y2="20" class="linea"/>
+        <line x1="0" y1="40" x2="500" y2="40" class="linea"/>
+        <line x1="0" y1="60" x2="500" y2="60" class="linea"/>
+        <line x1="0" y1="80" x2="500" y2="80" class="linea"/>
+        <line x1="0" y1="100" x2="500" y2="100" class="linea"/>
+      </svg>
+
+      <div id="notasPentagrama" class="notas-wrapper"></div>
+    </div>
+
+    <div class="tiempo-info">
+      <span id="tiempoActual">⏱️ esperando...</span>
+    </div>
+
+    <div id="controles"></div>
   </div>
-
-  <!-- 🎥 VIDEO -->
-  <div class="video-box">
-    <div class="video-placeholder" id="videoContainer"></div>
-  </div>
-
-  <!-- 🎼 PENTAGRAMA -->
-  <div id="notasPentagrama"></div>
-
-  <!-- ⏱️ INFO -->
-  <div id="tiempoActual">Esperando inicio...</div>
 
 </div>
+
+<!-- ✅ Soundfont (CRÍTICO) -->
+
 
 <script src="script.js"></script>
 </body>
 </html>
+
