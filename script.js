@@ -158,9 +158,20 @@ function actualizarPentagrama(seg) {
 
     html += `
       <div class="nota-columna">
-        <div class="nota-cabeza ${actual?'actual':''}" style="top:${top}px;"></div>
+
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
+
+        ${nota === 'Do' ? `
+          <div class="linea-adicional" style="top:${top + 5}px;"></div>
+        ` : ''}
+
         <div class="nota-nombre">${nota}</div>
-        <div class="nota-digito ${actual?'actual':''}">${d}</div>
+
+        <div class="nota-digito ${esActual ? 'actual' : ''}">
+          ${digito}
+        </div>
+
       </div>
     `;
   }
