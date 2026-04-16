@@ -67,6 +67,10 @@ async function iniciarAudio(){
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
   }
 
+  const estado = document.getElementById('estadoPrincipal');
+if (estado) {
+  estado.innerHTML = "🎵 Interpretando π en directo";
+}
   await audioCtx.resume();
 
   if(typeof Soundfont==="undefined"){
