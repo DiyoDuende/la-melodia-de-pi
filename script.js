@@ -29,8 +29,6 @@ function cargarSoundfontScript() {
 // CONFIG
 // ============================================================
 
-const MODO_PRUEBA = true;
-
 let audioCtx = null;
 let piano = null;
 let sonidoActivado = true;
@@ -57,25 +55,50 @@ const MAPA_MIDI = {
 };
 
 // ============================================================
-// GENERADOR PRUEBA
+// GENERADOR INFINITO DE PI (GIBBONS)
 // ============================================================
 
-let i = 0;
-const CICLO = ['0','1','2','3','4','5','6','7','8','9'];
+function* generarPi() {
+  let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
 
-function getDigito() {
-  const d = CICLO[i % 10];
-  i++;
-  return d;
+  while (true) {
+    if (4n*q + r - t < n*t) {
+      yield Number(n);
+      let nr = 10n*(r - n*t);
+      n = (10n*(3n*q + r))/t - 10n*n;
+      q = 10n*q;
+      r = nr;
+    } else {
+      let nr = (2n*q + r)*l;
+      let nn = (q*(7n*k) + 2n + r*l)/(t*l);
+      q = q*k;
+      t = t*l;
+      l = l + 2n;
+      k = k + 1n;
+      n = nn;
+      r = nr;
+    }
+  }
+}
+
+let piGen = null;
+const cachePi = [];
+
+// Obtener dígito por índice (usa caché)
+function obtenerDigitoPorIndice(idx) {
+  while (cachePi.length <= idx) {
+    const d = piGen.next().value.toString();
+    cachePi.push(d);
+  }
+  return cachePi[idx];
 }
 
 // ============================================================
-// AUDIO (CORRECTO Y ROBUSTO)
+// AUDIO
 // ============================================================
 
 async function iniciarAudio() {
 
-  // Crear contexto dentro del click
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -83,43 +106,35 @@ async function iniciarAudio() {
   await audioCtx.resume();
   console.log("🔊 Audio activo:", audioCtx.state);
 
-  // Cargar Soundfont
   try {
     await cargarSoundfontScript();
   } catch (e) {
     console.error(e);
-    alert("❌ No se pudo cargar Soundfont (CDN bloqueado)");
+    alert("❌ No se pudo cargar Soundfont");
     return;
   }
 
   if (typeof Soundfont === "undefined") {
-    alert("❌ Soundfont no está disponible");
+    alert("❌ Soundfont no disponible");
     return;
   }
 
-  // Cargar instrumento
   if (!piano) {
     try {
       piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
       console.log("🎹 Piano listo");
     } catch (err) {
       console.error(err);
-      alert("❌ Error cargando instrumento piano");
+      alert("❌ Error cargando piano");
     }
   }
 }
-
-// ============================================================
-// TOCAR NOTA (AQUÍ ESTABA EL FALLO)
-// ============================================================
 
 function tocarNota(nota) {
   if (!sonidoActivado || !piano) return;
 
   const midi = MAPA_MIDI[nota];
-  if (midi) {
-    piano.play(midi, audioCtx.currentTime);
-  }
+  if (midi) piano.play(midi, audioCtx.currentTime);
 }
 
 // ============================================================
@@ -136,7 +151,7 @@ function actualizarPentagrama(seg) {
     const idx = seg + j;
     if (idx < 0) continue;
 
-    const d = CICLO[idx % 10];
+    const d = obtenerDigitoPorIndice(idx);
     const nota = NOTAS[d];
     const top = ALTURAS[nota];
     const actual = j === 0;
@@ -160,8 +175,14 @@ function actualizarPentagrama(seg) {
 function iniciarMelodia() {
   if (intervalo) return;
 
+  // Iniciar generador de PI
+  piGen = generarPi();
+  cachePi.length = 0;
+
+  segundo = 0;
+
   intervalo = setInterval(() => {
-    const d = getDigito();
+    const d = obtenerDigitoPorIndice(segundo);
     const nota = NOTAS[d];
 
     tocarNota(nota);
@@ -181,26 +202,23 @@ function iniciarMelodia() {
 function crearBotones() {
   const cont = document.getElementById('controles');
 
-  // BOTÓN INICIO
   const btn = document.createElement('button');
-  btn.textContent = "🎵 Iniciar prueba";
+  btn.textContent = "🎵 Iniciar π";
 
   btn.onclick = async () => {
-
     await iniciarAudio();
 
     if (!piano) {
-      alert("❌ Error cargando el piano (Soundfont)");
+      alert("❌ Error cargando el piano");
       return;
     }
 
     iniciarMelodia();
 
     btn.disabled = true;
-    btn.textContent = "🎶 Reproduciendo...";
+    btn.textContent = "🎶 Reproduciendo π...";
   };
 
-  // BOTÓN MUTE
   const mute = document.createElement('button');
   mute.textContent = "🔊 Silenciar";
 
@@ -221,3 +239,4 @@ document.addEventListener("DOMContentLoaded", () => {
   crearBotones();
   actualizarPentagrama(0);
 });
+
