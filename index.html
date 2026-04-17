@@ -14,13 +14,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google" content="notranslate">
   
-  <!-- Favicon -->
   <link rel="icon" href="favicon.ico">
-  
-  <!-- Fuente -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -42,6 +38,11 @@
       <button class="lang-btn" onclick="cambiarIdioma('zh', this)">🇨🇳 中文</button>
       <button class="lang-btn" onclick="cambiarIdioma('ar', this)">🇸🇦 العربية</button>
     </div>
+  </div>
+
+  <!-- 🔊 BOTÓN AUDIO (CORRECTAMENTE COLOCADO) -->
+  <div class="audio-control">
+    <button id="btnAudio">🔊 Activar sonido</button>
   </div>
 
   <!-- CUENTA ATRÁS -->
@@ -79,10 +80,8 @@
 
   <!-- 🎼 PENTAGRAMA -->
   <div class="pentagrama-section">
-
     <div class="pentagrama-con-lineas">
 
-      <!-- Líneas -->
       <svg class="pentagrama-svg" viewBox="0 0 500 140" preserveAspectRatio="none">
         <line x1="0" y1="20" x2="500" y2="20" class="linea"/>
         <line x1="0" y1="40" x2="500" y2="40" class="linea"/>
@@ -91,15 +90,12 @@
         <line x1="0" y1="100" x2="500" y2="100" class="linea"/>
       </svg>
 
-      <!-- NOTAS -->
       <div id="notasPentagrama" class="notas-wrapper"></div>
-
     </div>
 
     <div class="tiempo-info">
       <span id="tiempoActual">⏱️ segundo #0 · π: 3 · 60 bpm</span>
     </div>
-
   </div>
 
   <!-- MENÚ -->
@@ -123,7 +119,6 @@
 
 </div>
 
-<!-- JS -->
 <script src="script.js"></script>
 </body>
 </html>
