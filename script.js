@@ -16,7 +16,7 @@ function cambiarIdioma(idioma) {
 }
 
 // ============================================================
-// MAPEO DE NOTAS
+// NOTAS Y ALTURAS
 // ============================================================
 
 const NOTAS = {
@@ -32,8 +32,21 @@ const NOTAS = {
   '9': 'Re⁸'
 };
 
+const ALTURAS = {
+  'Do': 110,
+  'Re': 105,
+  'Mi': 100,
+  'Fa': 90,
+  'Sol': 80,
+  'La': 70,
+  'Si': 60,
+  'Do⁸': 50,
+  'Re⁸': 40,
+  'Mi⁸': 30
+};
+
 // ============================================================
-// CUENTA ATRÁS (14 MARZO 2027)
+// CUENTA ATRÁS
 // ============================================================
 
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
@@ -42,8 +55,18 @@ function actualizarCountdown() {
   const ahora = new Date();
   const diff = INICIO_MELODIA - ahora;
 
+  const diasEl = document.getElementById('dias');
+  const horasEl = document.getElementById('horas');
+  const minutosEl = document.getElementById('minutos');
+  const segundosEl = document.getElementById('segundos');
+
+  if (!diasEl) return; // 🔴 evita error si no existe
+
   if (diff <= 0) {
-    document.getElementById('countdown').innerHTML = '¡YA HA EMPEZADO!';
+    diasEl.textContent = '00';
+    horasEl.textContent = '00';
+    minutosEl.textContent = '00';
+    segundosEl.textContent = '00';
     return;
   }
 
@@ -52,15 +75,13 @@ function actualizarCountdown() {
   const minutos = Math.floor((diff / (1000 * 60)) % 60);
   const segundos = Math.floor((diff / 1000) % 60);
 
-  const formato = (n) => n.toString().padStart(2, '0');
-  
-  document.getElementById('countdown').innerHTML = 
-    `${dias} ${formato(horas)} ${formato(minutos)} ${formato(segundos)}`;
+  const formato = n => n.toString().padStart(2, '0');
+
+  diasEl.textContent = dias;
+  horasEl.textContent = formato(horas);
+  minutosEl.textContent = formato(minutos);
+  segundosEl.textContent = formato(segundos);
 }
-
-setInterval(actualizarCountdown, 1000);
-actualizarCountdown();
-
 // ============================================================
 // PENTAGRAMA INICIAL
 // ============================================================
@@ -75,10 +96,17 @@ function generarPentagramaInicial() {
     const notaNombre = NOTAS[d] || '·';
     
     html += `
-      <div class="nota">
-        <div class="nota-simbolo ${esActual ? 'actual' : ''}">♩</div>
-        <div class="nota-nombre" translate="yes">${notaNombre}</div>
-        <div class="nota-digito ${esActual ? 'actual' : ''} no-traducir">${d}</div>
+      <div class="nota-columna">
+
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+             style="top:${top}px;"></div>
+
+        <div class="nota-nombre">${nota}</div>
+
+        <div class="nota-digito ${esActual ? 'actual' : ''}">
+          ${d}
+        </div>
+
       </div>
     `;
   });
