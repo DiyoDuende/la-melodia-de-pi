@@ -1,121 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  
-  <!-- OpenGraph -->
-  <meta property="og:title" content="La melodía de π">
-  <meta property="og:description" content="Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.">
-  <meta property="og:image" content="preview.png">
-  <meta property="og:url" content="https://tusitio.github.io/la-melodia-de-pi">
-  <meta name="twitter:card" content="summary_large_image">
-  
-  <title>La melodía de π</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="google" content="notranslate">
-  
-  <link rel="icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>La melodía de π</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="style.css">
+
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 </head>
 
 <body>
 <div class="container">
 
-  <!-- HEADER -->
-  <div class="header-top">
-    <div class="logo">La melodía de π</div>
-    
-    <div class="language-selector">
-      <button class="lang-btn activo" onclick="cambiarIdioma('es', this)">🇪🇸 Español</button>
-      <button class="lang-btn" onclick="cambiarIdioma('en', this)">🇬🇧 English</button>
-      <button class="lang-btn" onclick="cambiarIdioma('fr', this)">🇫🇷 Français</button>
-      <button class="lang-btn" onclick="cambiarIdioma('de', this)">🇩🇪 Deutsch</button>
-      <button class="lang-btn" onclick="cambiarIdioma('it', this)">🇮🇹 Italiano</button>
-      <button class="lang-btn" onclick="cambiarIdioma('pt', this)">🇵🇹 Português</button>
-      <button class="lang-btn" onclick="cambiarIdioma('ja', this)">🇯🇵 日本語</button>
-      <button class="lang-btn" onclick="cambiarIdioma('zh', this)">🇨🇳 中文</button>
-      <button class="lang-btn" onclick="cambiarIdioma('ar', this)">🇸🇦 العربية</button>
-    </div>
-  </div>
+  <h1>La melodía de π</h1>
 
-  <!-- 🔊 BOTÓN AUDIO (CORRECTAMENTE COLOCADO) -->
+  <!-- 🔊 AUDIO -->
   <div class="audio-control">
     <button id="btnAudio">🔊 Activar sonido</button>
   </div>
 
-  <!-- CUENTA ATRÁS -->
-  <div class="countdown-grande" id="countdownContainer">
-    <div class="countdown-titulo">
-      ⏳ TIEMPO PARA QUE π EMPIECE A SONAR
-    </div>
-
-    <div class="countdown-grid">
-      <div><span id="dias">--</span><label>DÍAS</label></div>
-      <div><span id="horas">--</span><label>HORAS</label></div>
-      <div><span id="minutos">--</span><label>MIN</label></div>
-      <div><span id="segundos">--</span><label>SEG</label></div>
-    </div>
-  </div> 
-
-  <!-- VIDEOS -->
-  <div class="videos">
-    <div class="video-box">
-      <div class="estado" id="estadoPrincipal">⏳ LIVE</div>
-      <div class="video-placeholder">
-        <div class="simbolo-pi">π</div>
-      </div>
-      <div class="lugar" id="lugarPrincipal">Desde el 14/03/2027</div>
-    </div>
-
-    <div class="video-box small">
-      <div class="estado">⏳ ESPERA</div>
-      <div class="video-placeholder">
-        <div class="simbolo-pi">π</div>
-      </div>
-      <div class="lugar">Próximos intérpretes</div>
-    </div>
+  <!-- 🎥 VIDEO -->
+  <div class="video-box">
+    <div class="video-placeholder" id="videoContainer"></div>
   </div>
 
   <!-- 🎼 PENTAGRAMA -->
-  <div class="pentagrama-section">
-    <div class="pentagrama-con-lineas">
+  <div id="notasPentagrama"></div>
 
-      <svg class="pentagrama-svg" viewBox="0 0 500 140" preserveAspectRatio="none">
-        <line x1="0" y1="20" x2="500" y2="20" class="linea"/>
-        <line x1="0" y1="40" x2="500" y2="40" class="linea"/>
-        <line x1="0" y1="60" x2="500" y2="60" class="linea"/>
-        <line x1="0" y1="80" x2="500" y2="80" class="linea"/>
-        <line x1="0" y1="100" x2="500" y2="100" class="linea"/>
-      </svg>
-
-      <div id="notasPentagrama" class="notas-wrapper"></div>
-    </div>
-
-    <div class="tiempo-info">
-      <span id="tiempoActual">⏱️ segundo #0 · π: 3 · 60 bpm</span>
-    </div>
-  </div>
-
-  <!-- MENÚ -->
-  <div class="menu">
-    <a class="menu-item" href="inscripcion.html">📝 Inscripción</a>
-    <a class="menu-item" href="#" onclick="alert('Normas: respeto, π, y una nota por segundo')">📜 Normas</a>
-    <a class="menu-item" href="#" onclick="alert('Una melodía infinita. Un mismo pulso. Un mismo ahora.')">📖 README</a>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="footer">
-    <div class="gran-fecha">14 · 03 · 2027 · 00:00 UTC</div>
-
-    <p>Una melodía infinita, tocada por personas finitas,</p>
-    <p>unidas por un mismo pulso, en un mismo ahora.</p>
-
-    <div style="margin-top: 20px; font-size: 0.7rem;">
-      π · 3.141592653589793...
-    </div>
-  </div>
+  <!-- ⏱️ INFO -->
+  <div id="tiempoActual">Esperando inicio...</div>
 
 </div>
 
