@@ -1,21 +1,3 @@
-setTimeout(() => {
-  conectarAInterprete("test123");
-}, 3000);
-
-// ============================================================
-// CONFIGURACIÓN DE TRADUCCIÓN
-// ============================================================
-
-function cambiarIdioma(idioma, el) {
-  alert("Traducción temporalmente desactivada");
-
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('activo');
-  });
-
-  if (el) el.classList.add('activo');
-}
-
 // ============================================================
 // TRADUCCIÓN
 // ============================================================
@@ -148,33 +130,17 @@ function obtenerDigitoPorIndice(idx) {
 }
 
 // ============================================================
-// MAPEO DE NOTAS
+// NOTAS
 // ============================================================
 
 const NOTAS = {
-  '0': 'Mi⁸',
-  '1': 'Do',
-  '2': 'Re',
-  '3': 'Mi',
-  '4': 'Fa',
-  '5': 'Sol',
-  '6': 'La',
-  '7': 'Si',
-  '8': 'Do⁸',
-  '9': 'Re⁸'
+  '0': 'Mi⁸','1': 'Do','2': 'Re','3': 'Mi','4': 'Fa',
+  '5': 'Sol','6': 'La','7': 'Si','8': 'Do⁸','9': 'Re⁸'
 };
 
 const ALTURAS = {
-  'Do': 114,
-  'Re': 104,
-  'Mi': 94,
-  'Fa': 84,
-  'Sol': 74,
-  'La': 64,
-  'Si': 54,
-  'Do⁸': 44,
-  'Re⁸': 34,
-  'Mi⁸': 24
+  'Do':114,'Re':104,'Mi':94,'Fa':84,'Sol':74,
+  'La':64,'Si':54,'Do⁸':44,'Re⁸':34,'Mi⁸':24
 };
 
 // ============================================================
@@ -187,25 +153,32 @@ function actualizarCountdown() {
   const ahora = new Date();
   const diff = INICIO_MELODIA - ahora;
 
+  const dias = document.getElementById('dias');
+  const horas = document.getElementById('horas');
+  const minutos = document.getElementById('minutos');
+  const segundos = document.getElementById('segundos');
+
+  if (!dias || !horas || !minutos || !segundos) return;
+
   if (diff <= 0) {
-    document.getElementById('dias').textContent = '00';
-    document.getElementById('horas').textContent = '00';
-    document.getElementById('minutos').textContent = '00';
-    document.getElementById('segundos').textContent = '00';
+    dias.textContent = '00';
+    horas.textContent = '00';
+    minutos.textContent = '00';
+    segundos.textContent = '00';
     return;
   }
 
-  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutos = Math.floor((diff / (1000 * 60)) % 60);
-  const segundos = Math.floor((diff / 1000) % 60);
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / (1000 * 60)) % 60);
+  const s = Math.floor((diff / 1000) % 60);
 
-  const formato = n => n.toString().padStart(2, '0');
+  const f = n => n.toString().padStart(2, '0');
 
-  document.getElementById('dias').textContent = dias;
-  document.getElementById('horas').textContent = formato(horas);
-  document.getElementById('minutos').textContent = formato(minutos);
-  document.getElementById('segundos').textContent = formato(segundos);
+  dias.textContent = d;
+  horas.textContent = f(h);
+  minutos.textContent = f(m);
+  segundos.textContent = f(s);
 }
 
 // ============================================================
@@ -215,7 +188,6 @@ function actualizarCountdown() {
 function generarPentagramaInicial() {
   const digitos = ['·', '·', '3', '1', '4'];
   const container = document.getElementById('notasPentagrama');
-
   if (!container) return;
 
   let html = '';
@@ -225,24 +197,13 @@ function generarPentagramaInicial() {
     const nota = NOTAS[d] || '·';
     const top = ALTURAS[nota] ?? 90;
 
-   html += `
-  <div class="nota-columna">
-
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
-
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 5}px;"></div>
-    ` : ''}
-
-    <div class="nota-nombre">${nota}</div>
-
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
-
-  </div>
-`;
+    html += `
+      <div class="nota-columna">
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
+        <div class="nota-nombre">${nota}</div>
+        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
+      </div>
+    `;
   });
 
   container.innerHTML = html;
@@ -253,15 +214,9 @@ function generarPentagramaInicial() {
 // ============================================================
 
 let modoVivo = false;
-let worker = null;
-
-if (typeof Worker !== 'undefined') {
-  worker = new Worker('worker/worker-pi.js');
-}
 
 function verificarInicio() {
   const ahora = new Date();
-
   if (ahora >= INICIO_MELODIA && !modoVivo) {
     modoVivo = true;
     iniciarModoVivo();
@@ -269,8 +224,6 @@ function verificarInicio() {
 }
 
 function iniciarModoVivo() {
-  console.log('🎵 π HA EMPEZADO');
-
   const countdown = document.getElementById('countdownContainer');
   if (countdown) countdown.style.display = 'none';
 
@@ -280,80 +233,58 @@ function iniciarModoVivo() {
   const lugar = document.getElementById('lugarPrincipal');
   if (lugar) lugar.innerHTML = 'π está sonando ahora';
 
-  if (worker) {
-    actualizarPentagramaVivo();
-    setInterval(actualizarPentagramaVivo, 1000);
-  }
+  actualizarPentagramaVivo();
+  setInterval(actualizarPentagramaVivo, 1000);
 }
 
 function actualizarPentagramaVivo() {
-  if (!worker) return;
 
   const ahora = Date.now();
   const segundoGlobal = Math.floor((ahora - INICIO_MELODIA) / 1000);
 
-  worker.postMessage({
-    id: 'pentagrama',
-    inicio: segundoGlobal - 2,
-    cantidad: 5
-  });
-}
+  const container = document.getElementById('notasPentagrama');
+  if (!container) return;
 
-if (worker) {
-  worker.onmessage = function(e) {
+  let html = '';
+  let digitos = [];
 
-    if (e.data.id === 'pentagrama' && modoVivo) {
+  for (let j = -2; j <= 2; j++) {
+    const idx = segundoGlobal + j;
+    if (idx < 0) continue;
 
-      const digitos = e.data.digitos;
-      const container = document.getElementById('notasPentagrama');
+    const d = obtenerDigitoPorIndice(idx);
+    digitos.push(d);
 
-      if (!container) return;
+    const esActual = (j === 0);
+    const nota = NOTAS[d] || '·';
+    const top = ALTURAS[nota] ?? 90;
 
-      let html = '';
+    html += `
+      <div class="nota-columna">
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
+        <div class="nota-nombre">${nota}</div>
+        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
+      </div>
+    `;
+  }
 
-      digitos.forEach((d, i) => {
+  container.innerHTML = html;
 
-        const esActual = (i === 2);
-        const nota = NOTAS[d] || '·';
-        const top = ALTURAS[nota] ?? 90;
+  const tiempo = document.getElementById('tiempoActual');
+  if (tiempo) {
+    tiempo.innerHTML = `⏱️ segundo #${segundoGlobal} · π: ${digitos[2]} · 60 bpm`;
+  }
 
-        html += `
-  <div class="nota-columna">
-
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
-
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 5}px;"></div>
-    ` : ''}
-
-    <div class="nota-nombre">${nota}</div>
-
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
-
-  </div>
-`;
-      });
-
-      container.innerHTML = html;
-
-      const tiempo = document.getElementById('tiempoActual');
-      if (tiempo) {
-        const segundoActual = e.data.inicio + 2;
-        tiempo.innerHTML =
-          `⏱️ segundo #${segundoActual} · π: ${digitos[2]} · 60 bpm`;
-      }
-    }
-  };
+  const notaActual = NOTAS[digitos[2]];
+  tocarNota(notaActual);
 }
 
 // ============================================================
-// ARRANQUE GLOBAL
+// INIT
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
+
   actualizarCountdown();
   setInterval(actualizarCountdown, 1000);
 
@@ -361,77 +292,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   verificarInicio();
   setInterval(verificarInicio, 1000);
+
+  setupAudioButton();
 });
-
-// ============================================================
-// 🎥 SISTEMA DE INTÉRPRETES (WEBRTC)
-// ============================================================
-
-let currentPeer = null;
-let currentCall = null;
-let currentVideoElement = null;
-
-// 🔌 Conectar con intérprete
-function conectarAInterprete(codigo) {
-
-  console.log("Intentando conectar con:", codigo);
-
-  // Limpiar anterior
-  if (currentCall) currentCall.close();
-  if (currentPeer) currentPeer.destroy();
-
-  const peer = new Peer();
-
-  peer.on('open', () => {
-
-    const call = peer.call(codigo, null);
-
-    if (!call) {
-      console.log("⚠️ No se pudo llamar al intérprete");
-      return;
-    }
-
-    call.on('stream', (remoteStream) => {
-
-      console.log("🎥 Stream recibido");
-
-      const container = document.querySelector('.video-box:first-child .video-placeholder');
-      if (!container) return;
-
-      let video = container.querySelector('video');
-
-      if (!video) {
-        video = document.createElement('video');
-        video.autoplay = true;
-        video.playsInline = true;
-        video.muted = true; // 🔇 empieza silenciado
-        video.style.width = '100%';
-        video.style.height = '100%';
-
-        container.innerHTML = '';
-        container.appendChild(video);
-      }
-
-      video.srcObject = remoteStream;
-
-      currentVideoElement = video;
-    });
-
-    call.on('error', (err) => {
-      console.error("Error en la llamada:", err);
-    });
-
-    currentCall = call;
-  });
-
-  currentPeer = peer;
-}
-
-// 🔊 Activar audio en el momento exacto
-function activarAudioInterprete() {
-  if (currentVideoElement) {
-    currentVideoElement.muted = false;
-    console.log("🎤 Audio activado");
-  }
-}
-function conectarAInterprete(codigo) {
