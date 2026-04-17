@@ -2,17 +2,14 @@
 // CONFIGURACIÓN DE TRADUCCIÓN
 // ============================================================
 
-translate.setUseVersion2();
-translate.selectiveTranslate.setExcludeTag('translate', 'no');
-translate.execute();
+function cambiarIdioma(idioma, el) {
+  alert("Traducción temporalmente desactivada");
 
-function cambiarIdioma(idioma) {
-  translate.changeLanguage(idioma);
-  
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.remove('activo');
   });
-  event.target.closest('.lang-btn').classList.add('activo');
+
+  if (el) el.classList.add('activo');
 }
 
 // ============================================================
@@ -32,8 +29,21 @@ const NOTAS = {
   '9': 'Re⁸'
 };
 
+const ALTURAS = {
+  'Do': 114,
+  'Re': 104,
+  'Mi': 94,
+  'Fa': 84,
+  'Sol': 74,
+  'La': 64,
+  'Si': 54,
+  'Do⁸': 44,
+  'Re⁸': 34,
+  'Mi⁸': 24
+};
+
 // ============================================================
-// CUENTA ATRÁS (14 MARZO 2027)
+// CUENTA ATRÁS
 // ============================================================
 
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
@@ -43,7 +53,10 @@ function actualizarCountdown() {
   const diff = INICIO_MELODIA - ahora;
 
   if (diff <= 0) {
-    document.getElementById('countdown').innerHTML = '¡YA HA EMPEZADO!';
+    document.getElementById('dias').textContent = '00';
+    document.getElementById('horas').textContent = '00';
+    document.getElementById('minutos').textContent = '00';
+    document.getElementById('segundos').textContent = '00';
     return;
   }
 
@@ -52,48 +65,60 @@ function actualizarCountdown() {
   const minutos = Math.floor((diff / (1000 * 60)) % 60);
   const segundos = Math.floor((diff / 1000) % 60);
 
-  const formato = (n) => n.toString().padStart(2, '0');
-  
-  document.getElementById('countdown').innerHTML = 
-    `${dias} ${formato(horas)} ${formato(minutos)} ${formato(segundos)}`;
-}
+  const formato = n => n.toString().padStart(2, '0');
 
-setInterval(actualizarCountdown, 1000);
-actualizarCountdown();
+  document.getElementById('dias').textContent = dias;
+  document.getElementById('horas').textContent = formato(horas);
+  document.getElementById('minutos').textContent = formato(minutos);
+  document.getElementById('segundos').textContent = formato(segundos);
+}
 
 // ============================================================
 // PENTAGRAMA INICIAL
 // ============================================================
 
 function generarPentagramaInicial() {
-  const digitos = ['3', '1', '4', '1', '5', '9'];
+  const digitos = ['·', '·', '3', '1', '4'];
   const container = document.getElementById('notasPentagrama');
-  
+
+  if (!container) return;
+
   let html = '';
+
   digitos.forEach((d, i) => {
     const esActual = (i === 2);
-    const notaNombre = NOTAS[d] || '·';
-    
-    html += `
-      <div class="nota">
-        <div class="nota-simbolo ${esActual ? 'actual' : ''}">♩</div>
-        <div class="nota-nombre" translate="yes">${notaNombre}</div>
-        <div class="nota-digito ${esActual ? 'actual' : ''} no-traducir">${d}</div>
-      </div>
-    `;
+    const nota = NOTAS[d] || '·';
+    const top = ALTURAS[nota] ?? 90;
+
+   html += `
+  <div class="nota-columna">
+
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
+
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
+    ` : ''}
+
+    <div class="nota-nombre">${nota}</div>
+
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${d}
+    </div>
+
+  </div>
+`;
   });
-  
+
   container.innerHTML = html;
 }
-
-generarPentagramaInicial();
 
 // ============================================================
 // MODO EN VIVO
 // ============================================================
 
 let modoVivo = false;
-let worker;
+let worker = null;
 
 if (typeof Worker !== 'undefined') {
   worker = new Worker('worker/worker-pi.js');
@@ -101,6 +126,7 @@ if (typeof Worker !== 'undefined') {
 
 function verificarInicio() {
   const ahora = new Date();
+
   if (ahora >= INICIO_MELODIA && !modoVivo) {
     modoVivo = true;
     iniciarModoVivo();
@@ -108,13 +134,17 @@ function verificarInicio() {
 }
 
 function iniciarModoVivo() {
-  console.log('🎵 π HA EMPEZADO A SONAR');
-  
-  document.getElementById('countdownContainer').style.display = 'none';
-  document.getElementById('estadoPrincipal').innerHTML = '🔴 LIVE';
-  document.getElementById('estadoPrincipal').setAttribute('translate', 'yes');
-  document.getElementById('lugarPrincipal').innerHTML = 'π está sonando ahora';
-  
+  console.log('🎵 π HA EMPEZADO');
+
+  const countdown = document.getElementById('countdownContainer');
+  if (countdown) countdown.style.display = 'none';
+
+  const estado = document.getElementById('estadoPrincipal');
+  if (estado) estado.innerHTML = '🔴 LIVE';
+
+  const lugar = document.getElementById('lugarPrincipal');
+  if (lugar) lugar.innerHTML = 'π está sonando ahora';
+
   if (worker) {
     actualizarPentagramaVivo();
     setInterval(actualizarPentagramaVivo, 1000);
@@ -123,45 +153,77 @@ function iniciarModoVivo() {
 
 function actualizarPentagramaVivo() {
   if (!worker) return;
-  
+
   const ahora = Date.now();
   const segundoGlobal = Math.floor((ahora - INICIO_MELODIA) / 1000);
-  
+
   worker.postMessage({
     id: 'pentagrama',
     inicio: segundoGlobal - 2,
-    cantidad: 6
+    cantidad: 5
   });
 }
 
 if (worker) {
   worker.onmessage = function(e) {
+
     if (e.data.id === 'pentagrama' && modoVivo) {
+
       const digitos = e.data.digitos;
       const container = document.getElementById('notasPentagrama');
-      
+
+      if (!container) return;
+
       let html = '';
+
       digitos.forEach((d, i) => {
+
         const esActual = (i === 2);
-        const notaNombre = NOTAS[d] || '·';
-        
+        const nota = NOTAS[d] || '·';
+        const top = ALTURAS[nota] ?? 90;
+
         html += `
-          <div class="nota">
-            <div class="nota-simbolo ${esActual ? 'actual' : ''}">♩</div>
-            <div class="nota-nombre" translate="yes">${notaNombre}</div>
-            <div class="nota-digito ${esActual ? 'actual' : ''} no-traducir">${d}</div>
-          </div>
-        `;
+  <div class="nota-columna">
+
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
+
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
+    ` : ''}
+
+    <div class="nota-nombre">${nota}</div>
+
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${d}
+    </div>
+
+  </div>
+`;
       });
-      
+
       container.innerHTML = html;
-      
-      const segundoGlobal = e.data.inicio + 2;
-      document.getElementById('tiempoActual').innerHTML = 
-        `⏱️ segundo #${segundoGlobal.toLocaleString()} · π: ${digitos[2]} · 60 bpm`;
+
+      const tiempo = document.getElementById('tiempoActual');
+      if (tiempo) {
+        const segundoActual = e.data.inicio + 2;
+        tiempo.innerHTML =
+          `⏱️ segundo #${segundoActual} · π: ${digitos[2]} · 60 bpm`;
+      }
     }
   };
 }
 
-setInterval(verificarInicio, 1000);
-verificarInicio();
+// ============================================================
+// ARRANQUE GLOBAL
+// ============================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  actualizarCountdown();
+  setInterval(actualizarCountdown, 1000);
+
+  generarPentagramaInicial();
+
+  verificarInicio();
+  setInterval(verificarInicio, 1000);
+});
