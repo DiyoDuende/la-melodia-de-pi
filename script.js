@@ -1,150 +1,18 @@
-setTimeout(() => {
-  conectarAInterprete("test123");
-}, 3000);
-
 // ============================================================
 // CONFIGURACIÓN DE TRADUCCIÓN
 // ============================================================
 
-function cambiarIdioma(idioma, el) {
-  alert("Traducción temporalmente desactivada");
+translate.setUseVersion2();
+translate.selectiveTranslate.setExcludeTag('translate', 'no');
+translate.execute();
 
+function cambiarIdioma(idioma) {
+  translate.changeLanguage(idioma);
+  
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.remove('activo');
   });
-
-  if (el) el.classList.add('activo');
-}
-
-// ============================================================
-// TRADUCCIÓN
-// ============================================================
-
-function cambiarIdioma(idioma, el) {
-  alert("Traducción temporalmente desactivada");
-
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('activo');
-  });
-
-  if (el) el.classList.add('activo');
-}
-
-// ============================================================
-// AUDIO + CONTROL
-// ============================================================
-
-function cargarSoundfontScript() {
-  return new Promise((resolve, reject) => {
-    if (typeof Soundfont !== "undefined") return resolve();
-
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js";
-
-    script.onload = resolve;
-    script.onerror = reject;
-
-    document.head.appendChild(script);
-  });
-}
-
-let audioCtx = null;
-let piano = null;
-let sonidoActivado = false; // empieza apagado
-
-async function iniciarAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-
-  await audioCtx.resume();
-
-  try {
-    await cargarSoundfontScript();
-  } catch (e) {
-    console.error("Error cargando Soundfont");
-    return false;
-  }
-
-  if (!piano) {
-    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
-  }
-
-  return true;
-}
-
-function tocarNota(nota) {
-  if (!sonidoActivado || !piano) return;
-
-  const MAPA_MIDI = {
-    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
-    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
-  };
-
-  const midi = MAPA_MIDI[nota];
-  if (midi) piano.play(midi, audioCtx.currentTime, { duration: 0.9 });
-}
-
-// ============================================================
-// BOTÓN AUDIO
-// ============================================================
-
-function setupAudioButton() {
-  const btn = document.getElementById("btnAudio");
-  if (!btn) return;
-
-  btn.onclick = async () => {
-
-    // Primer clic: inicializa audio
-    if (!piano) {
-      const ok = await iniciarAudio();
-      if (!ok) return;
-    }
-
-    // Toggle sonido
-    sonidoActivado = !sonidoActivado;
-
-    btn.textContent = sonidoActivado
-      ? "🔇 Silenciar"
-      : "🔊 Activar sonido";
-  };
-}
-
-// ============================================================
-// GENERADOR PI
-// ============================================================
-
-function* generarPi() {
-  let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
-
-  while (true) {
-    if (4n*q + r - t < n*t) {
-      yield Number(n);
-      let nr = 10n*(r - n*t);
-      n = (10n*(3n*q + r))/t - 10n*n;
-      q = 10n*q;
-      r = nr;
-    } else {
-      let nr = (2n*q + r)*l;
-      let nn = (q*(7n*k) + 2n + r*l)/(t*l);
-      q = q*k;
-      t = t*l;
-      l = l + 2n;
-      k = k + 1n;
-      n = nn;
-      r = nr;
-    }
-  }
-}
-
-let piGen = generarPi();
-const cachePi = [];
-
-function obtenerDigitoPorIndice(idx) {
-  while (cachePi.length <= idx) {
-    cachePi.push(piGen.next().value.toString());
-  }
-  return cachePi[idx];
+  event.target.closest('.lang-btn').classList.add('activo');
 }
 
 // ============================================================
@@ -164,21 +32,8 @@ const NOTAS = {
   '9': 'Re⁸'
 };
 
-const ALTURAS = {
-  'Do': 114,
-  'Re': 104,
-  'Mi': 94,
-  'Fa': 84,
-  'Sol': 74,
-  'La': 64,
-  'Si': 54,
-  'Do⁸': 44,
-  'Re⁸': 34,
-  'Mi⁸': 24
-};
-
 // ============================================================
-// CUENTA ATRÁS
+// CUENTA ATRÁS (14 MARZO 2027)
 // ============================================================
 
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
@@ -188,10 +43,7 @@ function actualizarCountdown() {
   const diff = INICIO_MELODIA - ahora;
 
   if (diff <= 0) {
-    document.getElementById('dias').textContent = '00';
-    document.getElementById('horas').textContent = '00';
-    document.getElementById('minutos').textContent = '00';
-    document.getElementById('segundos').textContent = '00';
+    document.getElementById('countdown').innerHTML = '¡YA HA EMPEZADO!';
     return;
   }
 
@@ -200,60 +52,48 @@ function actualizarCountdown() {
   const minutos = Math.floor((diff / (1000 * 60)) % 60);
   const segundos = Math.floor((diff / 1000) % 60);
 
-  const formato = n => n.toString().padStart(2, '0');
-
-  document.getElementById('dias').textContent = dias;
-  document.getElementById('horas').textContent = formato(horas);
-  document.getElementById('minutos').textContent = formato(minutos);
-  document.getElementById('segundos').textContent = formato(segundos);
+  const formato = (n) => n.toString().padStart(2, '0');
+  
+  document.getElementById('countdown').innerHTML = 
+    `${dias} ${formato(horas)} ${formato(minutos)} ${formato(segundos)}`;
 }
+
+setInterval(actualizarCountdown, 1000);
+actualizarCountdown();
 
 // ============================================================
 // PENTAGRAMA INICIAL
 // ============================================================
 
 function generarPentagramaInicial() {
-  const digitos = ['·', '·', '3', '1', '4'];
+  const digitos = ['3', '1', '4', '1', '5', '9'];
   const container = document.getElementById('notasPentagrama');
-
-  if (!container) return;
-
+  
   let html = '';
-
   digitos.forEach((d, i) => {
     const esActual = (i === 2);
-    const nota = NOTAS[d] || '·';
-    const top = ALTURAS[nota] ?? 90;
-
-   html += `
-  <div class="nota-columna">
-
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
-
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 5}px;"></div>
-    ` : ''}
-
-    <div class="nota-nombre">${nota}</div>
-
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
-
-  </div>
-`;
+    const notaNombre = NOTAS[d] || '·';
+    
+    html += `
+      <div class="nota">
+        <div class="nota-simbolo ${esActual ? 'actual' : ''}">♩</div>
+        <div class="nota-nombre" translate="yes">${notaNombre}</div>
+        <div class="nota-digito ${esActual ? 'actual' : ''} no-traducir">${d}</div>
+      </div>
+    `;
   });
-
+  
   container.innerHTML = html;
 }
+
+generarPentagramaInicial();
 
 // ============================================================
 // MODO EN VIVO
 // ============================================================
 
 let modoVivo = false;
-let worker = null;
+let worker;
 
 if (typeof Worker !== 'undefined') {
   worker = new Worker('worker/worker-pi.js');
@@ -261,7 +101,6 @@ if (typeof Worker !== 'undefined') {
 
 function verificarInicio() {
   const ahora = new Date();
-
   if (ahora >= INICIO_MELODIA && !modoVivo) {
     modoVivo = true;
     iniciarModoVivo();
@@ -269,17 +108,13 @@ function verificarInicio() {
 }
 
 function iniciarModoVivo() {
-  console.log('🎵 π HA EMPEZADO');
-
-  const countdown = document.getElementById('countdownContainer');
-  if (countdown) countdown.style.display = 'none';
-
-  const estado = document.getElementById('estadoPrincipal');
-  if (estado) estado.innerHTML = '🔴 LIVE';
-
-  const lugar = document.getElementById('lugarPrincipal');
-  if (lugar) lugar.innerHTML = 'π está sonando ahora';
-
+  console.log('🎵 π HA EMPEZADO A SONAR');
+  
+  document.getElementById('countdownContainer').style.display = 'none';
+  document.getElementById('estadoPrincipal').innerHTML = '🔴 LIVE';
+  document.getElementById('estadoPrincipal').setAttribute('translate', 'yes');
+  document.getElementById('lugarPrincipal').innerHTML = 'π está sonando ahora';
+  
   if (worker) {
     actualizarPentagramaVivo();
     setInterval(actualizarPentagramaVivo, 1000);
@@ -288,150 +123,46 @@ function iniciarModoVivo() {
 
 function actualizarPentagramaVivo() {
   if (!worker) return;
-
+  
   const ahora = Date.now();
   const segundoGlobal = Math.floor((ahora - INICIO_MELODIA) / 1000);
-
+  
   worker.postMessage({
     id: 'pentagrama',
     inicio: segundoGlobal - 2,
-    cantidad: 5
+    cantidad: 6
   });
 }
 
 if (worker) {
   worker.onmessage = function(e) {
-
     if (e.data.id === 'pentagrama' && modoVivo) {
-
       const digitos = e.data.digitos;
       const container = document.getElementById('notasPentagrama');
-
-      if (!container) return;
-
+      
       let html = '';
-
       digitos.forEach((d, i) => {
-
         const esActual = (i === 2);
-        const nota = NOTAS[d] || '·';
-        const top = ALTURAS[nota] ?? 90;
-
+        const notaNombre = NOTAS[d] || '·';
+        
         html += `
-  <div class="nota-columna">
-
-    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
-         style="top:${top}px;"></div>
-
-    ${nota === 'Do' ? `
-      <div class="linea-adicional" style="top:${top + 5}px;"></div>
-    ` : ''}
-
-    <div class="nota-nombre">${nota}</div>
-
-    <div class="nota-digito ${esActual ? 'actual' : ''}">
-      ${d}
-    </div>
-
-  </div>
-`;
+          <div class="nota">
+            <div class="nota-simbolo ${esActual ? 'actual' : ''}">♩</div>
+            <div class="nota-nombre" translate="yes">${notaNombre}</div>
+            <div class="nota-digito ${esActual ? 'actual' : ''} no-traducir">${d}</div>
+          </div>
+        `;
       });
-
+      
       container.innerHTML = html;
-
-      const tiempo = document.getElementById('tiempoActual');
-      if (tiempo) {
-        const segundoActual = e.data.inicio + 2;
-        tiempo.innerHTML =
-          `⏱️ segundo #${segundoActual} · π: ${digitos[2]} · 60 bpm`;
-      }
+      
+      const segundoGlobal = e.data.inicio + 2;
+      document.getElementById('tiempoActual').innerHTML = 
+        `⏱️ segundo #${segundoGlobal.toLocaleString()} · π: ${digitos[2]} · 60 bpm`;
     }
   };
 }
 
-// ============================================================
-// ARRANQUE GLOBAL
-// ============================================================
+setInterval(verificarInicio, 1000);
+verificarInicio();
 
-document.addEventListener("DOMContentLoaded", function () {
-  actualizarCountdown();
-  setInterval(actualizarCountdown, 1000);
-
-  generarPentagramaInicial();
-
-  verificarInicio();
-  setInterval(verificarInicio, 1000);
-});
-
-// ============================================================
-// 🎥 SISTEMA DE INTÉRPRETES (WEBRTC)
-// ============================================================
-
-let currentPeer = null;
-let currentCall = null;
-let currentVideoElement = null;
-
-// 🔌 Conectar con intérprete
-function conectarAInterprete(codigo) {
-
-  console.log("Intentando conectar con:", codigo);
-
-  // Limpiar anterior
-  if (currentCall) currentCall.close();
-  if (currentPeer) currentPeer.destroy();
-
-  const peer = new Peer();
-
-  peer.on('open', () => {
-
-    const call = peer.call(codigo, null);
-
-    if (!call) {
-      console.log("⚠️ No se pudo llamar al intérprete");
-      return;
-    }
-
-    call.on('stream', (remoteStream) => {
-
-      console.log("🎥 Stream recibido");
-
-      const container = document.querySelector('.video-box:first-child .video-placeholder');
-      if (!container) return;
-
-      let video = container.querySelector('video');
-
-      if (!video) {
-        video = document.createElement('video');
-        video.autoplay = true;
-        video.playsInline = true;
-        video.muted = true; // 🔇 empieza silenciado
-        video.style.width = '100%';
-        video.style.height = '100%';
-
-        container.innerHTML = '';
-        container.appendChild(video);
-      }
-
-      video.srcObject = remoteStream;
-
-      currentVideoElement = video;
-    });
-
-    call.on('error', (err) => {
-      console.error("Error en la llamada:", err);
-    });
-
-    currentCall = call;
-  });
-
-  currentPeer = peer;
-}
-
-// 🔊 Activar audio en el momento exacto
-function activarAudioInterprete() {
-  if (currentVideoElement) {
-    currentVideoElement.muted = false;
-    console.log("🎤 Audio activado");
-  }
-}
-function conectarAInterprete(codigo) {
