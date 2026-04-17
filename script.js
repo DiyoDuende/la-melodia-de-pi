@@ -204,29 +204,38 @@ function actualizarCountdown() {
 // PENTAGRAMA INICIAL
 // ============================================================
 
-function actualizarPentagrama(seg) {
+function generarPentagramaInicial() {
+  const digitos = ['·', '·', '3', '1', '4'];
   const container = document.getElementById('notasPentagrama');
+
   if (!container) return;
 
   let html = '';
 
-  for (let j = -2; j <= 2; j++) {
-    const idx = seg + j;
-    if (idx < 0) continue;
+  digitos.forEach((d, i) => {
+    const esActual = (i === 2);
+    const nota = NOTAS[d] || '·';
+    const top = ALTURAS[nota] ?? 90;
 
-    const d = CICLO[idx % 10];
-    const nota = NOTAS[d];
-    const top = ALTURAS[nota];
-    const actual = j === 0;
+   html += `
+  <div class="nota-columna">
 
-    html += `
-      <div class="nota-columna">
-        <div class="nota-cabeza ${actual?'actual':''}" style="top:${top}px;"></div>
-        <div class="nota-nombre">${nota}</div>
-        <div class="nota-digito ${actual?'actual':''}">${d}</div>
-      </div>
-    `;
-  }
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
+
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
+    ` : ''}
+
+    <div class="nota-nombre">${nota}</div>
+
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${d}
+    </div>
+
+  </div>
+`;
+  });
 
   container.innerHTML = html;
 }
@@ -329,6 +338,93 @@ function iniciarMelodia() {
   }, 1000);
 }
 
+// ============================================================
+// ARRANQUE GLOBAL
+// ============================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  actualizarCountdown();
+  setInterval(actualizarCountdown, 1000);
+
+  generarPentagramaInicial();
+
+  verificarInicio();
+  setInterval(verificarInicio, 1000);
+});
+
+// ============================================================
+// 🎥 SISTEMA DE INTÉRPRETES (WEBRTC)
+// ============================================================
+
+let currentPeer = null;
+let currentCall = null;
+let currentVideoElement = null;
+
+// 🔌 Conectar con intérprete
+function conectarAInterprete(codigo) {
+
+  console.log("Intentando conectar con:", codigo);
+
+  // Limpiar anterior
+  if (currentCall) currentCall.close();
+  if (currentPeer) currentPeer.destroy();
+
+  const peer = new Peer();
+
+  peer.on('open', () => {
+
+    const call = peer.call(codigo, null);
+
+    if (!call) {
+      console.log("⚠️ No se pudo llamar al intérprete");
+      return;
+    }
+
+    call.on('stream', (remoteStream) => {
+
+      console.log("🎥 Stream recibido");
+
+      const container = document.querySelector('.video-box:first-child .video-placeholder');
+      if (!container) return;
+
+      let video = container.querySelector('video');
+
+      if (!video) {
+        video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true; // 🔇 empieza silenciado
+        video.style.width = '100%';
+        video.style.height = '100%';
+
+        container.innerHTML = '';
+        container.appendChild(video);
+      }
+
+      video.srcObject = remoteStream;
+
+      currentVideoElement = video;
+    });
+
+    call.on('error', (err) => {
+      console.error("Error en la llamada:", err);
+    });
+
+    currentCall = call;
+  });
+
+  currentPeer = peer;
+}
+
+// 🔊 Activar audio en el momento exacto
+function activarAudioInterprete() {
+  if (currentVideoElement) {
+    currentVideoElement.muted = false;
+    console.log("🎤 Audio activado");
+  }
+}
+function conectarAInterprete(codigo) {
+  
 // ============================================================
 // UI
 // ============================================================
