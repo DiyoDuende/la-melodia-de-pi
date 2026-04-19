@@ -306,23 +306,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
   verificarInicio(); setInterval(verificarInicio, 1000); });
 
-// ============================================================
-// MODO PRUEBA SOLO PARA SONIDO (NO ROMPE NADA)
-// ============================================================
-
-let segundoPrueba = 0;
-
-setInterval(() => {
-  if (!piano) return; // aún no cargado
-
-  const digito = obtenerDigito(segundoPrueba);
-  const nota = NOTAS[digito];
-
-  if (nota) {
-    tocarNota(nota);
-    console.log("🎵 prueba:", digito, nota);
-  }
-
-  segundoPrueba++;
-
-}, 1000);
