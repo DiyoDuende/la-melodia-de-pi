@@ -101,6 +101,8 @@ async function iniciarAudio() {
 }
 
 function tocarNota(nota) {
+  console.log("🎵 intentando sonar:", nota);
+
   if (!sonidoActivado || !piano) return;
 
   const mapaMidi = {
