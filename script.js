@@ -42,6 +42,76 @@ const ALTURAS = {
   'Mi⁸': 24
 };
 
+// ============================================
+// GENERADOR INFINITO DE DÍGITOS DE PI
+// ============================================
+function* generarPi() {
+  let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
+  while (true) {
+    if (4n*q + r - t < n*t) {
+      yield Number(n);
+      let nr = 10n*(r - n*t);
+      n = (10n*(3n*q + r))/t - 10n*n;
+      q = 10n*q;
+      r = nr;
+    } else {
+      let nr = (2n*q + r)*l;
+      let nn = (q*(7n*k) + 2n + r*l)/(t*l);
+      q = q*k;
+      t = t*l;
+      l = l + 2n;
+      k = k + 1n;
+      n = nn;
+      r = nr;
+    }
+  }
+}
+
+let piGen = generarPi();
+const cachePi = [];
+
+function obtenerDigito(indice) {
+  while (cachePi.length <= indice) {
+    cachePi.push(piGen.next().value.toString());
+  }
+  return cachePi[indice];
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+
+let audioCtx = null;
+let piano = null;
+let sonidoActivado = false;
+
+async function iniciarAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  await audioCtx.resume();
+
+  if (!piano) {
+    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
+    console.log("🎹 Piano listo");
+  }
+
+  sonidoActivado = true;
+}
+
+function tocarNota(nota) {
+  if (!sonidoActivado || !piano) return;
+
+  const mapaMidi = {
+    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
+    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
+  };
+
+  const midi = mapaMidi[nota];
+  if (midi) piano.play(midi);
+}
+
 // ============================================================
 // CUENTA ATRÁS
 // ============================================================
@@ -180,6 +250,14 @@ if (worker) {
 
         const esActual = (i === 2);
         const nota = NOTAS[d] || '·';
+        if (esActual) {
+  const digitoReal = obtenerDigito(e.data.inicio + 2);
+  const notaReal = NOTAS[digitoReal];
+
+  if (notaReal) {
+    tocarNota(notaReal);
+  }
+}
         const top = ALTURAS[nota] ?? 90;
 
         html += `
