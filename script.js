@@ -304,5 +304,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
   generarPentagramaInicial();
 
-  verificarInicio();
-setInterval(verificarInicio, 1000);
+  verificarInicio(); setInterval(verificarInicio, 1000); });
