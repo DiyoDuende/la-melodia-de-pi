@@ -304,6 +304,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   generarPentagramaInicial();
 
-  verificarInicio();
-  setInterval(verificarInicio, 1000);
-});
+  // FORZAR MODO VIVO PARA PRUEBA
+modoVivo = true;
+iniciarModoVivo();
