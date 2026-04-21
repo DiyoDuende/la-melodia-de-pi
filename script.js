@@ -329,26 +329,4 @@ function obtenerInterpreteActual() {
   return cola[turno % cola.length];
 }
 
-// ============================================================
-// 🎥 AUTO CONEXIÓN INTÉRPRETE
-// ============================================================
-
-function actualizarInterpreteEnEscenario() {
-
-  const interprete = obtenerInterpreteActual();
-
-  if (!interprete) return;
-
-  if (window.codigoActual !== interprete.codigo) {
-
-    window.codigoActual = interprete.codigo;
-
-    console.log("🎤 Conectando a:", interprete.codigo);
-
-    conectarAInterprete(interprete.codigo);
-  }
-}
-
-// Ejecutar cada 5 segundos
-setInterval(actualizarInterpreteEnEscenario, 5000);
 
