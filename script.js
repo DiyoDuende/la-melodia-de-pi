@@ -306,3 +306,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   verificarInicio(); setInterval(verificarInicio, 1000); });
 
+// ============================================================
+// 🎼 COLA DE INTÉRPRETES
+// ============================================================
+
+function obtenerCola() {
+  return JSON.parse(localStorage.getItem('colaInterpretes') || '[]');
+}
+
+// Obtener intérprete actual según tiempo
+function obtenerInterpreteActual() {
+
+  const cola = obtenerCola();
+  if (!cola.length) return null;
+
+  const ahora = new Date();
+  const inicio = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
+
+  const segundos = Math.floor((ahora - inicio) / 1000);
+  const turno = Math.floor(segundos / 300); // 5 min
+
+  return cola[turno % cola.length];
+}
