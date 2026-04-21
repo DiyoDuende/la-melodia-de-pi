@@ -351,3 +351,4 @@ function actualizarInterpreteEnEscenario() {
 
 // Ejecutar cada 5 segundos
 setInterval(actualizarInterpreteEnEscenario, 5000);
+
