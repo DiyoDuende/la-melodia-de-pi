@@ -26,12 +26,11 @@ h1 { color:#ffd966; text-align:center; }
 <h1>🎵 La melodía de π</h1>
 
 <p>
-Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.
+Una obra infinita donde los dígitos de π se convierten en música en tiempo real.
 </p>
 
 <p>
-Desde el **14 de marzo de 2027 a las 00:00 UTC**, π suena en tiempo real.  
-Cada segundo = un dígito = una nota. 60 bpm. Para siempre.
+Comienza el 14 de marzo de 2027.
 </p>
 
 <p>
