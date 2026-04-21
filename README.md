@@ -35,7 +35,7 @@ Cada segundo = un dígito = una nota. 60 bpm. Para siempre.
 </p>
 
 <p>
-Cada persona toca 5 minutos de la secuencia, una nota por segundo.
+Cada persona toca 5 minutos de la secuencia.
 </p>
 
 </div>
