@@ -1,71 +1,207 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inscríbete - La melodía de π</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-
-<style>
-body {
-  background:#0a0c10;
-  color:#eef3f9;
-  font-family:'Inter',sans-serif;
-  padding:40px 20px;
-}
-.container {
-  max-width:700px;
-  margin:auto;
-  background:#0f141c;
-  padding:40px;
-  border-radius:12px;
-  border:1px solid #2a3a4a;
-}
-h1 { text-align:center; color:#ffd966; }
-
-input, textarea {
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  margin-bottom:20px;
-  background:#1a1f2a;
-  border:1px solid #3a4a5a;
-  color:white;
-  border-radius:8px;
-}
-
-button {
-  width:100%;
-  padding:14px;
-  background:#ffd966;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:bold;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscríbete - La melodía de π</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0c10;
+            color: #eef3f9;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #0f141c;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #2a3a4a;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #ffd966;
+        }
+        .subtitulo {
+            text-align: center;
+            color: #7f8fa3;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0c9e8;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1a1f2a;
+            border: 1px solid #3a4a5a;
+            border-radius: 8px;
+            color: #eef3f9;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ffd966;
+        }
+        button {
+            background: #ffd966;
+            color: #0a0c10;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.02);
+            background: #ffcd4a;
+        }
+        .info-box {
+            background: #1a1f2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #ffd966;
+        }
+        .aviso {
+            color: #ffa25b;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-align: center;
+        }
+        a {
+            color: #ffd966;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container">
+        <h1>🎵 Inscríbete para interpretar π</h1>
+        <div class="subtitulo">Forma parte de la melodía infinita</div>
 
-<div class="container">
-<h1>📝 Inscripción</h1>
+        <form id="formInscripcion">
+            <div class="form-group">
+                <label>Nombre completo *</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div class="form-group">
+                <label>Correo electrónico *</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label>País / Ciudad</label>
+                <input type="text" id="ubicacion">
+            </div>
+            <div class="form-group">
+                <label>Breve presentación (opcional)</label>
+                <textarea id="bio" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="aceptaNormas" required>
+                    Acepto las <a href="#" onclick="alert('Normas: respeto, π, y una nota por segundo'); return false;">normas de participación</a> *
+                </label>
+            </div>
+            <button type="submit">🎶 Enviar inscripción</button>
+        </form>
 
-<input placeholder="Nombre">
-<input placeholder="Email">
-<textarea placeholder="Instrumento / notas"></textarea>
+        <div id="respuesta" class="info-box" style="display: none;">
+            <div id="mensajeRespuesta"></div>
+        </div>
+        <div class="aviso">
+            * Los campos son obligatorios. Al inscribirte, aceptas recibir información sobre tu turno.
+        </div>
+    </div>
 
-<button onclick="alert('Inscripción registrada (modo local)')">
-Enviar
-</button>
+    <script>
+        // Simulación de cola de inscripciones (en producción se guardaría en servidor)
+        let colaInscripciones = JSON.parse(localStorage.getItem('colaInterpretes') || '[]');
 
-</div>
+        document.getElementById('formInscripcion').addEventListener('submit', function(e) {
+            e.preventDefault();
 
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const ubicacion = document.getElementById('ubicacion').value.trim();
+            const bio = document.getElementById('bio').value.trim();
+
+            if (!nombre || !email) {
+                alert('Por favor, completa tu nombre y correo electrónico.');
+                return;
+            }
+
+            // Verificar si el email ya está inscrito
+            if (colaInscripciones.some(i => i.email === email)) {
+                alert('Este correo ya está registrado. Solo se permite una inscripción por persona.');
+                return;
+            }
+
+            // Generar código único (simulado)
+            const codigoUnico = 'π-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+            // Calcular posición en cola
+            const posicion = colaInscripciones.length + 1;
+            const segundosPorIntérprete = 5 * 60; // 5 minutos
+            const fechaInicio = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
+            const segundosInicio = posicion * segundosPorIntérprete;
+            const fechaTurno = new Date(fechaInicio.getTime() + segundosInicio * 1000);
+
+            // Crear objeto del intérprete
+            const nuevoInterprete = {
+                codigo: codigoUnico,
+                nombre: nombre,
+                email: email,
+                ubicacion: ubicacion,
+                bio: bio,
+                posicion: posicion,
+                turnoUTC: fechaTurno.toISOString(),
+                bloqueado: false
+            };
+
+            // Guardar en cola
+            colaInscripciones.push(nuevoInterprete);
+            localStorage.setItem('colaInterpretes', JSON.stringify(colaInscripciones));
+
+            // Mostrar respuesta
+            const respuestaDiv = document.getElementById('respuesta');
+            const mensaje = document.getElementById('mensajeRespuesta');
+            mensaje.innerHTML = `
+                <strong>✅ ¡Inscripción recibida, ${nombre}!</strong><br><br>
+                Tu código único es: <strong style="font-size: 1.2rem; color: #ffd966;">${codigoUnico}</strong><br><br>
+                📍 Posición en la cola: #${posicion}<br>
+                🎵 Tu turno comenzará aproximadamente el: <strong>${fechaTurno.toUTCString()}</strong><br>
+                🎼 Interpretarás durante 5 minutos (300 notas).<br><br>
+                ✉️ Te enviaremos un correo 5 minutos antes de tu turno con los 500 dígitos y las notas que deberás tocar.<br>
+                🔗 Para conectar tu videostream, usa el código único proporcionado.
+            `;
+            respuestaDiv.style.display = 'block';
+
+            // Limpiar formulario (opcional)
+            document.getElementById('formInscripcion').reset();
+        });
+    </script>
 </body>
 </html>
-
-
-
-
-
