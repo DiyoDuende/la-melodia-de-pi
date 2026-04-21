@@ -1,51 +1,44 @@
-[README.md](https://github.com/user-attachments/files/26385321/README.md)
-docs/README.md
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>La melodía de π</title>
 
-```markdown
-# La melodía de π
+<style>
+body {
+  background:#0a0c10;
+  color:#eef3f9;
+  font-family:sans-serif;
+  padding:40px;
+}
+.container {
+  max-width:800px;
+  margin:auto;
+}
+h1 { color:#ffd966; text-align:center; }
+</style>
+</head>
 
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+<body>
 
+<div class="container">
+
+<h1>🎵 La melodía de π</h1>
+
+<p>
 Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.
+</p>
 
-## 🌍 Idiomas
-
-🇪🇸 Español · 🇬🇧 English · 🇫🇷 Français · 🇩🇪 Deutsch · 🇮🇹 Italiano · 🇵🇹 Português · 🇯🇵 日本語 · 🇨🇳 中文 · 🇸🇦 العربية
-
-## 🎯 El proyecto
-
+<p>
 Desde el **14 de marzo de 2027 a las 00:00 UTC**, π suena en tiempo real.  
 Cada segundo = un dígito = una nota. 60 bpm. Para siempre.
+</p>
 
-## 📁 Estructura
+<p>
+Cada persona toca 5 minutos de la secuencia, una nota por segundo.
+</p>
 
-```
+</div>
 
-/
-├── index.html
-├── style.css
-├── script.js
-├── inscripcion.html
-├── favicon.ico
-├── robots.txt
-├── sitemap.xml
-├── LICENSE
-├── worker/
-│   └── worker-pi.js
-└── docs/
-├── README.md
-└── manifiesto.md
-
-```
-
-## 🚀 Cómo contribuir
-
-1. Fork
-2. Mejora
-3. Pull request
-
-## 📜 Licencia
-
-CC BY-NC 4.0
-```
-
+</body>
+</html>
