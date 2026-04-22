@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 
 <style>
 body {
@@ -75,11 +75,7 @@ button {
 </div>
 
 <script>
-// ============================================================
-// EMAILJS INIT (CAMBIA ESTO)
-// ============================================================
 
-emailjs.init("abc123XYZ");
 
 // ============================================================
 // PI GENERADOR
@@ -162,21 +158,6 @@ function generarPDF(interprete){
  doc.save(`pi-${interprete.codigo}.pdf`);
 }
 
-// ============================================================
-// ENVÍO EMAIL
-// ============================================================
-
-function enviarEmail(interprete){
-
- emailjs.send("service_xxxxx","template_xxxxx",{
-  nombre: interprete.nombre,
-  codigo: interprete.codigo,
-  turnoUTC: interprete.turnoUTC,
-  turnoLocal: interprete.turnoLocal
- }).then(()=>{
-  console.log("📧 Email enviado");
- });
-}
 
 // ============================================================
 // FORM
@@ -213,14 +194,28 @@ document.getElementById('formInscripcion').addEventListener('submit',e=>{
  generarPDF(interprete);
 
  // EMAIL
- enviarEmail(interprete);
+
 
  document.getElementById('respuesta').style.display='block';
  document.getElementById('respuesta').innerHTML=`
- ✅ ${nombre}<br>
- Código: ${codigo}<br>
- Turno: ${turno.toUTCString()}
- `;
+<h3>✅ Inscripción completada</h3>
+
+<p><strong>${nombre}</strong></p>
+
+<p>🎼 Código:<br><strong style="color:#ffd966">${codigo}</strong></p>
+
+<p>⏱️ Turno UTC:<br>${turno.toUTCString()}</p>
+
+<p>🌍 Hora local:<br>${turno.toLocaleString()}</p>
+
+<p style="margin-top:15px;">
+📄 Se ha descargado tu partitura (PDF).
+</p>
+
+<p style="font-size:0.9rem;opacity:0.7;">
+Guarda este código. Lo necesitarás para conectarte.
+</p>
+`;
 });
 </script>
 
