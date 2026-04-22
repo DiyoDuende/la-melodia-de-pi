@@ -79,7 +79,7 @@ button {
 // EMAILJS INIT (CAMBIA ESTO)
 // ============================================================
 
-emailjs.init("TU_PUBLIC_KEY"); // 👈 cambia esto
+emailjs.init("abc123XYZ");
 
 // ============================================================
 // PI GENERADOR
@@ -168,7 +168,7 @@ function generarPDF(interprete){
 
 function enviarEmail(interprete){
 
- emailjs.send("TU_SERVICE_ID","TU_TEMPLATE_ID",{
+ emailjs.send("service_xxxxx","template_xxxxx",{
   nombre: interprete.nombre,
   codigo: interprete.codigo,
   turnoUTC: interprete.turnoUTC,
