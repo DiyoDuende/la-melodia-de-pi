@@ -84,7 +84,20 @@ function obtenerDigito(indice) {
 let audioCtx = null;
 let piano = null;
 let sonidoActivado = false;
+// ============================================================
+// VIDEO + INTÉRPRETES
+// ============================================================
 
+let currentPeer = null;
+let currentCall = null;
+let currentVideoElement = null;
+
+let turnoActual = 0;
+let intervaloTurno = null;
+
+let audioInterpreteActivo = false;
+
+const DURACION_TURNO = 300; // 5 min
 async function iniciarAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -101,17 +114,38 @@ async function iniciarAudio() {
 }
 
 function tocarNota(nota) {
-  console.log("🎵 intentando sonar:", nota);
 
   if (!sonidoActivado || !piano) return;
 
   const mapaMidi = {
-    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
-    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
+    'Do':'C4',
+    'Re':'D4',
+    'Mi':'E4',
+    'Fa':'F4',
+    'Sol':'G4',
+    'La':'A4',
+    'Si':'B4',
+    'Do⁸':'C5',
+    'Re⁸':'D5',
+    'Mi⁸':'E5'
   };
 
   const midi = mapaMidi[nota];
-  if (midi) piano.play(midi);
+  if (!midi) return;
+
+  // si hay intérprete sonando,
+  // π baja volumen
+  const volumen =
+    audioInterpreteActivo ? 0.2 : 0.8;
+
+  piano.play(
+    midi,
+    audioCtx.currentTime,
+    {
+      duration:0.9,
+      gain:volumen
+    }
+  );
 }
 
 // ============================================================
@@ -218,9 +252,11 @@ function iniciarModoVivo() {
   if (lugar) lugar.innerHTML = 'π está sonando ahora';
 
   if (worker) {
-    actualizarPentagramaVivo();
-    setInterval(actualizarPentagramaVivo, 1000);
-  }
+  actualizarPentagramaVivo();
+  setInterval(actualizarPentagramaVivo, 1000);
+}
+
+iniciarTurnos();
 }
 
 function actualizarPentagramaVivo() {
@@ -307,47 +343,182 @@ document.addEventListener("DOMContentLoaded", function () {
   verificarInicio(); setInterval(verificarInicio, 1000); });
 
 // ============================================================
-// 🎼 COLA DE INTÉRPRETES
+// VIDEO / TURNOS / WEBRTC
 // ============================================================
 
-function obtenerCola() {
-  return JSON.parse(localStorage.getItem('colaInterpretes') || '[]');
+function getSegundoGlobal(){
+ return Math.floor(
+   (Date.now()-INICIO_MELODIA)/1000
+ );
 }
 
-// Obtener intérprete actual según tiempo
-function obtenerInterpreteActual() {
 
-  const cola = obtenerCola();
-  if (!cola.length) return null;
 
-  const ahora = new Date();
-  const inicio = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
+function conectarAInterprete(codigo){
 
-  const segundos = Math.floor((ahora - inicio) / 1000);
-  const turno = Math.floor(segundos / 300); // 5 min
+ if(currentCall) currentCall.close();
+ if(currentPeer) currentPeer.destroy();
 
-  return cola[turno % cola.length];
+ if(currentVideoElement){
+   currentVideoElement.remove();
+   currentVideoElement=null;
+ }
+
+ audioInterpreteActivo=false;
+
+ const peer = new Peer();
+
+ peer.on('open',()=>{
+
+   const call=peer.call(codigo,null);
+
+   if(!call) return;
+
+   call.on('stream',(remoteStream)=>{
+
+     const container=
+document.querySelector(
+'.video-box:first-child .video-placeholder'
+);
+
+     if(!container) return;
+
+     const video=
+document.createElement('video');
+
+     video.autoplay=true;
+     video.playsInline=true;
+     video.muted=true;
+
+     video.style.width='100%';
+     video.style.height='100%';
+
+     container.innerHTML='';
+     container.appendChild(video);
+
+     video.srcObject=remoteStream;
+
+     currentVideoElement=video;
+
+   });
+
+   currentCall=call;
+
+ });
+
+ currentPeer=peer;
+
 }
 
-// ============================================================
-// 🎥 AUTO CONEXIÓN INTÉRPRETE
-// ============================================================
 
-function actualizarInterpreteEnEscenario() {
 
-  const interprete = obtenerInterpreteActual();
+function activarAudioDelInterprete(){
 
-  if (!interprete) return;
+ if(currentVideoElement){
+   currentVideoElement.muted=false;
+   audioInterpreteActivo=true;
+ }
 
-  if (window.codigoActual !== interprete.codigo) {
-
-    window.codigoActual = interprete.codigo;
-
-    console.log("🎤 Conectando a:", interprete.codigo);
-
-    conectarAInterprete(interprete.codigo);
-  }
 }
 
-// Ejecutar cada 5 segundos
-setInterval(actualizarInterpreteEnEscenario, 5000);
+
+
+function actualizarUIInterpretes(){
+
+const interpretes=
+JSON.parse(
+localStorage.getItem(
+'colaInterpretes'
+)||'[]'
+);
+
+if(!interpretes.length) return;
+
+const actual=
+interpretes[
+turnoActual % interpretes.length
+];
+
+const siguiente=
+interpretes[
+(turnoActual+1)%interpretes.length
+];
+
+const estado=
+document.getElementById(
+'estadoPrincipal'
+);
+
+if(estado){
+ estado.innerHTML=
+`🎵 ${actual.nombre}`;
+}
+
+const lugar=
+document.getElementById(
+'lugarPrincipal'
+);
+
+if(lugar){
+ lugar.innerHTML=
+`Desde ${actual.ubicacion||'Mundo'}`;
+}
+
+const espera=
+document.querySelector(
+'.video-box.small .lugar'
+);
+
+if(espera){
+ espera.innerHTML=
+`⏳ ${siguiente.nombre}`;
+}
+
+conectarAInterprete(
+actual.codigo
+);
+
+}
+
+
+
+function cambiarInterprete(){
+
+turnoActual++;
+
+actualizarUIInterpretes();
+
+setTimeout(()=>{
+ activarAudioDelInterprete();
+},1500);
+
+}
+
+
+
+function iniciarTurnos(){
+
+if(intervaloTurno){
+clearInterval(
+intervaloTurno
+);
+}
+
+const segundoGlobal=
+getSegundoGlobal();
+
+turnoActual=
+Math.floor(
+segundoGlobal /
+DURACION_TURNO
+);
+
+actualizarUIInterpretes();
+
+intervaloTurno=
+setInterval(
+cambiarInterprete,
+DURACION_TURNO*1000
+);
+
+}
