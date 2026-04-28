@@ -347,178 +347,177 @@ document.addEventListener("DOMContentLoaded", function () {
 // ============================================================
 
 function getSegundoGlobal(){
- return Math.floor(
-   (Date.now()-INICIO_MELODIA)/1000
- );
+  return Math.floor(
+    (Date.now() - INICIO_MELODIA) / 1000
+  );
 }
-
-
 
 function conectarAInterprete(codigo){
+  // Validar que codigo existe
+  if(!codigo){
+    console.error('Código de intérprete inválido');
+    return;
+  }
 
- if(currentCall) currentCall.close();
- if(currentPeer) currentPeer.destroy();
+  // Limpiar conexiones previas
+  if(currentCall){
+    currentCall.close();
+    currentCall = null;
+  }
+  
+  if(currentPeer){
+    currentPeer.destroy();
+    currentPeer = null;
+  }
 
- if(currentVideoElement){
-   currentVideoElement.remove();
-   currentVideoElement=null;
- }
+  if(currentVideoElement){
+    currentVideoElement.srcObject = null; // Detener stream
+    currentVideoElement.remove();
+    currentVideoElement = null;
+  }
 
- audioInterpreteActivo=false;
+  audioInterpreteActivo = false;
 
- const peer = new Peer();
+  try {
+    const peer = new Peer();
 
- peer.on('open',()=>{
+    peer.on('open', () => {
+      const call = peer.call(codigo, null);
 
-   const call=peer.call(codigo,null);
+      if(!call){
+        console.error('No se pudo iniciar la llamada');
+        return;
+      }
 
-   if(!call) return;
+      // Manejar stream
+      call.on('stream', (remoteStream) => {
+        const container = document.querySelector(
+          '.video-box:first-child .video-placeholder'
+        );
 
-   call.on('stream',(remoteStream)=>{
+        if(!container){
+          console.warn('Contenedor de video no encontrado');
+          return;
+        }
 
-     const container=
-document.querySelector(
-'.video-box:first-child .video-placeholder'
-);
+        const video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+        video.style.width = '100%';
+        video.style.height = '100%';
 
-     if(!container) return;
+        container.innerHTML = '';
+        container.appendChild(video);
 
-     const video=
-document.createElement('video');
+        video.srcObject = remoteStream;
+        currentVideoElement = video;
+      });
 
-     video.autoplay=true;
-     video.playsInline=true;
-     video.muted=true;
+      // Manejar errores en la llamada
+      call.on('error', (err) => {
+        console.error('Error en la llamada WebRTC:', err);
+      });
 
-     video.style.width='100%';
-     video.style.height='100%';
+      currentCall = call;
+    });
 
-     container.innerHTML='';
-     container.appendChild(video);
+    // Manejar errores del peer
+    peer.on('error', (err) => {
+      console.error('Error en Peer:', err);
+    });
 
-     video.srcObject=remoteStream;
+    currentPeer = peer;
 
-     currentVideoElement=video;
-
-   });
-
-   currentCall=call;
-
- });
-
- currentPeer=peer;
-
+  } catch(error){
+    console.error('Error al conectar intérprete:', error);
+  }
 }
-
-
 
 function activarAudioDelInterprete(){
-
- if(currentVideoElement){
-   currentVideoElement.muted=false;
-   audioInterpreteActivo=true;
- }
-
+  if(currentVideoElement){
+    currentVideoElement.muted = false;
+    audioInterpreteActivo = true;
+  } else {
+    console.warn('Elemento de video no disponible');
+  }
 }
-
-
 
 function actualizarUIInterpretes(){
+  try {
+    const interpretes = JSON.parse(
+      localStorage.getItem('colaInterpretes') || '[]'
+    );
 
-const interpretes=
-JSON.parse(
-localStorage.getItem(
-'colaInterpretes'
-)||'[]'
-);
+    if(!interpretes.length){
+      console.warn('No hay intérpretes en la cola');
+      return;
+    }
 
-if(!interpretes.length) return;
+    // Validar índices
+    const actual = interpretes[
+      turnoActual % interpretes.length
+    ];
+    
+    const siguiente = interpretes[
+      (turnoActual + 1) % interpretes.length
+    ];
 
-const actual=
-interpretes[
-turnoActual % interpretes.length
-];
+    // Actualizar estado principal
+    const estado = document.getElementById('estadoPrincipal');
+    if(estado){
+      estado.innerHTML = `🎵 ${actual.nombre || 'Intérprete'}`;
+    }
 
-const siguiente=
-interpretes[
-(turnoActual+1)%interpretes.length
-];
+    // Actualizar ubicación
+    const lugar = document.getElementById('lugarPrincipal');
+    if(lugar){
+      lugar.innerHTML = `Desde ${actual.ubicacion || 'Mundo'}`;
+    }
 
-const estado=
-document.getElementById(
-'estadoPrincipal'
-);
+    // Actualizar siguiente en espera
+    const espera = document.querySelector(
+      '.video-box.small .lugar'
+    );
+    if(espera){
+      espera.innerHTML = `⏳ ${siguiente.nombre || 'Próximo'}`;
+    }
 
-if(estado){
- estado.innerHTML=
-`🎵 ${actual.nombre}`;
+    // Conectar con el intérprete actual
+    conectarAInterprete(actual.codigo);
+
+  } catch(error){
+    console.error('Error actualizando UI de intérpretes:', error);
+  }
 }
-
-const lugar=
-document.getElementById(
-'lugarPrincipal'
-);
-
-if(lugar){
- lugar.innerHTML=
-`Desde ${actual.ubicacion||'Mundo'}`;
-}
-
-const espera=
-document.querySelector(
-'.video-box.small .lugar'
-);
-
-if(espera){
- espera.innerHTML=
-`⏳ ${siguiente.nombre}`;
-}
-
-conectarAInterprete(
-actual.codigo
-);
-
-}
-
-
 
 function cambiarInterprete(){
+  turnoActual++;
+  actualizarUIInterpretes();
 
-turnoActual++;
-
-actualizarUIInterpretes();
-
-setTimeout(()=>{
- activarAudioDelInterprete();
-},1500);
-
+  // Esperar a que el stream esté listo antes de activar audio
+  setTimeout(() => {
+    activarAudioDelInterprete();
+  }, 1500);
 }
-
-
 
 function iniciarTurnos(){
+  if(intervaloTurno){
+    clearInterval(intervaloTurno);
+    intervaloTurno = null;
+  }
 
-if(intervaloTurno){
-clearInterval(
-intervaloTurno
-);
-}
+  const segundoGlobal = getSegundoGlobal();
 
-const segundoGlobal=
-getSegundoGlobal();
+  turnoActual = Math.floor(
+    segundoGlobal / DURACION_TURNO
+  );
 
-turnoActual=
-Math.floor(
-segundoGlobal /
-DURACION_TURNO
-);
+  actualizarUIInterpretes();
 
-actualizarUIInterpretes();
-
-intervaloTurno=
-setInterval(
-cambiarInterprete,
-DURACION_TURNO*1000
-);
-
+  // Cambiar intérprete cada DURACION_TURNO segundos
+  intervaloTurno = setInterval(
+    cambiarInterprete,
+    DURACION_TURNO * 1000
+  );
 }
