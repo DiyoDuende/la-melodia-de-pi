@@ -239,26 +239,56 @@ function verificarInicio() {
   }
 }
 
-function iniciarModoVivo() {
+function iniciarModoVivo(){
+
   console.log('🎵 π HA EMPEZADO');
 
-  const countdown = document.getElementById('countdownContainer');
-  if (countdown) countdown.style.display = 'none';
+  const countdown =
+    document.getElementById('countdownContainer');
+  if(countdown){
+    countdown.style.display='none';
+  }
 
-  const estado = document.getElementById('estadoPrincipal');
-  if (estado) estado.innerHTML = '🔴 LIVE';
+  const estado =
+    document.getElementById('estadoPrincipal');
+  if(estado){
+    estado.innerHTML='🔴 LIVE';
+  }
 
-  const lugar = document.getElementById('lugarPrincipal');
-  if (lugar) lugar.innerHTML = 'π está sonando ahora';
+  const lugar =
+    document.getElementById('lugarPrincipal');
+  if(lugar){
+    lugar.innerHTML='π está sonando ahora';
+  }
 
-  if (worker) {
-  actualizarPentagramaVivo();
-  setInterval(actualizarPentagramaVivo, 1000);
+  // -------------------------
+  // PENTAGRAMA (solo un timer)
+  // -------------------------
+
+  if(worker){
+
+    actualizarPentagramaVivo();
+
+    if(!window.intervaloPentagrama){
+      window.intervaloPentagrama =
+        setInterval(
+          actualizarPentagramaVivo,
+          1000
+        );
+    }
+
+  }else{
+    console.warn(
+      'Worker no disponible'
+    );
+  }
+
+  // -------------------------
+  // INTÉRPRETES
+  // -------------------------
+
+  iniciarTurnos();
 }
-
-iniciarTurnos();
-}
-
 function actualizarPentagramaVivo() {
   if (!worker) return;
 
