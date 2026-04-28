@@ -409,7 +409,11 @@ function conectarAInterprete(codigo){
   audioInterpreteActivo = false;
 
   try {
-    const peer = new Peer();
+    const peer = new Peer({
+  host:'peerjs.com',
+  secure:true,
+  port:443
+});
 
     peer.on('open', () => {
       const call = peer.call(codigo, null);
@@ -544,6 +548,10 @@ function iniciarTurnos(){
   );
 
   actualizarUIInterpretes();
+
+setTimeout(()=>{
+  activarAudioDelInterprete();
+},1500);
 
   // Cambiar intérprete cada DURACION_TURNO segundos
   intervaloTurno = setInterval(
