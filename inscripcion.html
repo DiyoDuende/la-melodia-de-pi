@@ -178,7 +178,9 @@ document.getElementById('formInscripcion').addEventListener('submit',e=>{
  const posicion=cola.length+1;
 
  const inicioEvento=new Date(Date.UTC(2027,2,14,0,0,0));
- const turno=new Date(inicioEvento.getTime()+posicion*300000);
+ const turno=new Date(
+inicioEvento.getTime()+(posicion-1)*300000
+);
 
  const interprete={
   nombre,
