@@ -478,52 +478,82 @@ function activarAudioDelInterprete(){
 }
 
 function actualizarUIInterpretes(){
-  try {
+
+  try{
+
     const interpretes = JSON.parse(
-      localStorage.getItem('cola') || '[]'
+      localStorage.getItem('interpretes') || '[]'
+    );
+
+    console.log(
+      'Intérpretes registrados:',
+      interpretes
     );
 
     if(!interpretes.length){
-      console.warn('No hay intérpretes en la cola');
+      console.warn(
+        'No hay intérpretes inscritos'
+      );
       return;
     }
 
-    // Validar índices
-    const actual = interpretes[
-      turnoActual % interpretes.length
-    ];
-    
-    const siguiente = interpretes[
-      (turnoActual + 1) % interpretes.length
-    ];
+    const actual =
+      interpretes[
+        turnoActual % interpretes.length
+      ];
 
-    // Actualizar estado principal
-    const estado = document.getElementById('estadoPrincipal');
+    const siguiente =
+      interpretes[
+        (turnoActual + 1) % interpretes.length
+      ];
+
+    // VIDEO PRINCIPAL
+    const estado =
+      document.getElementById(
+        'estadoPrincipal'
+      );
+
     if(estado){
-      estado.innerHTML = `🎵 ${actual.nombre || 'Intérprete'}`;
+      estado.innerHTML=
+       `🎵 ${actual.nombre}`;
     }
 
-    // Actualizar ubicación
-    const lugar = document.getElementById('lugarPrincipal');
+    // UBICACIÓN
+    const lugar =
+      document.getElementById(
+        'lugarPrincipal'
+      );
+
     if(lugar){
-      lugar.innerHTML = `Desde ${actual.ubicacion || 'Mundo'}`;
+      lugar.innerHTML=
+       `Desde ${actual.ubicacion || 'Mundo'}`;
     }
 
-    // Actualizar siguiente en espera
-    const espera = document.querySelector(
-      '.video-box.small .lugar'
-    );
+    // PRÓXIMO INTÉRPRETE
+    const espera =
+      document.querySelector(
+       '.video-box.small .lugar'
+      );
+
     if(espera){
-      espera.innerHTML =
-`⏳ ${siguiente.nombre} (${siguiente.ubicacion})`;
+      espera.innerHTML=
+       `⏳ ${siguiente.nombre}`;
     }
 
-    // Conectar con el intérprete actual
-    conectarAInterprete(actual.codigo);
+    // CONECTAR VIDEO WEBRTC
+    conectarAInterprete(
+      actual.codigo
+    );
 
-  } catch(error){
-    console.error('Error actualizando UI de intérpretes:', error);
+  }catch(error){
+
+    console.error(
+      'Error intérpretes:',
+      error
+    );
+
   }
+
 }
 
 function cambiarInterprete(){
