@@ -514,7 +514,8 @@ function actualizarUIInterpretes(){
       '.video-box.small .lugar'
     );
     if(espera){
-      espera.innerHTML = `⏳ ${siguiente.nombre || 'Próximo'}`;
+      espera.innerHTML =
+`⏳ ${siguiente.nombre} (${siguiente.ubicacion})`;
     }
 
     // Conectar con el intérprete actual
