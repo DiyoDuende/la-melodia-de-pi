@@ -480,7 +480,7 @@ function activarAudioDelInterprete(){
 function actualizarUIInterpretes(){
   try {
     const interpretes = JSON.parse(
-      localStorage.getItem('colaInterpretes') || '[]'
+      localStorage.getItem('interpretes') || '[]'
     );
 
     if(!interpretes.length){
