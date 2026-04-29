@@ -163,7 +163,9 @@ function generarPDF(interprete){
 // FORM
 // ============================================================
 
-let cola=JSON.parse(localStorage.getItem('cola')||'[]');
+let cola=JSON.parse(
+ localStorage.getItem('interpretes')||'[]'
+);
 
 document.getElementById('formInscripcion').addEventListener('submit',e=>{
  e.preventDefault();
@@ -181,15 +183,20 @@ document.getElementById('formInscripcion').addEventListener('submit',e=>{
  const interprete={
   nombre,
   email,
+  ubicacion: document.getElementById('ubicacion').value,
   codigo,
   posicion,
+  turno: posicion-1,
+  inicioSegundo:(posicion-1)*300,
   turnoUTC: turno.toUTCString(),
   turnoLocal: turno.toLocaleString()
- };
+};
 
  cola.push(interprete);
- localStorage.setItem('cola',JSON.stringify(cola));
-
+ localStorage.setItem(
+ 'interpretes',
+ JSON.stringify(cola)
+);
  // PDF
  generarPDF(interprete);
 
@@ -197,26 +204,50 @@ document.getElementById('formInscripcion').addEventListener('submit',e=>{
 
 
  document.getElementById('respuesta').style.display='block';
- document.getElementById('respuesta').innerHTML=`
+document.getElementById('respuesta').innerHTML=`
 <h3>✅ Inscripción completada</h3>
 
 <p><strong>${nombre}</strong></p>
 
-<p>🎼 Código:<br><strong style="color:#ffd966">${codigo}</strong></p>
-
-<p>⏱️ Turno UTC:<br>${turno.toUTCString()}</p>
-
-<p>🌍 Hora local:<br>${turno.toLocaleString()}</p>
-
-<p style="margin-top:15px;">
-📄 Se ha descargado tu partitura (PDF).
+<p>
+🎼 Código:<br>
+<strong style="color:#ffd966">
+${codigo}
+</strong>
 </p>
 
-<p style="font-size:0.9rem;opacity:0.7;">
-Guarda este código. Lo necesitarás para conectarte.
+<p>
+⏱️ Turno #${posicion}
+</p>
+
+<p>
+🌍 Hora:<br>
+${turno.toLocaleString()}
+</p>
+
+<p>
+π empieza en segundo:
+<strong>${(posicion-1)*300}</strong>
+</p>
+
+<p style="margin-top:20px">
+<a
+href="interprete.html?code=${codigo}"
+target="_blank"
+style="
+color:#ffd966;
+font-weight:bold;
+"
+>
+👉 Entrar como intérprete
+</a>
+</p>
+
+<p style="font-size:.9rem;opacity:.7">
+Tu PDF se ha descargado.
+Guarda este código.
 </p>
 `;
-});
 </script>
 
 </body>
