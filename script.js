@@ -528,11 +528,11 @@ if (!actual) {
 
     // Conectar con el intérprete actual
     if (currentCall?.peer !== actual.codigo) {
-  conectarAInterprete(actual.codigo);
+ // conectarAInterprete(actual.codigo);
 
   setTimeout(() => {
-    activarAudioDelInterprete();
-  }, 1500);
+  activarAudioDelInterprete();
+}, 1500);
 }
 
   } catch(error){
