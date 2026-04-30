@@ -497,11 +497,20 @@ function actualizarUIInterpretes(){
       return;
     }
 
-    const actual =
-      interpretes[
-        turnoActual % interpretes.length
-      ];
+    const segundoGlobal = getSegundoGlobal();
 
+const actual = interpretes.find(i =>
+  segundoGlobal >= i.inicioSegundo &&
+  segundoGlobal < i.inicioSegundo + DURACION_TURNO
+);
+
+const siguiente = interpretes.find(i =>
+  i.inicioSegundo === (actual?.inicioSegundo + DURACION_TURNO)
+);
+if (!actual) {
+  console.log("⏳ Esperando intérprete...");
+  return;
+}
     const siguiente =
       interpretes[
         (turnoActual + 1) % interpretes.length
@@ -541,9 +550,13 @@ function actualizarUIInterpretes(){
     }
 
     // CONECTAR VIDEO WEBRTC
-    conectarAInterprete(
-      actual.codigo
-    );
+    if (currentCall?.peer !== actual.codigo) {
+  conectarAInterprete(actual.codigo);
+
+  setTimeout(() => {
+    activarAudioDelInterprete();
+  }, 1500);
+}
 
   }catch(error){
 
