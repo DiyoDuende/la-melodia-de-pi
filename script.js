@@ -491,12 +491,17 @@ function actualizarUIInterpretes(){
 
     // Validar índices
     const actual = interpretes[
-      turnoActual % interpretes.length
-    ];
+  turnoActual % interpretes.length
+] || null;
+
+if (!actual) {
+  console.warn("⚠️ Intérprete actual inválido");
+  return;
+}
     
     const siguiente = interpretes[
       (turnoActual + 1) % interpretes.length
-    ];
+    ] || null;
 
     // Actualizar estado principal
     const estado = document.getElementById('estadoPrincipal');
@@ -515,11 +520,20 @@ function actualizarUIInterpretes(){
       '.video-box.small .lugar'
     );
     if(espera){
-      espera.innerHTML = `⏳ ${siguiente.nombre || 'Próximo'}`;
-    }
+  espera.innerHTML =
+    siguiente
+      ? `⏳ ${siguiente.nombre}`
+      : '⏳ ---';
+}
 
     // Conectar con el intérprete actual
-    conectarAInterprete(actual.codigo);
+    if (currentCall?.peer !== actual.codigo) {
+  conectarAInterprete(actual.codigo);
+
+  setTimeout(() => {
+    activarAudioDelInterprete();
+  }, 1500);
+}
 
   } catch(error){
     console.error('Error actualizando UI de intérpretes:', error);
