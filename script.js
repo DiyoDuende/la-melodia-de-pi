@@ -482,7 +482,7 @@ function actualizarUIInterpretes(){
   try{
 
     const interpretes = JSON.parse(
-      localStorage.getItem('interpretes') || '[]'
+      localStorage.getItem('cola') || '[]'
     );
 
     console.log(
@@ -504,9 +504,7 @@ const actual = interpretes.find(i =>
   segundoGlobal < i.inicioSegundo + DURACION_TURNO
 );
 
-const siguiente = interpretes.find(i =>
-  i.inicioSegundo === (actual?.inicioSegundo + DURACION_TURNO)
-);
+
 if (!actual) {
   console.log("⏳ Esperando intérprete...");
   return;
@@ -544,10 +542,14 @@ if (!actual) {
        '.video-box.small .lugar'
       );
 
-    if(espera){
-      espera.innerHTML=
-       `⏳ ${siguiente.nombre}`;
-    }
+    
+      if(espera){
+  espera.innerHTML =
+    siguiente
+      ? `⏳ ${siguiente.nombre}`
+      : '⏳ Esperando...';
+}
+    
 
     // CONECTAR VIDEO WEBRTC
     if (currentCall?.peer !== actual.codigo) {
@@ -591,15 +593,64 @@ function iniciarTurnos(){
     segundoGlobal / DURACION_TURNO
   );
 
-  actualizarUIInterpretes();
+ function actualizarUIInterpretes(){
 
-setTimeout(()=>{
-  activarAudioDelInterprete();
-},1500);
+  try{
 
-  // Cambiar intérprete cada DURACION_TURNO segundos
-  intervaloTurno = setInterval(
-    cambiarInterprete,
-    DURACION_TURNO * 1000
-  );
+    const interpretes = JSON.parse(
+      localStorage.getItem('cola') || '[]'
+    );
+
+    console.log('Intérpretes registrados:', interpretes);
+
+    if(!interpretes.length){
+      console.warn('No hay intérpretes inscritos');
+      return;
+    }
+
+    const segundoGlobal = getSegundoGlobal();
+
+    const actual = interpretes.find(i =>
+      segundoGlobal >= i.inicioSegundo &&
+      segundoGlobal < i.inicioSegundo + DURACION_TURNO
+    );
+
+    const siguiente = interpretes.find(i =>
+      i.inicioSegundo === (actual?.inicioSegundo + DURACION_TURNO)
+    );
+
+    if (!actual) {
+      console.log("⏳ Esperando intérprete...");
+      return;
+    }
+
+    const estado = document.getElementById('estadoPrincipal');
+    if(estado){
+      estado.innerHTML = `🎵 ${actual.nombre}`;
+    }
+
+    const lugar = document.getElementById('lugarPrincipal');
+    if(lugar){
+      lugar.innerHTML = `Desde ${actual.ubicacion || 'Mundo'}`;
+    }
+
+    const espera = document.querySelector('.video-box.small .lugar');
+    if(espera){
+      espera.innerHTML =
+        siguiente
+          ? `⏳ ${siguiente.nombre}`
+          : '⏳ Esperando...';
+    }
+
+    if (currentCall?.peer !== actual.codigo) {
+      conectarAInterprete(actual.codigo);
+
+      setTimeout(() => {
+        activarAudioDelInterprete();
+      }, 1500);
+    }
+
+  }catch(error){
+    console.error('Error intérpretes:', error);
+  }
 }
