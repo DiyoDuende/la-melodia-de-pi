@@ -168,71 +168,124 @@ async function actualizarUIInterpretes() {
 setInterval(actualizarUIInterpretes, 15000);
 
 // ============================================================
+// PENTAGRAMA INICIAL
+// ============================================================
+
+function generarPentagramaInicial() {
+  const digitos = ['·', '·', '3', '1', '4'];
+  const container = document.getElementById('notasPentagrama');
+
+  if (!container) return;
+
+  let html = '';
+
+  digitos.forEach((d, i) => {
+    const esActual = (i === 2);
+    const nota = NOTAS[d] || '·';
+    const top = ALTURAS[nota] ?? 90;
+
+   html += `
+  <div class="nota-columna">
+
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
+
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
+    ` : ''}
+
+    <div class="nota-nombre">${nota}</div>
+
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${d}
+    </div>
+
+  </div>
+`;
+  });
+
+  container.innerHTML = html;
+}
+// ============================================================
 // WORKER + PENTAGRAMA
 // ============================================================
+let modoVivo = false;
 let worker = null;
-try {
-  worker = new Worker('./worker/worker-pi.js');
-} catch {
-  console.warn('Worker no cargado');
+
+if (typeof Worker !== 'undefined') {
+  worker = new Worker('worker/worker-pi.js');
 }
 
-let modoVivo = false;
-
 function verificarInicio() {
-  const diff = INICIO_MELODIA - ahoraReal();
+  const ahora = new Date();
 
-  if (diff <= 0 && !modoVivo) {
+  if (ahora >= INICIO_MELODIA && !modoVivo) {
     modoVivo = true;
-
-    document.getElementById('countdownContainer').style.display = 'none';
-
-    setInterval(()=>{
-      if (!worker) return;
-
-      const segundo = getSegundoGlobal();
-
-      if (segundo < 0) return; // 🔴 evita basura
-
-      worker.postMessage({
-        id:'pentagrama',
-        inicio:segundo-2,
-        cantidad:5
-      });
-
-    },1000);
+    iniciarModoVivo();
   }
 }
 
-setInterval(verificarInicio,1000);
+function iniciarModoVivo() {
+  console.log('🎵 π HA EMPEZADO');
 
+  const countdown = document.getElementById('countdownContainer');
+  if (countdown) countdown.style.display = 'none';
+
+  const estado = document.getElementById('estadoPrincipal');
+  if (estado) estado.innerHTML = '🔴 LIVE';
+
+  const lugar = document.getElementById('lugarPrincipal');
+  if (lugar) lugar.innerHTML = 'π está sonando ahora';
+
+  if (worker) {
+    actualizarPentagramaVivo();
+    setInterval(actualizarPentagramaVivo, 1000);
+  }
+}
 if (worker) {
-  worker.onmessage = function(e){
-    if (!modoVivo) return;
+  worker.onmessage = function(e) {
 
-    const digitos = e.data.digitos;
-    if (!digitos || digitos.length < 3) return;
+    if (e.data.id === 'pentagrama' && modoVivo) {
 
-    const container = document.getElementById('notasPentagrama');
-    if (!container) return;
+      const digitos = e.data.digitos;
+      const container = document.getElementById('notasPentagrama');
 
-    let html='';
+      if (!container) return;
 
-    digitos.forEach((d,i)=>{
-      if (d === undefined) return;
+      let html = '';
 
-      const nota = NOTAS[d];
-      if (!nota) return;
+      digitos.forEach((d, i) => {
 
-      const top = ALTURAS[nota] ?? 90;
+        const esActual = (i === 2);
+        const nota = NOTAS[d] || '·';
+        if (esActual) {
+  const digitoReal = obtenerDigito(e.data.inicio + 2);
+  const notaReal = NOTAS[digitoReal];
 
-      html += `
-      <div class="nota-columna">
-        <div class="nota-cabeza ${i===2?'actual':''}" style="top:${top}px;"></div>
-        <div class="nota-nombre">${nota}</div>
-        <div class="nota-digito ${i===2?'actual':''}">${d}</div>
-      </div>`;
-    });
+  if (notaReal) {
+    tocarNota(notaReal);
+  }
+}
+        const top = ALTURAS[nota] ?? 90;
+
+        html += `
+  <div class="nota-columna">
+
+    <div class="nota-cabeza ${esActual ? 'actual' : ''}" 
+         style="top:${top}px;"></div>
+
+    ${nota === 'Do' ? `
+      <div class="linea-adicional" style="top:${top + 5}px;"></div>
+    ` : ''}
+
+    <div class="nota-nombre">${nota}</div>
+
+    <div class="nota-digito ${esActual ? 'actual' : ''}">
+      ${d}
+    </div>
+
+  </div>
+`;
 
     container.innerHTML = html;
 
