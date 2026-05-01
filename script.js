@@ -16,12 +16,12 @@ let offsetServidor = 0;
 async function sincronizarTiempo() {
   try {
     const res = await fetch(`${API_URL}?action=getServerTime`);
-    function sincronizarTiempo() {
-  offsetServidor = 0;
-}
     const data = await res.json();
     offsetServidor = data.serverTime - Date.now();
-  } catch (e) { console.warn('No se pudo sincronizar el tiempo'); }
+  } catch (e) { 
+    console.warn('No se pudo sincronizar el tiempo');
+    offsetServidor = 0;
+  }
 }
 function ahoraReal() { return Date.now() + offsetServidor; }
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
@@ -238,15 +238,19 @@ setInterval(actualizarUIInterpretes, 15000);
 let worker = new Worker('./worker/worker-pi.js');
 let modoVivo = false;
 function verificarInicio() {
- if (!modoVivo) {
+  const diff = INICIO_MELODIA - ahoraReal();
+
+  if (diff <= 0 && !modoVivo) {
     modoVivo = true;
     document.getElementById('countdownContainer').style.display = 'none';
+
     setInterval(() => {
       const segundoGlobal = getSegundoGlobal();
-      worker.postMessage({ id: 'pentagrama', inicio: segundoGlobal-2, cantidad:5 });
+      worker.postMessage({ id: 'pentagrama', inicio: segundoGlobal - 2, cantidad: 5 });
     }, 1000);
   }
 }
+setInterval(verificarInicio, 1000);
 worker.onmessage = function(e) {
   if (e.data.id === 'pentagrama' && modoVivo) {
     const digitos = e.data.digitos;
