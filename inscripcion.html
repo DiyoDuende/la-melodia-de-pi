@@ -1,259 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inscríbete - La melodía de π</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-
-<style>
-body {
-  background:#0a0c10;
-  color:#eef3f9;
-  font-family:'Inter',sans-serif;
-  padding:40px 20px;
-}
-.container {
-  max-width:700px;
-  margin:auto;
-  background:#0f141c;
-  padding:40px;
-  border-radius:12px;
-  border:1px solid #2a3a4a;
-}
-h1 { text-align:center; color:#ffd966; }
-input, textarea {
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  margin-bottom:20px;
-  background:#1a1f2a;
-  border:1px solid #3a4a5a;
-  color:white;
-  border-radius:8px;
-}
-button {
-  width:100%;
-  padding:14px;
-  border-radius:40px;
-  background:#ffd966;
-  border:none;
-  cursor:pointer;
-}
-.info-box {
-  background:#1a1f2a;
-  padding:20px;
-  margin-top:20px;
-  border-left:4px solid #ffd966;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Inscríbete - La melodía de π</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { background:#0a0c10; color:#eef3f9; font-family:'Inter',sans-serif; padding:40px 20px; }
+    .container { max-width:700px; margin:auto; background:#0f141c; padding:40px; border-radius:12px; border:1px solid #2a3a4a; }
+    h1 { text-align:center; color:#ffd966; }
+    input, textarea { width:100%; padding:12px; margin-top:8px; margin-bottom:20px; background:#1a1f2a; border:1px solid #3a4a5a; color:white; border-radius:8px; }
+    button { width:100%; padding:14px; border-radius:40px; background:#ffd966; border:none; cursor:pointer; font-weight:bold; }
+    .info-box { background:#1a1f2a; padding:20px; margin-top:20px; border-left:4px solid #ffd966; display:none; }
+  </style>
 </head>
-
 <body>
-
 <div class="container">
-<h1>🎵 Inscríbete para interpretar π</h1>
-
-<form id="formInscripcion">
-<input type="text" id="nombre" placeholder="Nombre completo" required>
-<input type="email" id="email" placeholder="Correo electrónico" required>
-<input type="text" id="ubicacion" placeholder="País / Ciudad">
-<textarea id="bio" placeholder="Presentación"></textarea>
-
-<label>
-<input type="checkbox" required> Acepto normas
-</label>
-
-<button type="submit">🎶 Enviar inscripción</button>
-</form>
-
-<div id="respuesta" class="info-box" style="display:none;"></div>
+  <h1>🎵 Inscríbete para interpretar π</h1>
+  <form id="formInscripcion">
+    <input type="text" id="nombre" placeholder="Nombre completo" required>
+    <input type="email" id="email" placeholder="Correo electrónico" required>
+    <input type="text" id="ubicacion" placeholder="País / Ciudad">
+    <textarea id="bio" placeholder="Breve presentación (opcional)"></textarea>
+    <label><input type="checkbox" id="acepto" required> Acepto las normas de respeto y educación</label>
+    <button type="submit">🎶 Enviar inscripción</button>
+  </form>
+  <div id="respuesta" class="info-box"></div>
 </div>
 
 <script>
+  // ============================================================
+  // CONFIGURACIÓN (cambia estos valores)
+  // ============================================================
+  const API_URL = 'https://script.google.com/macros/s/TU_ID/exec'; // tu Apps Script
+  // EmailJS (opcional, si quieres enviar correo)
+  // emailjs.init('TU_USER_ID');
 
-
-// ============================================================
-// PI GENERADOR
-// ============================================================
-
-function* generarPi() {
-  let q=1n,r=0n,t=1n,k=1n,n=3n,l=3n;
-  while(true){
-    if(4n*q+r-t<n*t){
-      yield Number(n);
-      let nr=10n*(r-n*t);
-      n=(10n*(3n*q+r))/t-10n*n;
-      q=10n*q;r=nr;
-    }else{
-      let nr=(2n*q+r)*l;
-      let nn=(q*(7n*k)+2n+r*l)/(t*l);
-      q=q*k;t=t*l;l=l+2n;k=k+1n;n=nn;r=nr;
+  // ============================================================
+  // GENERADOR DE π (para el PDF)
+  // ============================================================
+  function* generarPi() {
+    let q=1n,r=0n,t=1n,k=1n,n=3n,l=3n;
+    while(true){
+      if(4n*q+r-t<n*t){
+        yield Number(n);
+        let nr=10n*(r-n*t);
+        n=(10n*(3n*q+r))/t-10n*n;
+        q=10n*q; r=nr;
+      } else {
+        let nr=(2n*q+r)*l;
+        let nn=(q*(7n*k)+2n+r*l)/(t*l);
+        q=q*k; t=t*l; l=l+2n; k=k+1n; n=nn; r=nr;
+      }
     }
   }
-}
-
-// ============================================================
-// NOTAS
-// ============================================================
-
-const NOTAS = {
- '0':'Mi⁸','1':'Do','2':'Re','3':'Mi','4':'Fa',
- '5':'Sol','6':'La','7':'Si','8':'Do⁸','9':'Re⁸'
-};
-
-// ============================================================
-// GENERAR NOTAS
-// ============================================================
-
-function generarNotas(inicio,cantidad){
- const gen=generarPi();
- const cache=[];
- function get(i){
-  while(cache.length<=i){
-   cache.push(gen.next().value.toString());
+  const NOTAS = { '0':'Mi⁸','1':'Do','2':'Re','3':'Mi','4':'Fa','5':'Sol','6':'La','7':'Si','8':'Do⁸','9':'Re⁸' };
+  function generarNotas(inicio,cantidad){
+    const gen=generarPi();
+    const cache=[];
+    function get(i){ while(cache.length<=i) cache.push(gen.next().value.toString()); return cache[i]; }
+    const lista=[];
+    for(let i=0;i<cantidad;i++){
+      const d=get(inicio+i);
+      lista.push({digito:d,nota:NOTAS[d]});
+    }
+    return lista;
   }
-  return cache[i];
- }
- const lista=[];
- for(let i=0;i<cantidad;i++){
-  const d=get(inicio+i);
-  lista.push({seg:i,digito:d,nota:NOTAS[d]});
- }
- return lista;
-}
+  function generarPDF(interprete, inicioSegundo){
+    const { jsPDF } = window.jspdf;
+    const doc=new jsPDF();
+    const notas=generarNotas(inicioSegundo,300);
+    doc.setFontSize(16);
+    doc.text("La melodía de π",20,20);
+    doc.setFontSize(10);
+    doc.text(`Código: ${interprete.codigo}`,20,30);
+    doc.text(`Turno UTC: ${interprete.turnoUTC}`,20,36);
+    doc.text(`Hora local: ${interprete.turnoLocal}`,20,42);
+    let y=55;
+    notas.forEach((n,i)=>{
+      doc.text(`${i+1} | ${n.digito} | ${n.nota}`,20,y);
+      y+=5;
+      if(y>280){ doc.addPage(); y=20; }
+    });
+    doc.save(`pi-${interprete.codigo}.pdf`);
+  }
 
-// ============================================================
-// PDF
-// ============================================================
+  // ============================================================
+  // ENVÍO DEL FORMULARIO
+  // ============================================================
+  const form = document.getElementById('formInscripcion');
+  const respuestaDiv = document.getElementById('respuesta');
 
-function generarPDF(interprete){
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    const ubicacion = document.getElementById('ubicacion').value;
+    const bio = document.getElementById('bio').value;
+    const codigo = 'π-' + Math.random().toString(36).substring(2,10).toUpperCase();
 
- const { jsPDF } = window.jspdf;
- const doc=new jsPDF();
+    // Enviar a Apps Script para que asigne el turno y guarde
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ nombre, email, lugar: ubicacion, instrumento: bio, codigo, grabacion: 'si' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const turnoUTC = new Date(data.inicioSegundo * 1000).toUTCString();
+      const turnoLocal = new Date(data.inicioSegundo * 1000).toLocaleString();
+      const interprete = { codigo, turnoUTC, turnoLocal };
+      generarPDF(interprete, data.inicioSegundo);
 
- const inicio=(interprete.posicion-1)*300;
- const notas=generarNotas(inicio,300);
+      // (Opcional) Enviar email con EmailJS
+      // await emailjs.send('service_id', 'template_id', { nombre, email, codigo, fecha: turnoLocal });
 
- doc.setFontSize(16);
- doc.text("La melodía de π",20,20);
-
- doc.setFontSize(10);
- doc.text(`Código: ${interprete.codigo}`,20,30);
- doc.text(`Turno UTC: ${interprete.turnoUTC}`,20,36);
- doc.text(`Hora local: ${interprete.turnoLocal}`,20,42);
-
- let y=55;
-
- notas.forEach(n=>{
-  doc.text(`${n.seg} | ${n.digito} | ${n.nota}`,20,y);
-  y+=5;
-  if(y>280){doc.addPage();y=20;}
- });
-
- doc.save(`pi-${interprete.codigo}.pdf`);
-}
-
-
-// ============================================================
-// FORM
-// ============================================================
-
-let cola=JSON.parse(
- localStorage.getItem('interpretes')||'[]'
-);
-
-document.getElementById('formInscripcion').addEventListener('submit',e=>{
- e.preventDefault();
-
- const nombre=document.getElementById('nombre').value;
- const email=document.getElementById('email').value;
-
- const codigo='π-'+Math.random().toString(36).substring(2,8).toUpperCase();
-
- const posicion=cola.length+1;
-
- const inicioEvento=new Date(Date.UTC(2027,2,14,0,0,0));
- const turno=new Date(
-inicioEvento.getTime()+(posicion-1)*300000
-);
-
- const interprete={
-  nombre,
-  email,
-  ubicacion: document.getElementById('ubicacion').value,
-  codigo,
-  posicion,
-  turno: posicion-1,
-  inicioSegundo:(posicion-1)*300,
-  turnoUTC: turno.toUTCString(),
-  turnoLocal: turno.toLocaleString()
-};
-
- cola.push(interprete);
- localStorage.setItem(
- 'interpretes',
- JSON.stringify(cola)
-);
- // PDF
- generarPDF(interprete);
-
- // EMAIL
-
-
- document.getElementById('respuesta').style.display='block';
-document.getElementById('respuesta').innerHTML=`
-<h3>✅ Inscripción completada</h3>
-
-<p><strong>${nombre}</strong></p>
-
-<p>
-🎼 Código:<br>
-<strong style="color:#ffd966">
-${codigo}
-</strong>
-</p>
-
-<p>
-⏱️ Turno #${posicion}
-</p>
-
-<p>
-🌍 Hora:<br>
-${turno.toLocaleString()}
-</p>
-
-<p>
-π empieza en segundo:
-<strong>${(posicion-1)*300}</strong>
-</p>
-
-<p style="margin-top:20px">
-<a
-href="interprete.html?code=${codigo}"
-target="_blank"
-style="
-color:#ffd966;
-font-weight:bold;
-"
->
-👉 Entrar como intérprete
-</a>
-</p>
-
-<p style="font-size:.9rem;opacity:.7">
-Tu PDF se ha descargado.
-Guarda este código.
-</p>
-`;
-
-});
-  
+      respuestaDiv.style.display = 'block';
+      respuestaDiv.innerHTML = `
+        <h3>✅ Inscripción completada</h3>
+        <p><strong>${nombre}</strong></p>
+        <p>🎼 Código: <strong style="color:#ffd966">${codigo}</strong></p>
+        <p>⏱️ Turno #${data.inicioSegundo/300}</p>
+        <p>🌍 Hora UTC: ${turnoUTC}</p>
+        <p>🌍 Hora local: ${turnoLocal}</p>
+        <p>π empezará en el segundo global <strong>${data.inicioSegundo}</strong></p>
+        <p><a href="interprete.html?code=${codigo}&turno=${data.inicioSegundo}" target="_blank" style="color:#ffd966;">👉 Entrar como intérprete</a></p>
+        <p style="font-size:.9rem; opacity:.7">Tu PDF se ha descargado. Guarda este código.</p>
+      `;
+      form.reset();
+    } else {
+      alert('Error al inscribirte. Inténtalo de nuevo.');
+    }
+  });
 </script>
-  
 </body>
 </html>
+
