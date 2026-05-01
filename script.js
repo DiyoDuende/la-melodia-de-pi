@@ -222,7 +222,7 @@ setInterval(actualizarUIInterpretes, 15000);
 let worker = new Worker('./worker/worker-pi.js');
 let modoVivo = false;
 function verificarInicio() {
-  if (Date.now() >= INICIO_MELODIA && !modoVivo) {
+ if (!modoVivo) {
     modoVivo = true;
     document.getElementById('countdownContainer').style.display = 'none';
     setInterval(() => {
