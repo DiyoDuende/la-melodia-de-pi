@@ -1,0 +1,34 @@
+{
+  "es": {
+    "titulo": "La melodía de π",
+    "countdownTitle": "⏳ TIEMPO PARA QUE π EMPIECE A SONAR",
+    "dias": "DÍAS",
+    "horas": "HORAS",
+    "min": "MIN",
+    "seg": "SEG",
+    "live": "LIVE",
+    "espera": "ESPERA",
+    "desde": "Desde el 14/03/2027",
+    "proximos": "Próximos intérpretes",
+    "inscripcion": "📝 Inscripción",
+    "normas": "📜 Normas",
+    "readme": "📖 README",
+    "footer": "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora."
+  },
+  "en": {
+    "titulo": "The Melody of π",
+    "countdownTitle": "⏳ TIME UNTIL π BEGINS TO PLAY",
+    "dias": "DAYS",
+    "horas": "HOURS",
+    "min": "MIN",
+    "seg": "SEC",
+    "live": "LIVE",
+    "espera": "WAITING",
+    "desde": "From 14/03/2027",
+    "proximos": "Next performers",
+    "inscripcion": "📝 Sign up",
+    "normas": "📜 Rules",
+    "readme": "📖 README",
+    "footer": "An infinite melody, played by finite people, united by the same pulse, in the same now."
+  }
+}
