@@ -187,10 +187,11 @@ body {
 }
 .nota-nombre {
   position: absolute;
-  bottom: 0px;
+  top: 120px;
   width: 100%;
   text-align: center;
   font-size: 0.8rem;
+  color: #9bb8e0;
 }
 .nota-digito {
   position: absolute;
