@@ -219,7 +219,7 @@ setInterval(actualizarUIInterpretes, 15000);
 // ============================================================
 // PENTAGRAMA EN VIVO (worker)
 // ============================================================
-let worker = new Worker('/la-melodia-de-pi/worker/worker-pi.js');
+let worker = new Worker('./worker/worker-pi.js');
 let modoVivo = false;
 function verificarInicio() {
   if (Date.now() >= INICIO_MELODIA && !modoVivo) {
