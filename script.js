@@ -52,8 +52,16 @@ const NOTAS = {
   '5': 'Sol', '6': 'La', '7': 'Si', '8': 'Do⁸', '9': 'Re⁸'
 };
 const ALTURAS = {
-  'Do': 114, 'Re': 104, 'Mi': 94, 'Fa': 84, 'Sol': 74,
-  'La': 64, 'Si': 54, 'Do⁸': 44, 'Re⁸': 34, 'Mi⁸': 24
+  'Mi⁸': 10,
+  'Re⁸': 20,
+  'Do⁸': 30,
+  'Si': 40,
+  'La': 50,
+  'Sol': 60,
+  'Fa': 70,
+  'Mi': 80,
+  'Re': 90,
+  'Do': 100
 };
 function* generarPi() {
   let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
