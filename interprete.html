@@ -1,46 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Intérprete - La melodía de π</title>
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Intérprete - La melodía de π</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background:#0a0c10; color:#eef3f9; font-family:'Inter',sans-serif; text-align:center; padding:20px; }
+    video { width:100%; max-width:800px; background:#1a1f2a; border-radius:12px; margin-top:20px; }
+    button { margin-top:20px; background:#ffd966; border:none; padding:12px 24px; border-radius:40px; cursor:pointer; font-weight:bold; }
+  </style>
 </head>
+<body>
+  <h1>🎤 Esperando tu turno...</h1>
+  <p>Mantén esta página abierta cuando comience tu actuación.</p>
+  <div id="estado" style="margin:20px; color:#ffd966;"></div>
+  <video id="localVideo" autoplay muted playsinline></video>
+  <button id="btnStart">📹 Activar cámara y micrófono</button>
 
-<body style="background:black; color:white; text-align:center; font-family:sans-serif;">
+  <script src="https://cdn.livekit.io/livekit/livekit-latest.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const CODIGO = params.get('code');
+    const TURNO_STR = params.get('turno');
+    if (!CODIGO || !TURNO_STR) {
+      document.body.innerHTML = '<h1>❌ Enlace inválido</h1>';
+      throw new Error('Missing parameters');
+    }
+    const TURNO = parseInt(TURNO_STR);
+    const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0)).getTime();
+    function getSegundoGlobal() { return Math.floor((Date.now() - INICIO_MELODIA) / 1000); }
+    function enTurno() { const ahora = getSegundoGlobal(); return ahora >= TURNO && ahora < TURNO + 300; }
 
-<h1>🎤 Esperando tu turno...</h1>
-<p>Mantén esta página abierta</p>
+    const TOKEN_URL = 'https://tu-worker.workers.dev';   // 🔴 CAMBIA
+    const LIVEKIT_URL = 'wss://tu-dominio-livekit.com'; // 🔴 CAMBIA
 
-<video id="localVideo" autoplay muted playsinline style="width:300px; background:#000;"></video>
+    let room = null;
+    let localStream = null;
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const codigo = params.get('code');
+    async function solicitarToken() {
+      const roomName = `turno-${TURNO}`;
+      const res = await fetch(`${TOKEN_URL}?room=${roomName}&identity=${CODIGO}`);
+      const data = await res.json();
+      return data.token;
+    }
 
-if (!codigo) {
-  document.body.innerHTML = '<h1>❌ Código inválido</h1>';
-  throw new Error("No code");
-}
+    async function conectar() {
+      if (!enTurno()) {
+        document.getElementById('estado').innerText = '⏳ Aún no es tu turno. Espera unos minutos.';
+        return;
+      }
+      if (!localStream) {
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          document.getElementById('localVideo').srcObject = localStream;
+        } catch(err) {
+          document.getElementById('estado').innerText = '❌ Error al acceder a cámara/micrófono.';
+          return;
+        }
+      }
+      const token = await solicitarToken();
+      room = new Livekit.Room();
+      await room.connect(LIVEKIT_URL, token);
+      await room.localParticipant.publishTracks(localStream.getTracks());
+      document.getElementById('estado').innerText = '🎙️ Estás al aire. Tu actuación durará 5 minutos.';
+      // Desconectar automáticamente después de 5 minutos
+      setTimeout(() => desconectar(), 300000);
+    }
 
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-.then(stream => {
+    async function desconectar() {
+      if (room) await room.disconnect();
+      room = null;
+      document.getElementById('estado').innerText = 'Turno finalizado. Gracias por participar.';
+    }
 
-  document.getElementById('localVideo').srcObject = stream;
-
-  const peer = new Peer(codigo);
-
-  peer.on('open', () => {
-    console.log("🎤 Intérprete listo:", codigo);
-  });
-
-  peer.on('call', (call) => {
-    console.log("📞 Llamada recibida");
-    call.answer(stream);
-  });
-
-})
-.catch(err => alert("Error cámara/micrófono: " + err.message));
-</script>
-
+    document.getElementById('btnStart').addEventListener('click', conectar);
+  </script>
 </body>
 </html>
+
