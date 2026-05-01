@@ -2,9 +2,9 @@
 // ============================================================
 // CONFIGURACIÓN GLOBAL (cambia estas URLs por las tuyas)
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/TU_ID/exec';
-const TOKEN_URL = 'https://tu-worker.workers.dev';
-const LIVEKIT_URL = 'wss://tu-dominio-livekit.com';
+// const API_URL = 'https://script.google.com/macros/s/TU_ID/exec';
+// const TOKEN_URL = 'https://tu-worker.workers.dev';
+// const LIVEKIT_URL = 'wss://tu-dominio-livekit.com';
 
 let room = null;
 let currentEspera = null;
@@ -16,6 +16,9 @@ let offsetServidor = 0;
 async function sincronizarTiempo() {
   try {
     const res = await fetch(`${API_URL}?action=getServerTime`);
+    function sincronizarTiempo() {
+  offsetServidor = 0;
+}
     const data = await res.json();
     offsetServidor = data.serverTime - Date.now();
   } catch (e) { console.warn('No se pudo sincronizar el tiempo'); }
@@ -297,6 +300,6 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 // ARRANQUE GLOBAL
 // ============================================================
 verificarInicio();
-setInterval(verificarInicio,1000);
-actualizarUIInterpretes();
+setInterval(actualizarUIInterpretes, 15000);
+actualizarUIInterpretes();;
 
