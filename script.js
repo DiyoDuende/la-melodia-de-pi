@@ -1,3 +1,4 @@
+
 // ============================================================
 // 1. CONFIGURACIÓN GLOBAL (cambia estas URLs cuando las tengas)
 // ============================================================
@@ -182,28 +183,27 @@ async function actualizarUIInterpretes() {
 }
 setInterval(actualizarUIInterpretes, 15000);
 
+// ============================================================
+// 10. CUENTA ATRÁS (usando ahoraReal)
+// ============================================================
 function actualizarCountdown() {
-  const diff = INICIO_MELODIA - Date.now();
-
+  const diff = INICIO_MELODIA - ahoraReal();
   if (diff <= 0) {
-    document.querySelectorAll('#dias,#horas,#minutos,#segundos')
-      .forEach(el => el.textContent = '00');
+    document.querySelectorAll('#dias,#horas,#minutos,#segundos').forEach(el => el.textContent = '00');
     return;
   }
-
   const dias = Math.floor(diff / 86400000);
   const horas = Math.floor((diff % 86400000) / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
   const segs = Math.floor((diff % 60000) / 1000);
-
   document.getElementById('dias').textContent = dias;
   document.getElementById('horas').textContent = horas.toString().padStart(2,'0');
   document.getElementById('minutos').textContent = mins.toString().padStart(2,'0');
   document.getElementById('segundos').textContent = segs.toString().padStart(2,'0');
 }
-
 setInterval(actualizarCountdown, 1000);
 actualizarCountdown();
+
 // ============================================================
 // 11. PENTAGRAMA (WORKER + MODO DEMO)
 // ============================================================
