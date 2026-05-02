@@ -293,4 +293,44 @@ body {
   .videos { grid-template-columns: 1fr; }
 }
 
-
+/* ===== NUEVO BLOQUE DE ACCESO PARA INTÉRPRETES ===== */
+.acceso-interprete {
+  background: #0f141c;
+  border: 1px solid #2a3a4a;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+  border-radius: 12px;
+}
+.acceso-titulo {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #b0c9e8;
+}
+.acceso-interprete form {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.acceso-interprete input {
+  padding: 10px;
+  background: #1a1f2a;
+  border: 1px solid #3a4a5a;
+  color: white;
+  border-radius: 30px;
+  width: 200px;
+}
+.acceso-interprete button {
+  background: #ffd966;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.acceso-ayuda {
+  font-size: 0.7rem;
+  margin-top: 10px;
+  color: #7f8fa3;
+}
