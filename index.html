@@ -53,19 +53,8 @@
     </div>
   </div>
 
-  <!-- 🎤 ACCESO PARA INTÉRPRETES -->
-  <div class="acceso-interprete">
-    <div class="acceso-titulo" data-i18n="acceso_titulo">🎤 ¿Ya tienes tu código?</div>
-    <form id="formAccesoInterprete">
-      <input type="text" id="codigoAcceso" placeholder="Código (ej. π-ABCD1234)" required>
-      <input type="number" id="turnoAcceso" placeholder="Segundo de inicio (ej. 1710000000)" required>
-      <button type="submit">Acceder a mi turno</button>
-    </form>
-    <p class="acceso-ayuda" data-i18n="acceso_ayuda">El código y el segundo de inicio los recibiste por correo al inscribirte.</p>
-  </div>
-
   <div style="text-align:center; margin:20px 0;">
-    <button id="btnAudio" class="audio-btn">🔊 Activar sonido</button>
+    <button id="btnAudio" class="audio-btn" data-i18n="btn_audio">🔊 Activar sonido</button>
   </div>
 
   <div class="pentagrama-section">
@@ -80,7 +69,7 @@
       <div id="notasPentagrama" class="notas-wrapper"></div>
     </div>
     <div class="tiempo-info">
-      <span id="tiempoActual">⏱️ segundo #0 · π: 3 · 60 bpm</span>
+      <span id="tiempoActual">⏱️ segundo #0 · π: 3 · 60 bpm (esperando inicio)</span>
     </div>
   </div>
 
@@ -88,6 +77,16 @@
     <a class="menu-item" href="inscripcion.html" data-i18n="inscripcion">📝 Inscripción</a>
     <a class="menu-item" href="normas.html" data-i18n="normas">📜 Normas</a>
     <a class="menu-item" href="readme.html" data-i18n="readme">📖 README</a>
+  </div>
+
+  <div class="acceso-interprete">
+    <div class="acceso-titulo" data-i18n="acceso_titulo">🎤 ¿Ya tienes tu código?</div>
+    <form id="formAccesoInterprete">
+      <input type="text" id="codigoAcceso" placeholder="Código (ej. π-ABCD1234)" required>
+      <input type="number" id="turnoAcceso" placeholder="Segundo de inicio (ej. 1710000000)" required>
+      <button type="submit" data-i18n="acceso_btn">Acceder a mi turno</button>
+    </form>
+    <p class="acceso-ayuda" data-i18n="acceso_ayuda">El código y el segundo de inicio los recibiste por correo al inscribirte.</p>
   </div>
 
   <div class="footer">
@@ -101,4 +100,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
