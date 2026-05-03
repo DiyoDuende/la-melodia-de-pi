@@ -11,7 +11,7 @@ let currentEspera = null;
 let offsetServidor = 0;
 
 // ============================================================
-// 2. SINCRONIZACIÓN DE TIEMPO (CRÍTICA)
+// 2. SINCRONIZACIÓN DE TIEMPO
 // ============================================================
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
 
@@ -50,13 +50,60 @@ async function obtenerInterpretes() {
 }
 
 // ============================================================
-// 4. TRADUCCIÓN (placeholder)
+// 4. TRADUCCIÓN REAL CON JSON
 // ============================================================
-function cambiarIdioma(idioma, el) {
-  alert("Traducción temporalmente desactivada");
-  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('activo'));
-  if (el) el.classList.add('activo');
+let textos = {};
+let idiomaActual = 'es';
+
+async function cargarTraducciones() {
+  try {
+    const res = await fetch('traducciones.json');
+    textos = await res.json();
+    aplicarTraduccion();
+  } catch (e) {
+    console.warn('No se pudieron cargar las traducciones');
+  }
 }
+
+function aplicarTraduccion() {
+  if (!textos[idiomaActual]) return;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (textos[idiomaActual][key]) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = textos[idiomaActual][key];
+      } else {
+        el.innerHTML = textos[idiomaActual][key];
+      }
+    }
+  });
+  const btnAudio = document.getElementById('btnAudio');
+  if (btnAudio && sonidoActivado !== undefined) {
+    const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+    if (textos[idiomaActual][key]) btnAudio.innerHTML = textos[idiomaActual][key];
+  }
+}
+
+function cambiarIdioma(idioma, btn) {
+  idiomaActual = idioma;
+  aplicarTraduccion();
+  localStorage.setItem('idioma', idioma);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('activo'));
+  if (btn) btn.classList.add('activo');
+}
+
+const idiomaGuardado = localStorage.getItem('idioma');
+if (idiomaGuardado && ['es','en','fr','de','it','pt','ja','zh','ar'].includes(idiomaGuardado)) {
+  idiomaActual = idiomaGuardado;
+}
+cargarTraducciones();
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    cambiarIdioma(btn.dataset.lang, btn);
+  });
+  if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
+});
 
 // ============================================================
 // 5. NOTAS Y ALTURAS
@@ -71,7 +118,7 @@ const ALTURAS = {
 };
 
 // ============================================================
-// 6. GENERADOR INFINITO DE π
+// 6. GENERADOR DE π
 // ============================================================
 function* generarPi() {
   let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
@@ -102,7 +149,7 @@ function obtenerDigito(indice) {
 }
 
 // ============================================================
-// 7. AUDIO π
+// 7. AUDIO
 // ============================================================
 let audioCtx = null, piano = null, sonidoActivado = false, audioInterpreteActivo = false;
 
@@ -124,8 +171,11 @@ async function iniciarAudio() {
     piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
   }
   sonidoActivado = true;
+  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+  if (textos[idiomaActual] && textos[idiomaActual][key]) {
+    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+  }
 }
-
 function tocarNota(nota) {
   if (!sonidoActivado || !piano || !nota) return;
   const mapa = {
@@ -146,25 +196,26 @@ function tocarNota(nota) {
 document.getElementById('btnAudio')?.addEventListener('click', async () => {
   if (!piano) await iniciarAudio();
   sonidoActivado = !sonidoActivado;
-  document.getElementById('btnAudio').textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
+  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+  if (textos[idiomaActual] && textos[idiomaActual][key]) {
+    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+  } else {
+    document.getElementById('btnAudio').textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
+  }
 });
 
 // ============================================================
-// 8. LIVEKIT (desactivado hasta tener URLs)
+// 8. LIVEKIT (placeholder)
 // ============================================================
 async function conectarAInterprete(codigo, inicioSegundo) {
-  if (!TOKEN_URL || !LIVEKIT_URL) {
-    console.warn('LiveKit no configurado');
-    return;
-  }
-  // Aquí irá la lógica real (omitida por ahora)
+  if (!TOKEN_URL || !LIVEKIT_URL) return;
 }
 async function gestionarEspera(siguiente) {
   if (!TOKEN_URL || !LIVEKIT_URL) return;
 }
 
 // ============================================================
-// 9. UI DE INTÉRPRETES (actualiza cada 15s)
+// 9. UI INTÉRPRETES
 // ============================================================
 async function actualizarUIInterpretes() {
   if (!API_URL) return;
@@ -176,15 +227,15 @@ async function actualizarUIInterpretes() {
     document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
     if (TOKEN_URL && LIVEKIT_URL) conectarAInterprete(actual.codigo, actual.inicioSegundo);
   } else {
-    document.getElementById('estadoPrincipal').innerHTML = '🔴 LIVE';
-    document.getElementById('lugarPrincipal').innerHTML = 'π está sonando ahora';
+    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
+    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde || 'π está sonando ahora';
     audioInterpreteActivo = false;
   }
 }
 setInterval(actualizarUIInterpretes, 15000);
 
 // ============================================================
-// 10. CUENTA ATRÁS (usando ahoraReal)
+// 10. CUENTA ATRÁS
 // ============================================================
 function actualizarCountdown() {
   const diff = INICIO_MELODIA - ahoraReal();
@@ -205,15 +256,14 @@ setInterval(actualizarCountdown, 1000);
 actualizarCountdown();
 
 // ============================================================
-// 11. PENTAGRAMA (WORKER + MODO DEMO)
+// 11. PENTAGRAMA
 // ============================================================
 let worker = null;
 try {
   worker = new Worker('worker/worker-pi.js');
 } catch(e) {
   console.warn('Worker no cargado');
-  const tiempoSpan = document.getElementById('tiempoActual');
-  if (tiempoSpan) tiempoSpan.innerHTML = '⚠️ Modo limitado (sin cálculo en tiempo real)';
+  document.getElementById('tiempoActual').innerHTML = '⚠️ Modo limitado (sin cálculo en tiempo real)';
 }
 
 let modoVivo = false;
@@ -234,12 +284,11 @@ function activarModoVivo() {
   if (modoVivo) return;
   modoVivo = true;
   document.getElementById('countdownContainer').style.display = 'none';
-  document.getElementById('estadoPrincipal').innerHTML = '🔴 LIVE';
+  document.getElementById('estadoPrincipal').innerHTML = 'LIVE';
   document.getElementById('lugarPrincipal').innerHTML = 'π está sonando ahora';
   iniciarActualizacionViva();
 }
 
-// Comprobación periódica usando ahoraReal()
 setInterval(() => {
   if (!modoVivo && ahoraReal() >= INICIO_MELODIA) {
     activarModoVivo();
@@ -259,12 +308,12 @@ if (worker) {
       const esActual = (i === 2);
       const nota = NOTAS[d] || '·';
       const top = ALTURAS[nota] ?? 90;
-      html += `
-        <div class="nota-columna">
-          <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
-          <div class="nota-nombre">${nota}</div>
-          <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
-        </div>`;
+      html += `<div class="nota-columna">
+        <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
+        ${nota === 'Do' ? `<div class="linea-adicional" style="top:${top + 5}px;"></div>` : ''}
+        <div class="nota-nombre">${nota}</div>
+        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
+      </div>`;
     });
     container.innerHTML = html;
     const tiempoSpan = document.getElementById('tiempoActual');
@@ -284,31 +333,28 @@ function generarPentagramaInicial() {
     const esActual = (i === 2);
     const nota = NOTAS[d] || '·';
     const top = ALTURAS[nota] ?? 90;
-    html += `
-      <div class="nota-columna">
-        <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
-        <div class="nota-nombre">${nota}</div>
-        <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
-      </div>`;
+    html += `<div class="nota-columna">
+      <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
+      ${nota === 'Do' ? `<div class="linea-adicional" style="top:${top + 5}px;"></div>` : ''}
+      <div class="nota-nombre">${nota}</div>
+      <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
+    </div>`;
   });
   container.innerHTML = html;
   document.getElementById('tiempoActual').innerHTML = `⏱️ segundo #0 · π: 3 · 60 bpm (esperando inicio)`;
 }
 
 // ============================================================
-// 12. FORMULARIO DE ACCESO PARA INTÉRPRETES
+// 12. ACCESO INTÉRPRETE
 // ============================================================
 document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) => {
   e.preventDefault();
   let codigo = document.getElementById('codigoAcceso').value.trim();
   const turno = document.getElementById('turnoAcceso').value.trim();
-
-  // Permitir tanto "code" como "codigo"
   if (!codigo || !turno) {
     alert('Por favor, introduce tu código y el segundo de inicio.');
     return;
   }
-  // Validación simple del código
   if (!/π-[A-Z0-9]{4,}/.test(codigo)) {
     alert('El código parece inválido. Debe empezar con π- seguido de letras y números.');
     return;
