@@ -17,16 +17,11 @@
 
   <div class="header-top">
     <div class="logo" data-i18n="titulo">La melodía de π</div>
-    <div class="language-selector">
-      <button class="lang-btn activo" data-lang="es">🇪🇸 Español</button>
-      <button class="lang-btn" data-lang="en">🇬🇧 English</button>
-      <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
-      <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
-      <button class="lang-btn" data-lang="it">🇮🇹 Italiano</button>
-      <button class="lang-btn" data-lang="pt">🇵🇹 Português</button>
-      <button class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
-      <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
-      <button class="lang-btn" data-lang="ar">🇸🇦 العربية</button>
+    <div id="translate-selector" style="margin-top: 0px;"></div>
+     <script>
+         // Configuración para añadir el selector automáticamente
+         translate.language.addCustomSelector('#translate-selector');
+     </script>
     </div>
   </div>
 
@@ -98,5 +93,11 @@
 
 <script src="https://cdn.livekit.io/livekit/livekit-latest.js"></script>
 <script src="script.js"></script>
+  <script src="https://cdn.staticfile.net/translate.js/3.2.1/translate.js"></script>
+   <script>
+       translate.language.setLocal('spanish');
+       translate.service.use('client.edge');
+       translate.execute();
+   </script>
 </body>
 </html>
