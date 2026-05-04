@@ -105,6 +105,7 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
   if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
 });
 
+
 // ============================================================
 // 5. NOTAS Y ALTURAS
 // ============================================================
