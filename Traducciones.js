@@ -42,3 +42,13 @@
     "btn_audio_on": "🔇 Mute"
   }
 }
+{
+  "es": {
+    "estado_live": "🔴 LIVE",
+    "estado_sonando": "π está sonando ahora"
+  },
+  "en": {
+    "estado_live": "🔴 LIVE",
+    "estado_sonando": "π is playing now"
+  }
+}
