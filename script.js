@@ -228,8 +228,9 @@ async function actualizarUIInterpretes() {
     document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
     if (TOKEN_URL && LIVEKIT_URL) conectarAInterprete(actual.codigo, actual.inicioSegundo);
   } else {
-    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
-    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde || 'π está sonando ahora';
+    document.getElementById('estadoPrincipal').setAttribute('data-i18n', 'estado_live');
+document.getElementById('lugarPrincipal').setAttribute('data-i18n', 'estado_sonando');
+aplicarTraduccion();
     audioInterpreteActivo = false;
   }
 }
