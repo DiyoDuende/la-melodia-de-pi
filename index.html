@@ -82,8 +82,8 @@
   <div class="acceso-interprete">
     <div class="acceso-titulo" data-i18n="acceso_titulo">🎤 ¿Ya tienes tu código?</div>
     <form id="formAccesoInterprete">
-      <input type="text" id="codigoAcceso" data-i18n="codigo_placeholder" placeholder="Código (ej. π-ABCD1234)">
-      <input type="number" id="turnoAcceso" data-i18n="turno_placeholder" placeholder="Segundo de inicio">
+      <input type="text" id="codigoAcceso" placeholder="Código (ej. π-ABCD1234)" required>
+      <input type="number" id="turnoAcceso" placeholder="Segundo de inicio (ej. 1710000000)" required>
       <button type="submit" data-i18n="acceso_btn">Acceder a mi turno</button>
     </form>
     <p class="acceso-ayuda" data-i18n="acceso_ayuda">El código y el segundo de inicio los recibiste por correo al inscribirte.</p>
@@ -100,4 +100,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
