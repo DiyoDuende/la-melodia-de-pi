@@ -235,7 +235,15 @@ aplicarTraduccion();
   }
 }
 setInterval(actualizarUIInterpretes, 15000);
+function t(key, vars = {}) {
+  let texto = textos[idiomaActual]?.[key] || key;
 
+  Object.keys(vars).forEach(k => {
+    texto = texto.replace(`{${k}}`, vars[k]);
+  });
+
+  return texto;
+}
 // ============================================================
 // 10. CUENTA ATRÁS
 // ============================================================
