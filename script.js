@@ -330,10 +330,11 @@ if (worker) {
     container.innerHTML = html;
     const tiempoSpan = document.getElementById('tiempoActual');
     if (tiempoSpan) {
-      tiempoSpan.innerHTML = t('tiempo_info', {
-  segundo: e.data.inicio + 2,
-  digito: digitos[2]
-});
+  tiempoSpan.innerHTML = t('tiempo_info', {
+    segundo: e.data.inicio + 2,
+    digito: digitos[2]
+  });
+}
     if (sonidoActivado) tocarNota(NOTAS[digitos[2]]);
   };
 }
