@@ -1,172 +1,54 @@
 {
   "es": {
-    "titulo": "La Melodía de π",
-    "subtitulo": "Un segundo, una nota, un intérprete",
-
-    "btn_audio": "🔊 Activar sonido",
-    "btn_audio_on": "🔇 Silenciar",
-
-    "estado_live": "🔴 LIVE",
-    "estado_sonando": "π está sonando ahora",
-    "desde": "Desde",
-
+    "titulo": "La melodía de π",
     "countdownTitle": "⏳ TIEMPO PARA QUE π EMPIECE A SONAR",
     "dias": "DÍAS",
     "horas": "HORAS",
     "min": "MIN",
     "seg": "SEG",
-
+    "live": "LIVE",
     "espera": "ESPERA",
+    "desde": "Desde el 14/03/2027",
     "proximos": "Próximos intérpretes",
-
     "inscripcion": "📝 Inscripción",
     "normas": "📜 Normas",
     "readme": "📖 README",
-
-    "inscripcion_titulo": "Inscripción de intérpretes",
-    "nombre": "Nombre",
-    "lugar": "Lugar",
-    "enviar": "Enviar",
-
-    "normas_titulo": "Normas",
-    "readme_titulo": "Sobre el proyecto",
-
     "acceso_titulo": "🎤 ¿Ya tienes tu código?",
     "acceso_btn": "Acceder a mi turno",
     "acceso_ayuda": "El código y el segundo de inicio los recibiste por correo al inscribirte.",
-
-    "codigo_placeholder": "Código (ej. π-ABCD1234)",
-    "turno_placeholder": "Segundo de inicio (ej. 1710000000)",
-
     "footer": "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.",
-
-    "nota_Do": "Do",
-    "nota_Re": "Re",
-    "nota_Mi": "Mi",
-    "nota_Fa": "Fa",
-    "nota_Sol": "Sol",
-    "nota_La": "La",
-    "nota_Si": "Si"
+    "btn_audio": "🔊 Activar sonido",
+    "btn_audio_on": "🔇 Silenciar"
   },
-
   "en": {
     "titulo": "The Melody of π",
-    "subtitulo": "One second, one note, one performer",
-
-    "btn_audio": "🔊 Enable sound",
-    "btn_audio_on": "🔇 Mute",
-
-    "estado_live": "🔴 LIVE",
-    "estado_sonando": "π is playing now",
-    "desde": "From",
-
-    "countdownTitle": "⏳ TIME UNTIL π STARTS PLAYING",
+    "countdownTitle": "⏳ TIME UNTIL π BEGINS TO PLAY",
     "dias": "DAYS",
     "horas": "HOURS",
     "min": "MIN",
     "seg": "SEC",
-
+    "live": "LIVE",
     "espera": "WAITING",
+    "desde": "From 14/03/2027",
     "proximos": "Next performers",
-
-    "inscripcion": "📝 Registration",
+    "inscripcion": "📝 Sign up",
     "normas": "📜 Rules",
     "readme": "📖 README",
-
-    "inscripcion_titulo": "Performer Registration",
-    "nombre": "Name",
-    "lugar": "Location",
-    "enviar": "Submit",
-
-    "normas_titulo": "Rules",
-    "readme_titulo": "About the project",
-
-    "acceso_titulo": "🎤 Do you already have your code?",
+    "acceso_titulo": "🎤 Already have your code?",
     "acceso_btn": "Access my turn",
-    "acceso_ayuda": "You received your code and start time by email when registering.",
-
-    "codigo_placeholder": "Code (e.g. π-ABCD1234)",
-    "turno_placeholder": "Start second (e.g. 1710000000)",
-
+    "acceso_ayuda": "You received the code and start second by email when you signed up.",
     "footer": "An infinite melody, played by finite people, united by the same pulse, in the same now.",
-
-    "nota_Do": "C",
-    "nota_Re": "D",
-    "nota_Mi": "E",
-    "nota_Fa": "F",
-    "nota_Sol": "G",
-    "nota_La": "A",
-    "nota_Si": "B"
+    "btn_audio": "🔊 Enable sound",
+    "btn_audio_on": "🔇 Mute"
   }
 }
-
 {
   "es": {
-    "desde_lugar": "Desde {lugar}",
-    "tiempo_info": "⏱️ segundo #{segundo} · π: {digito} · 60 bpm",
-    "esperando": "(esperando inicio)",
-
-    "nota_Mi8": "Mi⁸",
-    "nota_Do8": "Do⁸",
-    "nota_Re8": "Re⁸"
+    "estado_live": "🔴 LIVE",
+    "estado_sonando": "π está sonando ahora"
   },
   "en": {
-    "desde_lugar": "From {lugar}",
-    "tiempo_info": "⏱️ second #{segundo} · π: {digito} · 60 bpm",
-    "esperando": "(waiting start)",
-
-    "nota_Mi8": "E5",
-    "nota_Do8": "C5",
-    "nota_Re8": "D5"
-  }
-}
-
-{
-  "es": {
-    "countdownTitle": "⏳ TIEMPO PARA QUE π EMPIECE A SONAR",
-    "dias": "DÍAS",
-    "horas": "HORAS",
-    "min": "MIN",
-    "seg": "SEG",
-
-    "live": "🔴 LIVE",
-    "espera": "ESPERA",
-    "proximos": "Próximos intérpretes",
-
-    "inscripcion": "📝 Inscripción",
-    "normas": "📜 Normas",
-    "readme": "📖 README",
-
-    "acceso_titulo": "🎤 ¿Ya tienes tu código?",
-    "codigo_placeholder": "Código (ej. π-ABCD1234)",
-    "turno_placeholder": "Segundo de inicio",
-    "acceso_btn": "Acceder a mi turno",
-    "acceso_ayuda": "El código y el segundo de inicio los recibiste por correo al inscribirte.",
-
-    "footer": "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora."
-  },
-
-  "en": {
-    "countdownTitle": "⏳ TIME UNTIL π STARTS PLAYING",
-    "dias": "DAYS",
-    "horas": "HOURS",
-    "min": "MIN",
-    "seg": "SEC",
-
-    "live": "🔴 LIVE",
-    "espera": "WAITING",
-    "proximos": "Upcoming performers",
-
-    "inscripcion": "📝 Registration",
-    "normas": "📜 Rules",
-    "readme": "📖 README",
-
-    "acceso_titulo": "🎤 Do you already have your code?",
-    "codigo_placeholder": "Code (e.g. π-ABCD1234)",
-    "turno_placeholder": "Start second",
-    "acceso_btn": "Access my turn",
-    "acceso_ayuda": "You received your code and start time by email after registering.",
-
-    "footer": "An infinite melody, played by finite people, united by the same pulse, in the same now."
+    "estado_live": "🔴 LIVE",
+    "estado_sonando": "π is playing now"
   }
 }
