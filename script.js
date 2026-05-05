@@ -225,7 +225,8 @@ async function actualizarUIInterpretes() {
   const actual = interpretes.find(i => segundo >= i.inicioSegundo && segundo < i.inicioSegundo + 300);
   if (actual) {
     document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
-    document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
+    document.getElementById('lugarPrincipal').innerHTML =
+  t('desde_lugar', { lugar: actual.lugar });
     if (TOKEN_URL && LIVEKIT_URL) conectarAInterprete(actual.codigo, actual.inicioSegundo);
   } else {
     document.getElementById('estadoPrincipal').setAttribute('data-i18n', 'estado_live');
@@ -329,8 +330,10 @@ if (worker) {
     container.innerHTML = html;
     const tiempoSpan = document.getElementById('tiempoActual');
     if (tiempoSpan) {
-      tiempoSpan.innerHTML = `⏱️ segundo #${e.data.inicio+2} · π: ${digitos[2]} · 60 bpm`;
-    }
+      tiempoSpan.innerHTML = t('tiempo_info', {
+  segundo: e.data.inicio + 2,
+  digito: digitos[2]
+});
     if (sonidoActivado) tocarNota(NOTAS[digitos[2]]);
   };
 }
@@ -352,8 +355,8 @@ function generarPentagramaInicial() {
     </div>`;
   });
   container.innerHTML = html;
-  document.getElementById('tiempoActual').innerHTML = `⏱️ segundo #0 · π: 3 · 60 bpm (esperando inicio)`;
-}
+  document.getElementById('tiempoActual').innerHTML =
+  t('tiempo_info', { segundo: 0, digito: 3 }) + ' ' + t('esperando');
 
 // ============================================================
 // 12. ACCESO INTÉRPRETE
