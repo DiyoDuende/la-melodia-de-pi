@@ -100,4 +100,23 @@
   }
 }
 
+{
+  "es": {
+    "desde_lugar": "Desde {lugar}",
+    "tiempo_info": "⏱️ segundo #{segundo} · π: {digito} · 60 bpm",
+    "esperando": "(esperando inicio)",
 
+    "nota_Mi8": "Mi⁸",
+    "nota_Do8": "Do⁸",
+    "nota_Re8": "Re⁸"
+  },
+  "en": {
+    "desde_lugar": "From {lugar}",
+    "tiempo_info": "⏱️ second #{segundo} · π: {digito} · 60 bpm",
+    "esperando": "(waiting start)",
+
+    "nota_Mi8": "E5",
+    "nota_Do8": "C5",
+    "nota_Re8": "D5"
+  }
+}
