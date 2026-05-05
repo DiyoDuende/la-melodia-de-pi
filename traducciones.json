@@ -120,3 +120,53 @@
     "nota_Re8": "D5"
   }
 }
+
+{
+  "es": {
+    "countdownTitle": "⏳ TIEMPO PARA QUE π EMPIECE A SONAR",
+    "dias": "DÍAS",
+    "horas": "HORAS",
+    "min": "MIN",
+    "seg": "SEG",
+
+    "live": "🔴 LIVE",
+    "espera": "ESPERA",
+    "proximos": "Próximos intérpretes",
+
+    "inscripcion": "📝 Inscripción",
+    "normas": "📜 Normas",
+    "readme": "📖 README",
+
+    "acceso_titulo": "🎤 ¿Ya tienes tu código?",
+    "codigo_placeholder": "Código (ej. π-ABCD1234)",
+    "turno_placeholder": "Segundo de inicio",
+    "acceso_btn": "Acceder a mi turno",
+    "acceso_ayuda": "El código y el segundo de inicio los recibiste por correo al inscribirte.",
+
+    "footer": "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora."
+  },
+
+  "en": {
+    "countdownTitle": "⏳ TIME UNTIL π STARTS PLAYING",
+    "dias": "DAYS",
+    "horas": "HOURS",
+    "min": "MIN",
+    "seg": "SEC",
+
+    "live": "🔴 LIVE",
+    "espera": "WAITING",
+    "proximos": "Upcoming performers",
+
+    "inscripcion": "📝 Registration",
+    "normas": "📜 Rules",
+    "readme": "📖 README",
+
+    "acceso_titulo": "🎤 Do you already have your code?",
+    "codigo_placeholder": "Code (e.g. π-ABCD1234)",
+    "turno_placeholder": "Start second",
+    "acceso_btn": "Access my turn",
+    "acceso_ayuda": "You received your code and start time by email after registering.",
+
+    "footer": "An infinite melody, played by finite people, united by the same pulse, in the same now."
+  }
+}
