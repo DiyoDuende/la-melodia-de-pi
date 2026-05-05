@@ -2,12 +2,26 @@
   "es": {
     "titulo": "La Melodía de π",
     "subtitulo": "Un segundo, una nota, un intérprete",
+
     "btn_audio": "🔊 Activar sonido",
     "btn_audio_on": "🔇 Silenciar",
 
     "estado_live": "🔴 LIVE",
     "estado_sonando": "π está sonando ahora",
     "desde": "Desde",
+
+    "countdownTitle": "⏳ TIEMPO PARA QUE π EMPIECE A SONAR",
+    "dias": "DÍAS",
+    "horas": "HORAS",
+    "min": "MIN",
+    "seg": "SEG",
+
+    "espera": "ESPERA",
+    "proximos": "Próximos intérpretes",
+
+    "inscripcion": "📝 Inscripción",
+    "normas": "📜 Normas",
+    "readme": "📖 README",
 
     "inscripcion_titulo": "Inscripción de intérpretes",
     "nombre": "Nombre",
@@ -16,6 +30,15 @@
 
     "normas_titulo": "Normas",
     "readme_titulo": "Sobre el proyecto",
+
+    "acceso_titulo": "🎤 ¿Ya tienes tu código?",
+    "acceso_btn": "Acceder a mi turno",
+    "acceso_ayuda": "El código y el segundo de inicio los recibiste por correo al inscribirte.",
+
+    "codigo_placeholder": "Código (ej. π-ABCD1234)",
+    "turno_placeholder": "Segundo de inicio (ej. 1710000000)",
+
+    "footer": "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.",
 
     "nota_Do": "Do",
     "nota_Re": "Re",
@@ -29,12 +52,26 @@
   "en": {
     "titulo": "The Melody of π",
     "subtitulo": "One second, one note, one performer",
+
     "btn_audio": "🔊 Enable sound",
     "btn_audio_on": "🔇 Mute",
 
     "estado_live": "🔴 LIVE",
     "estado_sonando": "π is playing now",
     "desde": "From",
+
+    "countdownTitle": "⏳ TIME UNTIL π STARTS PLAYING",
+    "dias": "DAYS",
+    "horas": "HOURS",
+    "min": "MIN",
+    "seg": "SEC",
+
+    "espera": "WAITING",
+    "proximos": "Next performers",
+
+    "inscripcion": "📝 Registration",
+    "normas": "📜 Rules",
+    "readme": "📖 README",
 
     "inscripcion_titulo": "Performer Registration",
     "nombre": "Name",
@@ -43,6 +80,15 @@
 
     "normas_titulo": "Rules",
     "readme_titulo": "About the project",
+
+    "acceso_titulo": "🎤 Do you already have your code?",
+    "acceso_btn": "Access my turn",
+    "acceso_ayuda": "You received your code and start time by email when registering.",
+
+    "codigo_placeholder": "Code (e.g. π-ABCD1234)",
+    "turno_placeholder": "Start second (e.g. 1710000000)",
+
+    "footer": "An infinite melody, played by finite people, united by the same pulse, in the same now.",
 
     "nota_Do": "C",
     "nota_Re": "D",
