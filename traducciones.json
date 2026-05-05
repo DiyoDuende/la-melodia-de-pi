@@ -1,34 +1,55 @@
 {
   "es": {
-    "titulo": "La melodía de π",
-    "countdownTitle": "⏳ TIEMPO PARA QUE π EMPIECE A SONAR",
-    "dias": "DÍAS",
-    "horas": "HORAS",
-    "min": "MIN",
-    "seg": "SEG",
-    "live": "LIVE",
-    "espera": "ESPERA",
-    "desde": "Desde el 14/03/2027",
-    "proximos": "Próximos intérpretes",
-    "inscripcion": "📝 Inscripción",
-    "normas": "📜 Normas",
-    "readme": "📖 README",
-    "footer": "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora."
+    "titulo": "La Melodía de π",
+    "subtitulo": "Un segundo, una nota, un intérprete",
+    "btn_audio": "🔊 Activar sonido",
+    "btn_audio_on": "🔇 Silenciar",
+
+    "estado_live": "🔴 LIVE",
+    "estado_sonando": "π está sonando ahora",
+    "desde": "Desde",
+
+    "inscripcion_titulo": "Inscripción de intérpretes",
+    "nombre": "Nombre",
+    "lugar": "Lugar",
+    "enviar": "Enviar",
+
+    "normas_titulo": "Normas",
+    "readme_titulo": "Sobre el proyecto",
+
+    "nota_Do": "Do",
+    "nota_Re": "Re",
+    "nota_Mi": "Mi",
+    "nota_Fa": "Fa",
+    "nota_Sol": "Sol",
+    "nota_La": "La",
+    "nota_Si": "Si"
   },
+
   "en": {
     "titulo": "The Melody of π",
-    "countdownTitle": "⏳ TIME UNTIL π BEGINS TO PLAY",
-    "dias": "DAYS",
-    "horas": "HOURS",
-    "min": "MIN",
-    "seg": "SEC",
-    "live": "LIVE",
-    "espera": "WAITING",
-    "desde": "From 14/03/2027",
-    "proximos": "Next performers",
-    "inscripcion": "📝 Sign up",
-    "normas": "📜 Rules",
-    "readme": "📖 README",
-    "footer": "An infinite melody, played by finite people, united by the same pulse, in the same now."
+    "subtitulo": "One second, one note, one performer",
+    "btn_audio": "🔊 Enable sound",
+    "btn_audio_on": "🔇 Mute",
+
+    "estado_live": "🔴 LIVE",
+    "estado_sonando": "π is playing now",
+    "desde": "From",
+
+    "inscripcion_titulo": "Performer Registration",
+    "nombre": "Name",
+    "lugar": "Location",
+    "enviar": "Submit",
+
+    "normas_titulo": "Rules",
+    "readme_titulo": "About the project",
+
+    "nota_Do": "C",
+    "nota_Re": "D",
+    "nota_Mi": "E",
+    "nota_Fa": "F",
+    "nota_Sol": "G",
+    "nota_La": "A",
+    "nota_Si": "B"
   }
 }
