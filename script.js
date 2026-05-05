@@ -316,7 +316,8 @@ if (worker) {
     digitos.forEach((d, i) => {
       if (d === undefined) return;
       const esActual = (i === 2);
-      const nota = NOTAS[d] || '·';
+      const notaBase = NOTAS[d];
+      const nota = notaBase ? t(`nota_${notaBase.replace('⁸','8')}`) : '·';
       const top = ALTURAS[nota] ?? 90;
       html += `<div class="nota-columna">
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
