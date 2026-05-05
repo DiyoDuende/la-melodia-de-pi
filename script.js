@@ -318,8 +318,10 @@ if (worker) {
       if (d === undefined) return;
       const esActual = (i === 2);
       const notaBase = NOTAS[d];
-      const nota = notaBase ? t(`nota_${notaBase.replace('⁸','8')}`) : '·';
-      const top = ALTURAS[nota] ?? 90;
+      const notaBase = NOTAS[d];
+      const notaTraducida = notaBase ? t(`nota_${notaBase.replace('⁸','8')}`) : '·';
+
+      const top = ALTURAS[notaBase] ?? 90;
       html += `<div class="nota-columna">
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
         ${nota === 'Do' ? `<div class="linea-adicional" style="top:${top + 5}px;"></div>` : ''}
@@ -356,8 +358,9 @@ function generarPentagramaInicial() {
     </div>`;
   });
   container.innerHTML = html;
-  document.getElementById('tiempoActual').innerHTML =
+ document.getElementById('tiempoActual').innerHTML =
   t('tiempo_info', { segundo: 0, digito: 3 }) + ' ' + t('esperando');
+}
 
 // ============================================================
 // 12. ACCESO INTÉRPRETE
