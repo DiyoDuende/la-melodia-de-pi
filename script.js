@@ -225,8 +225,7 @@ async function actualizarUIInterpretes() {
   const actual = interpretes.find(i => segundo >= i.inicioSegundo && segundo < i.inicioSegundo + 300);
   if (actual) {
     document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
-    document.getElementById('lugarPrincipal').innerHTML =
-  t('desde_lugar', { lugar: actual.lugar });
+    document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
     if (TOKEN_URL && LIVEKIT_URL) conectarAInterprete(actual.codigo, actual.inicioSegundo);
   } else {
     document.getElementById('estadoPrincipal').setAttribute('data-i18n', 'estado_live');
@@ -237,8 +236,6 @@ aplicarTraduccion();
 }
 setInterval(actualizarUIInterpretes, 15000);
 
-  return texto;
-}
 // ============================================================
 // 10. CUENTA ATRÁS
 // ============================================================
@@ -311,11 +308,8 @@ if (worker) {
     digitos.forEach((d, i) => {
       if (d === undefined) return;
       const esActual = (i === 2);
-      const notaBase = NOTAS[d];
-      const notaBase = NOTAS[d];
-      const notaTraducida = notaBase ? t(`nota_${notaBase.replace('⁸','8')}`) : '·';
-
-      const top = ALTURAS[notaBase] ?? 90;
+      const nota = NOTAS[d] || '·';
+      const top = ALTURAS[nota] ?? 90;
       html += `<div class="nota-columna">
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
         ${nota === 'Do' ? `<div class="linea-adicional" style="top:${top + 5}px;"></div>` : ''}
@@ -326,11 +320,8 @@ if (worker) {
     container.innerHTML = html;
     const tiempoSpan = document.getElementById('tiempoActual');
     if (tiempoSpan) {
-  tiempoSpan.innerHTML = t('tiempo_info', {
-    segundo: e.data.inicio + 2,
-    digito: digitos[2]
-  });
-}
+      tiempoSpan.innerHTML = `⏱️ segundo #${e.data.inicio+2} · π: ${digitos[2]} · 60 bpm`;
+    }
     if (sonidoActivado) tocarNota(NOTAS[digitos[2]]);
   };
 }
@@ -352,8 +343,7 @@ function generarPentagramaInicial() {
     </div>`;
   });
   container.innerHTML = html;
- document.getElementById('tiempoActual').innerHTML =
-  t('tiempo_info', { segundo: 0, digito: 3 }) + ' ' + t('esperando');
+  document.getElementById('tiempoActual').innerHTML = `⏱️ segundo #0 · π: 3 · 60 bpm (esperando inicio)`;
 }
 
 // ============================================================
