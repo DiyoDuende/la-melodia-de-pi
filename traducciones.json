@@ -99,3 +99,11 @@
     "nota_Si": "B"
   }
 }
+
+"es": {
+  "codigo_placeholder": "Código (ej. π-ABCD1234)",
+  "turno_placeholder": "Segundo de inicio (ej. 1710000000)"
+},
+"en": {
+  "codigo_placeholder": "Code (e.g. π-ABCD1234)",
+  "turno_placeholder": "Start second (e.g. 1710000000)"
