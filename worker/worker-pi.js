@@ -31,3 +31,4 @@ self.onmessage = (e) => {
   }
   self.postMessage({ id, inicio, digitos: result });
 };
+
