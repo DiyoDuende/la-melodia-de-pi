@@ -6,7 +6,7 @@
   <meta property="og:description" content="Una melodía infinita, tocada por personas finitas.">
   <meta property="og:image" content="preview.png">
   <meta property="og:url" content="https://diyoduende.github.io/la-melodia-de-pi">
-  <title>La melodía de π</title>
+  <title data-i18n="titulo_pagina">La melodía de π</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
   </div>
 
   <div class="countdown-grande" id="countdownContainer">
-    <div class="countdown-titulo" data-i18n="countdownTitle">⏳ TIEMPO PARA QUE π EMPIECE A SONAR</div>
+    <div class="countdown-titulo" data-i18n="countdown_titulo">⏳ TIEMPO PARA QUE π EMPIECE A SONAR</div>
     <div class="countdown-grid">
       <div><span id="dias">--</span><label data-i18n="dias">DÍAS</label></div>
       <div><span id="horas">--</span><label data-i18n="horas">HORAS</label></div>
@@ -44,12 +44,12 @@
     <div class="video-box">
       <div class="estado" id="estadoPrincipal" data-i18n="live">LIVE</div>
       <div class="video-placeholder" id="videoPlaceholderPrincipal"><div class="simbolo-pi">π</div></div>
-      <div class="lugar" id="lugarPrincipal" data-i18n="desde">Desde el 14/03/2027</div>
+      <div class="lugar" id="lugarPrincipal" data-i18n="desde_fecha">Desde el 14/03/2027</div>
     </div>
     <div class="video-box small">
-      <div class="estado" data-i18n="espera">ESPERA</div>
+      <div class="estado" id="estadoEspera" data-i18n="espera">ESPERA</div>
       <div class="video-placeholder" id="videoPlaceholderEspera"><div class="simbolo-pi">π</div></div>
-      <div class="lugar" id="lugarEspera" data-i18n="proximos">Próximos intérpretes</div>
+      <div class="lugar" id="lugarEspera" data-i18n="proximos_interprete">Próximos intérpretes</div>
     </div>
   </div>
 
@@ -82,8 +82,8 @@
   <div class="acceso-interprete">
     <div class="acceso-titulo" data-i18n="acceso_titulo">🎤 ¿Ya tienes tu código?</div>
     <form id="formAccesoInterprete">
-      <input type="text" id="codigoAcceso" placeholder="Código (ej. π-ABCD1234)" required>
-      <input type="number" id="turnoAcceso" placeholder="Segundo de inicio (ej. 1710000000)" required>
+      <input type="text" id="codigoAcceso" data-i18n="codigo_placeholder" placeholder="Código (ej. π-ABCD1234)" required>
+      <input type="number" id="turnoAcceso" data-i18n="turno_placeholder" placeholder="Segundo de inicio (ej. 1710000000)" required>
       <button type="submit" data-i18n="acceso_btn">Acceder a mi turno</button>
     </form>
     <p class="acceso-ayuda" data-i18n="acceso_ayuda">El código y el segundo de inicio los recibiste por correo al inscribirte.</p>
@@ -91,7 +91,7 @@
 
   <div class="footer">
     <div class="gran-fecha">14 · 03 · 2027 · 00:00 UTC</div>
-    <div data-i18n="footer">Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.</div>
+    <div data-i18n="footer_texto">Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.</div>
     <div style="margin-top:20px; font-size:0.7rem;">π · 3.141592653589793...</div>
   </div>
 </div>
@@ -100,3 +100,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
