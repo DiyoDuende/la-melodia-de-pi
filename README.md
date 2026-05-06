@@ -1,14 +1,14 @@
 # 🎵 La melodía de π
 
-*Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.*
+Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora.
 
 ## ✨ ¿Qué es esto?
 
-"La melodía de π" es una obra musical colaborativa e infinita. Convertimos los dígitos decimales del número π en notas musicales y las reproducimos en tiempo real, una por segundo.
+"La melodía de π" es una obra musical colaborativa e infinita. Convertimos los dígitos decimales del número π en notas musicales y las reproducimos en tiempo real, una por segundo. El tiempo no se negocia. π no espera.
 
 ## 🎹 ¿Cómo funciona?
 
-Los intérpretes se inscriben y se les asigna un turno de 5 minutos en orden de llegada. Durante su turno, tocan en vivo la secuencia de π que les corresponde, mientras la web emite la secuencia sonora simultáneamente.
+Los intérpretes se inscriben y se les asigna un turno de 5 minutos en orden de llegada. Durante su turno, tocan en vivo la secuencia de π que les corresponde, mientras la web emite la secuencia de notas que deben tocar.
 
 ## 🌍 ¿Quién puede participar?
 
@@ -20,8 +20,12 @@ Cada dígito (0-9) se asigna a una nota musical: Do, Re, Mi, Fa, Sol, La, Si, y 
 
 ## ⚙️ Tecnología
 
-La web genera los dígitos de π sobre la marcha con un algoritmo spigot infinito. El sonido se sintetiza con Soundfont Player (piano acústico). Los turnos se gestionan con una cola FIFO.
+La web genera los dígitos de π sobre la marcha con un algoritmo spigot infinito. El sonido se sintetiza con Soundfont Player (piano acústico). Los turnos se gestionan con una cola FIFO. La web está traducida a 9 idiomas (español, inglés, francés, alemán, italiano, portugués, japonés, chino y árabe).
+
+## 📜 Licencia
+
+Creative Commons BY-NC 4.0
 
 > "Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, en un mismo ahora."
 
-¿Tienes dudas? Escríbenos a [info@melodiadepi.org](mailto:info@melodiadepi.org)
+¿Tienes dudas? Escríbenos a info@melodiadepi.org
