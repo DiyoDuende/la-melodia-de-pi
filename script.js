@@ -98,13 +98,20 @@ const idiomaGuardado = localStorage.getItem('idioma');
 if (idiomaGuardado && ['es','en','fr','de','it','pt','ja','zh','ar'].includes(idiomaGuardado)) {
   idiomaActual = idiomaGuardado;
 }
-cargarTraducciones();
 
-document.querySelectorAll('.lang-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    cambiarIdioma(btn.dataset.lang, btn);
+document.addEventListener("DOMContentLoaded", async () => {
+
+  await cargarTraducciones();
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cambiarIdioma(btn.dataset.lang, btn);
+    });
+    if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
   });
-  if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
+
+  generarPentagramaInicial();
+  actualizarUIInterpretes();
 });
 
 // ============================================================
@@ -331,11 +338,12 @@ function generarPentagramaInicial() {
   digitosDemo.forEach((d, i) => {
     const esActual = (i === 2);
     const nota = NOTAS[d] || '·';
+const notaTraducida = textos[idiomaActual]?.[`nota_${nota}`] || nota;
     const top = ALTURAS[nota] ?? 90;
     html += `<div class="nota-columna">
       <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
       ${nota === 'Do' ? `<div class="linea-adicional" style="top:${top + 5}px;"></div>` : ''}
-      <div class="nota-nombre">${nota}</div>
+      <div class="nota-nombre">${notaTraducida}</div>
       <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
     </div>`;
   });
@@ -365,7 +373,17 @@ document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) 
 // ============================================================
 // 13. INICIALIZACIÓN
 // ============================================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+  await cargarTraducciones();
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cambiarIdioma(btn.dataset.lang, btn);
+    });
+    if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
+  });
+
   generarPentagramaInicial();
   actualizarUIInterpretes();
 });
