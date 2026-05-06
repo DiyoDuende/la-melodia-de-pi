@@ -71,12 +71,12 @@ function aplicarTraduccion() {
     const key = el.getAttribute('data-i18n');
     if (textos[idiomaActual][key]) {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.placeholder = textos[idiomaActual][key];
-      }  {
-        document.title = textos[idiomaActual][key];
-      } else {
-        el.innerHTML = textos[idiomaActual][key];
-      }
+  el.placeholder = textos[idiomaActual][key];
+} else if (el.tagName === 'TITLE') {
+  document.title = textos[idiomaActual][key];
+} else {
+  el.innerHTML = textos[idiomaActual][key];
+}
     }
   });
   const btnAudio = document.getElementById('btnAudio');
