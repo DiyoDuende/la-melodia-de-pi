@@ -18,11 +18,10 @@
   <video id="localVideo" autoplay muted playsinline></video>
   <button id="btnStart">📹 Activar cámara y micrófono</button>
 
-  <!-- Cargamos LiveKit solo si está disponible -->
   <script src="https://cdn.livekit.io/livekit/livekit-latest.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const CODIGO = params.get('code');
+    const CODIGO = params.get('code') || params.get('codigo');
     const TURNO_STR = params.get('turno');
     if (!CODIGO || !TURNO_STR) {
       document.getElementById('status').innerHTML = '❌ Enlace inválido. Falta el código o el turno.';
@@ -33,8 +32,8 @@
     function getSegundoGlobal() { return Math.floor((Date.now() - INICIO_MELODIA) / 1000); }
     function enTurno() { const ahora = getSegundoGlobal(); return ahora >= TURNO && ahora < TURNO + 300; }
 
-    const TOKEN_URL = null;   // ← pon tu URL del worker cuando la tengas
-    const LIVEKIT_URL = null; // ← pon tu URL de LiveKit cuando la tengas
+    const TOKEN_URL = null;   // Pon tu URL del worker cuando la tengas
+    const LIVEKIT_URL = null; // Pon tu URL de LiveKit cuando la tengas
 
     let room = null;
     let localStream = null;
@@ -86,13 +85,14 @@
     }
 
     document.getElementById('btnStart').addEventListener('click', iniciarTransmision);
-    // Mostrar estado inicial
     if (enTurno()) {
       document.getElementById('status').innerHTML = '✅ Estás en tu turno. Pulsa el botón para empezar a transmitir.';
     } else {
-      document.getElementById('status').innerHTML = `⏳ Tu turno comienza en ${(TURNO - getSegundoGlobal())} segundos. Mantén esta página abierta.`;
+      const segundosRestantes = TURNO - getSegundoGlobal();
+      document.getElementById('status').innerHTML = `⏳ Tu turno comienza en ${segundosRestantes} segundos. Mantén esta página abierta.`;
     }
   </script>
 </body>
 </html>
+
 
