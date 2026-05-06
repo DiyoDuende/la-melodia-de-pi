@@ -72,7 +72,7 @@ function aplicarTraduccion() {
     if (textos[idiomaActual][key]) {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         el.placeholder = textos[idiomaActual][key];
-      } else if (el.tagName === 'TITLE') {
+      }  {
         document.title = textos[idiomaActual][key];
       } else {
         el.innerHTML = textos[idiomaActual][key];
@@ -233,8 +233,8 @@ async function actualizarUIInterpretes() {
     document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
     if (TOKEN_URL && LIVEKIT_URL) conectarAInterprete(actual.codigo, actual.inicioSegundo);
   } else {
-    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
-    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
+    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.estado_live || 'LIVE';
+    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.estado_sonando || 'π está sonando ahora';
     audioInterpreteActivo = false;
   }
 }
@@ -313,11 +313,12 @@ if (worker) {
       if (d === undefined) return;
       const esActual = (i === 2);
       const nota = NOTAS[d] || '·';
+      const notaTraducida = textos[idiomaActual]?.[`nota_${nota}`] || nota;
       const top = ALTURAS[nota] ?? 90;
       html += `<div class="nota-columna">
         <div class="nota-cabeza ${esActual ? 'actual' : ''}" style="top:${top}px;"></div>
         ${nota === 'Do' ? `<div class="linea-adicional" style="top:${top + 5}px;"></div>` : ''}
-        <div class="nota-nombre">${nota}</div>
+        <div class="nota-nombre">${notaTraducida}</div>
         <div class="nota-digito ${esActual ? 'actual' : ''}">${d}</div>
       </div>`;
     });
@@ -368,23 +369,5 @@ document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) 
   }
   const url = `interprete.html?code=${encodeURIComponent(codigo)}&turno=${encodeURIComponent(turno)}`;
   window.open(url, '_blank');
-});
-
-// ============================================================
-// 13. INICIALIZACIÓN
-// ============================================================
-document.addEventListener("DOMContentLoaded", async () => {
-
-  await cargarTraducciones();
-
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      cambiarIdioma(btn.dataset.lang, btn);
-    });
-    if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
-  });
-
-  generarPentagramaInicial();
-  actualizarUIInterpretes();
 });
 
