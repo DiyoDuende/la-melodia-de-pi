@@ -50,7 +50,7 @@ async function obtenerInterpretes() {
 }
 
 // ============================================================
-// 4. TRADUCCIÓN REAL CON JSON
+// 4. TRADUCCIÓN COMPLETA (data-i18n + JSON)
 // ============================================================
 let textos = {};
 let idiomaActual = 'es';
@@ -72,6 +72,8 @@ function aplicarTraduccion() {
     if (textos[idiomaActual][key]) {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         el.placeholder = textos[idiomaActual][key];
+      } else if (el.tagName === 'TITLE') {
+        document.title = textos[idiomaActual][key];
       } else {
         el.innerHTML = textos[idiomaActual][key];
       }
@@ -105,7 +107,6 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
   if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
 });
 
-
 // ============================================================
 // 5. NOTAS Y ALTURAS
 // ============================================================
@@ -119,7 +120,7 @@ const ALTURAS = {
 };
 
 // ============================================================
-// 6. GENERADOR DE π
+// 6. GENERADOR INFINITO DE π
 // ============================================================
 function* generarPi() {
   let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
@@ -150,7 +151,7 @@ function obtenerDigito(indice) {
 }
 
 // ============================================================
-// 7. AUDIO
+// 7. AUDIO (PIANO)
 // ============================================================
 let audioCtx = null, piano = null, sonidoActivado = false, audioInterpreteActivo = false;
 
@@ -177,6 +178,7 @@ async function iniciarAudio() {
     document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
   }
 }
+
 function tocarNota(nota) {
   if (!sonidoActivado || !piano || !nota) return;
   const mapa = {
@@ -186,12 +188,7 @@ function tocarNota(nota) {
   const midi = mapa[nota];
   if (!midi) return;
   const gain = audioInterpreteActivo ? 0.2 : 0.8;
-  piano.play(midi, audioCtx.currentTime, {
-    duration: 0.9,
-    gain,
-    attack: 0.01,
-    release: 0.3
-  });
+  piano.play(midi, audioCtx.currentTime, { duration: 0.9, gain, attack: 0.01, release: 0.3 });
 }
 
 document.getElementById('btnAudio')?.addEventListener('click', async () => {
@@ -210,13 +207,14 @@ document.getElementById('btnAudio')?.addEventListener('click', async () => {
 // ============================================================
 async function conectarAInterprete(codigo, inicioSegundo) {
   if (!TOKEN_URL || !LIVEKIT_URL) return;
+  // Aquí irá la conexión real cuando tengas las URLs
 }
 async function gestionarEspera(siguiente) {
   if (!TOKEN_URL || !LIVEKIT_URL) return;
 }
 
 // ============================================================
-// 9. UI INTÉRPRETES
+// 9. UI DE INTÉRPRETES
 // ============================================================
 async function actualizarUIInterpretes() {
   if (!API_URL) return;
@@ -228,9 +226,8 @@ async function actualizarUIInterpretes() {
     document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
     if (TOKEN_URL && LIVEKIT_URL) conectarAInterprete(actual.codigo, actual.inicioSegundo);
   } else {
-    document.getElementById('estadoPrincipal').setAttribute('data-i18n', 'estado_live');
-document.getElementById('lugarPrincipal').setAttribute('data-i18n', 'estado_sonando');
-aplicarTraduccion();
+    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
+    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
     audioInterpreteActivo = false;
   }
 }
@@ -258,7 +255,7 @@ setInterval(actualizarCountdown, 1000);
 actualizarCountdown();
 
 // ============================================================
-// 11. PENTAGRAMA
+// 11. PENTAGRAMA + WORKER
 // ============================================================
 let worker = null;
 try {
@@ -286,8 +283,8 @@ function activarModoVivo() {
   if (modoVivo) return;
   modoVivo = true;
   document.getElementById('countdownContainer').style.display = 'none';
-  document.getElementById('estadoPrincipal').innerHTML = 'LIVE';
-  document.getElementById('lugarPrincipal').innerHTML = 'π está sonando ahora';
+  document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
+  document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
   iniciarActualizacionViva();
 }
 
@@ -372,3 +369,4 @@ document.addEventListener("DOMContentLoaded", () => {
   generarPentagramaInicial();
   actualizarUIInterpretes();
 });
+
