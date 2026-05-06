@@ -2,33 +2,43 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Inscríbete - La melodía de π</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="inscripcion_titulo">Inscripción - La melodía de π</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    body { background:#0a0c10; color:#eef3f9; font-family:'Inter',sans-serif; padding:40px 20px; }
-    .container { max-width:700px; margin:auto; background:#0f141c; padding:40px; border-radius:12px; border:1px solid #2a3a4a; }
-    h1 { text-align:center; color:#ffd966; }
-    input, textarea { width:100%; padding:12px; margin-top:8px; margin-bottom:20px; background:#1a1f2a; border:1px solid #3a4a5a; color:white; border-radius:8px; }
-    button { width:100%; padding:14px; border-radius:40px; background:#ffd966; border:none; cursor:pointer; font-weight:bold; }
-    .info-box { background:#1a1f2a; padding:20px; margin-top:20px; border-left:4px solid #ffd966; display:none; }
-  </style>
 </head>
 <body>
-<div class="container">
-  <h1>🎵 Inscríbete para interpretar π</h1>
+<div class="container" style="max-width:700px;">
+  <div class="header-top" style="justify-content: space-between;">
+    <div class="logo" data-i18n="titulo">La melodía de π</div>
+    <div class="language-selector">
+      <button class="lang-btn activo" data-lang="es">🇪🇸 Español</button>
+      <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+      <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+      <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+      <button class="lang-btn" data-lang="it">🇮🇹 Italiano</button>
+      <button class="lang-btn" data-lang="pt">🇵🇹 Português</button>
+      <button class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+      <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
+      <button class="lang-btn" data-lang="ar">🇸🇦 العربية</button>
+    </div>
+  </div>
+  <h1 data-i18n="inscripcion_titulo">📝 Inscripción</h1>
   <form id="formInscripcion">
-    <input type="text" id="nombre" placeholder="Nombre completo" required>
-    <input type="email" id="email" placeholder="Correo electrónico" required>
-    <input type="text" id="ubicacion" placeholder="País / Ciudad">
-    <textarea id="bio" placeholder="Breve presentación (opcional)"></textarea>
-    <label><input type="checkbox" id="acepto" required> Acepto las normas de respeto y educación</label>
-    <button type="submit">🎶 Enviar inscripción</button>
+    <input type="text" id="nombre" data-i18n="nombre" placeholder="Nombre completo" required>
+    <input type="email" id="email" data-i18n="email" placeholder="Correo electrónico" required>
+    <input type="text" id="ubicacion" data-i18n="ubicacion" placeholder="País / Ciudad">
+    <textarea id="bio" data-i18n="presentacion" placeholder="Presentación (opcional)"></textarea>
+    <label><input type="checkbox" id="acepto" required> <span data-i18n="acepto">Acepto las normas de respeto y educación</span></label>
+    <button type="submit" data-i18n="enviar">🎶 Enviar inscripción</button>
   </form>
-  <div id="respuesta" class="info-box"></div>
+  <div id="respuesta" class="info-box" style="display:none;"></div>
+  <a href="index.html" data-i18n="volver">← Volver</a>
 </div>
-
+<script src="script.js"></script>
 <script>
+
   // ============================================================
   // CONFIGURACIÓN (cambia estos valores)
   // ============================================================
