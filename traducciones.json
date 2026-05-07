@@ -138,16 +138,6 @@
     "readme_tecnologia_texto": "The website generates the digits of π on the fly with an infinite spigot algorithm. The sound is synthesized with Soundfont Player (acoustic piano). The turns are managed with a FIFO queue.",
     "readme_frase_final": "\"An infinite melody, played by finite people, united by the same pulse, in the same now.\"",
     "readme_contacto": "Questions? Write to us at info@melodiadepi.org"
-    "nota_Do": "C",
-    "nota_Re": "D",
-    "nota_Mi": "E",
-    "nota_Fa": "F",
-    "nota_Sol": "G",
-    "nota_La": "A",
-    "nota_Si": "B",
-    "nota_Do⁸": "C (8va)",
-    "nota_Re⁸": "D (8va)",
-    "nota_Mi⁸": "E (8va)"
   },
   "fr": {
     "titulo_pagina": "La Mélodie de π",
@@ -218,16 +208,6 @@
     "readme_tecnologia_texto": "Le site Web génère les chiffres de π à la volée avec un algorithme spigot infini. Le son est synthétisé avec Soundfont Player (piano acoustique). Les tours sont gérés avec une file d'attente FIFO.",
     "readme_frase_final": "\"Une mélodie infinie, jouée par des personnes finies, unies par la même pulsation, dans le même instant.\"",
     "readme_contacto": "Des questions ? Écrivez-nous à info@melodiadepi.org"
-    "nota_Do": "Do",
-    "nota_Re": "Ré",
-    "nota_Mi": "Mi",
-    "nota_Fa": "Fa",
-    "nota_Sol": "Sol",
-    "nota_La": "La",
-    "nota_Si": "Si",
-    "nota_Do⁸": "Do (8va)",
-    "nota_Re⁸": "Ré (8va)",
-    "nota_Mi⁸": "Mi (8va)"
   },
   "de": {
     "titulo_pagina": "Die Melodie von π",
@@ -298,16 +278,6 @@
     "readme_tecnologia_texto": "Die Website generiert die Ziffern von π im laufenden Betrieb mit einem unendlichen Spigot-Algorithmus. Der Klang wird mit Soundfont Player (akustisches Klavier) synthetisiert. Die Auftritte werden mit einer FIFO-Warteschlange verwaltet.",
     "readme_frase_final": "\"Eine unendliche Melodie, gespielt von endlichen Menschen, vereint durch denselben Puls, im selben Jetzt.\"",
     "readme_contacto": "Fragen? Schreiben Sie uns an info@melodiadepi.org"
-    "nota_Do": "C",
-    "nota_Re": "D",
-    "nota_Mi": "E",
-    "nota_Fa": "F",
-    "nota_Sol": "G",
-    "nota_La": "A",
-    "nota_Si": "H",
-    "nota_Do⁸": "C (8va)",
-    "nota_Re⁸": "D (8va)",
-    "nota_Mi⁸": "E (8va)"
   },
   "it": {
     "titulo_pagina": "La Melodia di π",
@@ -378,16 +348,6 @@
     "readme_tecnologia_texto": "Il sito web genera le cifre di π al volo con un algoritmo spigot infinito. Il suono è sintetizzato con Soundfont Player (piano acustico). I turni sono gestiti con una coda FIFO.",
     "readme_frase_final": "\"Una melodia infinita, suonata da persone finite, unite dallo stesso impulso, nello stesso ora.\"",
     "readme_contacto": "Domande? Scrivici a info@melodiadepi.org"
-    "nota_Do": "Do",
-    "nota_Re": "Re",
-    "nota_Mi": "Mi",
-    "nota_Fa": "Fa",
-    "nota_Sol": "Sol",
-    "nota_La": "La",
-    "nota_Si": "Si",
-    "nota_Do⁸": "Do (8va)",
-    "nota_Re⁸": "Re (8va)",
-    "nota_Mi⁸": "Mi (8va)"
   },
   "pt": {
     "titulo_pagina": "A Melodia de π",
@@ -458,16 +418,6 @@
     "readme_tecnologia_texto": "O site gera os dígitos de π em tempo real com um algoritmo spigot infinito. O som é sintetizado com Soundfont Player (piano acústico). Os turnos são geridos com uma fila FIFO.",
     "readme_frase_final": "\"Uma melodia infinita, tocada por pessoas finitas, unidas pelo mesmo pulso, no mesmo agora.\"",
     "readme_contacto": "Dúvidas? Escreva-nos para info@melodiadepi.org"
-    "nota_Do": "Dó",
-    "nota_Re": "Ré",
-    "nota_Mi": "Mi",
-    "nota_Fa": "Fá",
-    "nota_Sol": "Sol",
-    "nota_La": "Lá",
-    "nota_Si": "Si",
-    "nota_Do⁸": "Dó (8va)",
-    "nota_Re⁸": "Ré (8va)",
-    "nota_Mi⁸": "Mi (8va)"
   },
   "ja": {
     "titulo_pagina": "πのメロディ",
@@ -538,16 +488,6 @@
     "readme_tecnologia_texto": "ウェブサイトは、無限のスピゴットアルゴリズムを使用してπの桁をオンザフライで生成します。音声はSoundfont Player（アコースティックピアノ）で合成されます。ターンはFIFOキューで管理されます。",
     "readme_frase_final": "「有限な人々によって演奏される無限のメロディ、同じ鼓動、同じ今で団結して。」",
     "readme_contacto": "ご質問は？ info@melodiadepi.org までお問い合わせください。"
-    "nota_Do": "C",
-    "nota_Re": "D",
-    "nota_Mi": "E",
-    "nota_Fa": "F",
-    "nota_Sol": "G",
-    "nota_La": "A",
-    "nota_Si": "H",
-    "nota_Do⁸": "C (8va)",
-    "nota_Re⁸": "D (8va)",
-    "nota_Mi⁸": "E (8va)"
   },
   "zh": {
     "titulo_pagina": "π的旋律",
@@ -618,16 +558,6 @@
     "readme_tecnologia_texto": "网站使用无限流算法实时生成π的数字。声音使用Soundfont Player（原声钢琴）合成。轮次使用FIFO队列管理。",
     "readme_frase_final": "“一曲无限的旋律，由有限的人演奏，在同一脉动中，在同一个当下团结在一起。”",
     "readme_contacto": "有疑问？请通过 info@melodiadepi.org 与我们联系。"
-    "nota_Do": "C",
-    "nota_Re": "D",
-    "nota_Mi": "E",
-    "nota_Fa": "F",
-    "nota_Sol": "G",
-    "nota_La": "A",
-    "nota_Si": "B",
-    "nota_Do⁸": "C (8va)",
-    "nota_Re⁸": "D (8va)",
-    "nota_Mi⁸": "E (8va)"
   },
   "ar": {
     "titulo_pagina": "لحن π",
@@ -698,15 +628,5 @@
     "readme_tecnologia_texto": "يقوم الموقع الإلكتروني بتوليد أرقام π أثناء التشغيل باستخدام خوارزمية spigot لا نهائية. يتم تجميع الصوت باستخدام Soundfont Player (بيانو أكوستيك). تتم إدارة الأدوار باستخدام قائمة انتظار FIFO.",
     "readme_frase_final": "\"لحن لا نهائي، يعزفه أشخاص محدودون، متحدون بنبض واحد، في نفس الآن.\"",
     "readme_contacto": "لديك أسئلة؟ راسلنا على info@melodiadepi.org"
-    "nota_Do": "C",
-    "nota_Re": "D",
-    "nota_Mi": "E",
-    "nota_Fa": "F",
-    "nota_Sol": "G",
-    "nota_La": "A",
-    "nota_Si": "B",
-    "nota_Do⁸": "C (8va)",
-    "nota_Re⁸": "D (8va)",
-    "nota_Mi⁸": "E (8va)"
   }
 }
