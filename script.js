@@ -2,7 +2,7 @@
 // ============================================================
 // 1. CONFIGURACIÓN GLOBAL (cambia estas URLs cuando las tengas)
 // ============================================================
-const API_URL = null;        // Ej: 'https://script.google.com/macros/s/TU_ID/exec'
+const API_URL = 'https://script.google.com/macros/s/AKfycbxdrVld3fqUXdsk-k-l2KOxq82AmqoHOxbheaogr9a78UcjdeeO7NrTIFvBvmX35xeKtw/exec';
 const TOKEN_URL = null;      // Ej: 'https://tu-worker.workers.dev'
 const LIVEKIT_URL = null;    // Ej: 'wss://tu-dominio-livekit.com'
 
