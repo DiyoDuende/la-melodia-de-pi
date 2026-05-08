@@ -38,110 +38,134 @@
 </div>
 <script src="script.js"></script>
 <script>
+  // ============================================================
+  // 1. CONFIGURACIÓN (cambia esta URL cuando tengas tu Apps Script)
+  // ============================================================
+  const API_URL = null; // 👈 Pon aquí la URL de tu Apps Script (terminada en /exec)
 
   // ============================================================
-  // CONFIGURACIÓN (cambia estos valores)
-  // ============================================================
-  const API_URL = 'https://script.google.com/macros/s/AKfycbwIgBLBy_aJYhgkPqVZ8sQY3zBlCmeHcvyv6kMue2cNmLbnNvsB_iJjqog8aeTCO-Ue/exec';  // tu Apps Script
-  // EmailJS (opcional, si quieres enviar correo)
-  // emailjs.init('TU_USER_ID');
-
-  // ============================================================
-  // GENERADOR DE π (para el PDF)
+  // 2. GENERADOR DE π (para el PDF)
   // ============================================================
   function* generarPi() {
-    let q=1n,r=0n,t=1n,k=1n,n=3n,l=3n;
-    while(true){
-      if(4n*q+r-t<n*t){
+    let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
+    while (true) {
+      if (4n*q + r - t < n*t) {
         yield Number(n);
-        let nr=10n*(r-n*t);
-        n=(10n*(3n*q+r))/t-10n*n;
-        q=10n*q; r=nr;
+        let nr = 10n*(r - n*t);
+        n = (10n*(3n*q + r))/t - 10n*n;
+        q = 10n*q;
+        r = nr;
       } else {
-        let nr=(2n*q+r)*l;
-        let nn=(q*(7n*k)+2n+r*l)/(t*l);
-        q=q*k; t=t*l; l=l+2n; k=k+1n; n=nn; r=nr;
+        let nr = (2n*q + r)*l;
+        let nn = (q*(7n*k) + 2n + r*l)/(t*l);
+        q = q*k;
+        t = t*l;
+        l = l + 2n;
+        k = k + 1n;
+        n = nn;
+        r = nr;
       }
     }
   }
-  const NOTAS = { '0':'Mi⁸','1':'Do','2':'Re','3':'Mi','4':'Fa','5':'Sol','6':'La','7':'Si','8':'Do⁸','9':'Re⁸' };
-  function generarNotas(inicio,cantidad){
-    const gen=generarPi();
-    const cache=[];
-    function get(i){ while(cache.length<=i) cache.push(gen.next().value.toString()); return cache[i]; }
-    const lista=[];
-    for(let i=0;i<cantidad;i++){
-      const d=get(inicio+i);
-      lista.push({digito:d,nota:NOTAS[d]});
-    }
-    return lista;
-  }
-  function generarPDF(interprete, inicioSegundo){
+
+  const NOTAS = {
+    '0': 'Mi⁸', '1': 'Do', '2': 'Re', '3': 'Mi', '4': 'Fa',
+    '5': 'Sol', '6': 'La', '7': 'Si', '8': 'Do⁸', '9': 'Re⁸'
+  };
+
+  function generarPDF(nombre, codigo, inicioSegundo, turnoUTC, turnoLocal) {
     const { jsPDF } = window.jspdf;
-    const doc=new jsPDF();
-    const notas=generarNotas(inicioSegundo,300);
+    const doc = new jsPDF();
+    const gen = generarPi();
+    const cache = [];
+    function getDigito(pos) {
+      while (cache.length <= pos) cache.push(gen.next().value.toString());
+      return cache[pos];
+    }
+
     doc.setFontSize(16);
-    doc.text("La melodía de π",20,20);
+    doc.text("La melodía de π", 20, 20);
     doc.setFontSize(10);
-    doc.text(`Código: ${interprete.codigo}`,20,30);
-    doc.text(`Turno UTC: ${interprete.turnoUTC}`,20,36);
-    doc.text(`Hora local: ${interprete.turnoLocal}`,20,42);
-    let y=55;
-    notas.forEach((n,i)=>{
-      doc.text(`${i+1} | ${n.digito} | ${n.nota}`,20,y);
-      y+=5;
-      if(y>280){ doc.addPage(); y=20; }
-    });
-    doc.save(`pi-${interprete.codigo}.pdf`);
+    doc.text(`Intérprete: ${nombre}`, 20, 30);
+    doc.text(`Código: ${codigo}`, 20, 36);
+    doc.text(`Inicio (UTC): ${turnoUTC}`, 20, 42);
+    doc.text(`Inicio (local): ${turnoLocal}`, 20, 48);
+    doc.text("Tus 300 notas (5 minutos):", 20, 58);
+
+    let y = 68;
+    let linea = '';
+    for (let i = 0; i < 300; i++) {
+      const digito = getDigito(inicioSegundo + i);
+      const nota = NOTAS[digito] || '·';
+      linea += `${digito}(${nota}) `;
+      if ((i + 1) % 15 === 0 || i === 299) {
+        doc.text(linea, 20, y);
+        linea = '';
+        y += 8;
+        if (y > 280) { doc.addPage(); y = 20; }
+      }
+    }
+    doc.save(`pi-${codigo}.pdf`);
   }
 
   // ============================================================
-  // ENVÍO DEL FORMULARIO
+  // 3. ENVÍO DEL FORMULARIO
   // ============================================================
-  const form = document.getElementById('formInscripcion');
-  const respuestaDiv = document.getElementById('respuesta');
-
-  form.addEventListener('submit', async (e) => {
+  document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
     const nombre = document.getElementById('nombre').value;
     const email = document.getElementById('email').value;
-    const ubicacion = document.getElementById('ubicacion').value;
-    const bio = document.getElementById('bio').value;
-    const codigo = 'π-' + Math.random().toString(36).substring(2,10).toUpperCase();
+    const ubicacion = document.getElementById('ubicacion').value || 'No especificado';
+    const bio = document.getElementById('bio').value || '';
+    const codigo = 'π-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
-    // Enviar a Apps Script para que asigne el turno y guarde
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ nombre, email, lugar: ubicacion, instrumento: bio, codigo, grabacion: 'si' })
-    });
-    const data = await res.json();
-    if (data.success) {
-      const turnoUTC = new Date(data.inicioSegundo * 1000).toUTCString();
-      const turnoLocal = new Date(data.inicioSegundo * 1000).toLocaleString();
-      const interprete = { codigo, turnoUTC, turnoLocal };
-      generarPDF(interprete, data.inicioSegundo);
+    if (!API_URL) {
+      alert('⚠️ El servidor de inscripciones no está configurado aún.\nPor favor, contacta con el administrador.');
+      btn.disabled = false;
+      btn.textContent = '🎶 Enviar inscripción';
+      return;
+    }
 
-      // (Opcional) Enviar email con EmailJS
-      // await emailjs.send('service_id', 'template_id', { nombre, email, codigo, fecha: turnoLocal });
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ nombre, email, lugar: ubicacion, instrumento: bio, codigo, grabacion: 'no' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const turnoUTC = new Date(data.inicioSegundo * 1000).toUTCString();
+        const turnoLocal = new Date(data.inicioSegundo * 1000).toLocaleString();
+        generarPDF(nombre, codigo, data.inicioSegundo, turnoUTC, turnoLocal);
 
-      respuestaDiv.style.display = 'block';
-      respuestaDiv.innerHTML = `
-        <h3>✅ Inscripción completada</h3>
-        <p><strong>${nombre}</strong></p>
-        <p>🎼 Código: <strong style="color:#ffd966">${codigo}</strong></p>
-        <p>⏱️ Turno #${data.inicioSegundo/300}</p>
-        <p>🌍 Hora UTC: ${turnoUTC}</p>
-        <p>🌍 Hora local: ${turnoLocal}</p>
-        <p>π empezará en el segundo global <strong>${data.inicioSegundo}</strong></p>
-        <p><a href="interprete.html?code=${codigo}&turno=${data.inicioSegundo}" target="_blank" style="color:#ffd966;">👉 Entrar como intérprete</a></p>
-        <p style="font-size:.9rem; opacity:.7">Tu PDF se ha descargado. Guarda este código.</p>
-      `;
-      form.reset();
-    } else {
-      alert('Error al inscribirte. Inténtalo de nuevo.');
+        const respuestaDiv = document.getElementById('respuesta');
+        respuestaDiv.style.display = 'block';
+        respuestaDiv.innerHTML = `
+          <h3>✅ Inscripción completada</h3>
+          <p><strong>${nombre}</strong></p>
+          <p>🎼 Código: <strong style="color:#ffd966">${codigo}</strong></p>
+          <p>⏱️ Turno #${Math.floor(data.inicioSegundo / 300) + 1}</p>
+          <p>🌍 Hora UTC: ${turnoUTC}</p>
+          <p>🌍 Hora local: ${turnoLocal}</p>
+          <p>π empezará en el segundo global <strong>${data.inicioSegundo}</strong></p>
+          <p><a href="interprete.html?code=${codigo}&turno=${data.inicioSegundo}" target="_blank" style="color:#ffd966;">👉 Entrar como intérprete</a></p>
+          <p style="font-size:.9rem; opacity:.7">Tu PDF se ha descargado. Guarda este código.</p>
+        `;
+        document.getElementById('formInscripcion').reset();
+      } else {
+        alert('Error al inscribirte: ' + (data.error || 'Inténtalo más tarde.'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de conexión. Inténtalo de nuevo.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🎶 Enviar inscripción';
     }
   });
 </script>
 </body>
 </html>
-
