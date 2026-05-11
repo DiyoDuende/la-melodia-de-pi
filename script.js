@@ -1,10 +1,9 @@
-
 // ============================================================
 // 1. CONFIGURACIÓN GLOBAL (cambia estas URLs cuando las tengas)
 // ============================================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbxdrVld3fqUXdsk-k-l2KOxq82AmqoHOxbheaogr9a78UcjdeeO7NrTIFvBvmX35xeKtw/exec';
-const TOKEN_URL = null;      // Ej: 'https://tu-worker.workers.dev'
-const LIVEKIT_URL = null;    // Ej: 'wss://tu-dominio-livekit.com'
+const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
+const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
 
 let room = null;
 let currentEspera = null;
@@ -100,16 +99,13 @@ if (idiomaGuardado && ['es','en','fr','de','it','pt','ja','zh','ar'].includes(id
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-
   await cargarTraducciones();
-
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       cambiarIdioma(btn.dataset.lang, btn);
     });
     if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
   });
-
   generarPentagramaInicial();
   actualizarUIInterpretes();
 });
@@ -158,7 +154,7 @@ function obtenerDigito(indice) {
 }
 
 // ============================================================
-// 7. AUDIO (PIANO)
+// 7. AUDIO (PIANO) - LOGICA CORREGIDA
 // ============================================================
 let audioCtx = null, piano = null, sonidoActivado = false, audioInterpreteActivo = false;
 
@@ -199,8 +195,12 @@ function tocarNota(nota) {
 }
 
 document.getElementById('btnAudio')?.addEventListener('click', async () => {
-  if (!piano) await iniciarAudio();
-  sonidoActivado = !sonidoActivado;
+  // CORRECCIÓN: Primero se inicia el audio si es necesario, luego se invierte el estado
+  if (!piano) {
+    await iniciarAudio();
+  } else {
+    sonidoActivado = !sonidoActivado;
+  }
   const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
   if (textos[idiomaActual] && textos[idiomaActual][key]) {
     document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
@@ -370,4 +370,3 @@ document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) 
   const url = `interprete.html?code=${encodeURIComponent(codigo)}&turno=${encodeURIComponent(turno)}`;
   window.open(url, '_blank');
 });
-
