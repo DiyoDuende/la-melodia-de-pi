@@ -5,13 +5,13 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxdrVld3fqUXdsk-k-l2KOx
 const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
 const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
 
-let room = null;          // sala activa del intérprete actual
-let currentEspera = null; // sala de espera para el siguiente intérprete (opcional)
+let room = null;
+let currentEspera = null;
 let offsetServidor = 0;
 let audioInterpreteActivo = false;
 
 // ============================================================
-// 2. SINCRONIZACIÓN DE TIEMPO (con servidor)
+// 2. SINCRONIZACIÓN DE TIEMPO
 // ============================================================
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
 
@@ -33,7 +33,7 @@ setInterval(sincronizarTiempo, 60000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizarTiempo(); });
 
 // ============================================================
-// 3. OBTENER INTÉRPRETES (CACHE CON TIEMPO)
+// 3. INTÉRPRETES (CACHE)
 // ============================================================
 let cacheInterpretes = [];
 let lastFetch = 0;
@@ -50,7 +50,7 @@ async function obtenerInterpretes() {
 }
 
 // ============================================================
-// 4. TRADUCCIÓN COMPLETA (data-i18n + JSON)
+// 4. TRADUCCIONES (data-i18n + JSON)
 // ============================================================
 let textos = {};
 let idiomaActual = 'es';
@@ -94,13 +94,14 @@ function cambiarIdioma(idioma, btn) {
   if (btn) btn.classList.add('activo');
 }
 
+// Recuperar idioma guardado
 const idiomaGuardado = localStorage.getItem('idioma');
 if (idiomaGuardado && ['es','en','fr','de','it','pt','ja','zh','ar'].includes(idiomaGuardado)) {
   idiomaActual = idiomaGuardado;
 }
 
 // ============================================================
-// 5. NOTAS Y ALTURAS (para el pentagrama)
+// 5. NOTAS Y ALTURAS (pentagrama)
 // ============================================================
 const NOTAS = {
   '0': 'Mi⁸', '1': 'Do', '2': 'Re', '3': 'Mi', '4': 'Fa',
@@ -112,218 +113,7 @@ const ALTURAS = {
 };
 
 // ============================================================
-// 6. GENERADOR DE π (con buffer deslizante para no consumir RAM)
-// ============================================================
-// NOTA: El worker ya genera los dígitos. En el main thread solo guardamos
-// una caché limitada para evitar fugas de memoria.
-const MAX_CACHE_DIGITOS = 1000;
-let cachePi = [];
-
-function obtenerDigito(indice) {
-  // Nos aseguramos de que el worker haya generado hasta ese índice.
-  // (El worker se comunica mediante postMessage, esta función solo se usa
-  // en el pentagrama de respaldo. Para el modo en vivo se usa worker.onmessage)
-  // Pero mantenemos una pequeña caché local para no crecer sin límite.
-  while (cachePi.length <= indice) {
-    // Simulación: si no hay worker, usamos el generador local.
-    // Sin embargo, el worker ya está operativo en modoVivo.
-    // Este bloque solo se ejecuta en modo demo (antes de 2027).
-    cachePi.push('3'); // placeholder, pero en la práctica no se usa.
-    if (cachePi.length > MAX_CACHE_DIGITOS) cachePi.shift();
-  }
-  return cachePi[indice];
-}
-
-// El generador local (solo para respaldo, apenas se usa)
-function* generarPi() { /* ... (mismo código) ... */ }
-
-// ============================================================
-// 7. AUDIO (PIANO) - lógica corregida
-// ============================================================
-let audioCtx = null, piano = null, sonidoActivado = false;
-
-async function loadSoundfont() {
-  if (window.Soundfont) return;
-  return new Promise(resolve => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/soundfont-player/dist/soundfont-player.min.js';
-    script.onload = resolve;
-    document.head.appendChild(script);
-  });
-}
-
-async function iniciarAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  await audioCtx.resume();
-  if (!piano) {
-    await loadSoundfont();
-    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
-  }
-  sonidoActivado = true;
-  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
-  if (textos[idiomaActual] && textos[idiomaActual][key]) {
-    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
-  }
-}
-
-function tocarNota(nota) {
-  if (!sonidoActivado || !piano || !nota) return;
-  const mapa = {
-    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
-    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
-  };
-  const midi = mapa[nota];
-  if (!midi) return;
-  const gain = audioInterpreteActivo ? 0.2 : 0.8;
-  piano.play(midi, audioCtx.currentTime, { duration: 0.9, gain, attack: 0.01, release: 0.3 });
-}
-
-document.getElementById('btnAudio')?.addEventListener('click', async () => {
-  if (!piano) {
-    await iniciarAudio();
-  } else {
-    sonidoActivado = !sonidoActivado;
-  }
-  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
-  if (textos[idiomaActual] && textos[idiomaActual][key]) {
-    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
-  } else {
-    document.getElementById('btnAudio').textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
-  }
-});
-
-// ============================================================
-// 8. LIVEKIT – CONEXIÓN REAL (ESPECTADOR)
-// ============================================================
-async function obtenerTokenEspectador(roomName) {
-  const url = `${TOKEN_URL}?room=${encodeURIComponent(roomName)}&identity=viewer-${Math.random()}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  return data.token;
-}
-
-async function conectarAInterprete(codigo, inicioSegundo) {
-  if (!TOKEN_URL || !LIVEKIT_URL) return;
-  const roomName = `turno-${inicioSegundo}`;
-  // Si ya estamos conectados a la misma sala, no hacer nada
-  if (room && room.name === roomName) return;
-  // Desconectar sala anterior
-  if (room) {
-    room.disconnect();
-    room = null;
-  }
-  try {
-    const token = await obtenerTokenEspectador(roomName);
-    const newRoom = new Livekit.Room();
-    await newRoom.connect(LIVEKIT_URL, token);
-    // Escuchar tracks de audio/video
-    newRoom.on('trackSubscribed', (track, publication, participant) => {
-      if (track.kind === 'video') {
-        const container = document.getElementById('videoPlaceholderPrincipal');
-        if (container) {
-          container.innerHTML = '';
-          const el = track.attach();
-          el.style.width = '100%';
-          el.style.height = '100%';
-          container.appendChild(el);
-        }
-      }
-      if (track.kind === 'audio') {
-        audioInterpreteActivo = true;
-      }
-    });
-    room = newRoom;
-  } catch (err) {
-    console.error('Error conectando a sala de LiveKit:', err);
-  }
-}
-
-// Gestión de sala de espera (similar, pero con muted)
-async function conectarEspera(siguiente) {
-  if (!siguiente || !siguiente.inicioSegundo) {
-    const container = document.getElementById('videoPlaceholderEspera');
-    if (container) container.innerHTML = '<div class="simbolo-pi">π</div>';
-    return;
-  }
-  const roomName = `turno-${siguiente.inicioSegundo}`;
-  const container = document.getElementById('videoPlaceholderEspera');
-  if (!container) return;
-  try {
-    const token = await obtenerTokenEspectador(roomName);
-    const waitRoom = new Livekit.Room();
-    await waitRoom.connect(LIVEKIT_URL, token);
-    waitRoom.on('trackSubscribed', (track, publication, participant) => {
-      if (track.kind === 'video') {
-        container.innerHTML = '';
-        const el = track.attach();
-        el.muted = true;
-        el.style.width = '100%';
-        el.style.height = '100%';
-        container.appendChild(el);
-      }
-    });
-    if (currentEspera && currentEspera !== waitRoom) currentEspera.disconnect();
-    currentEspera = waitRoom;
-  } catch (err) {
-    console.warn('No se pudo cargar la sala de espera', err);
-  }
-}
-
-// ============================================================
-// 9. UI DE INTÉRPRETES (actualiza cada 15s)
-// ============================================================
-async function actualizarUIInterpretes() {
-  if (!API_URL) return;
-  const interpretes = await obtenerInterpretes();
-  const segundo = getSegundoGlobal();
-  const actual = interpretes.find(i => segundo >= i.inicioSegundo && segundo < i.inicioSegundo + 300);
-  const siguiente = interpretes.find(i => i.inicioSegundo === (actual?.inicioSegundo + 300));
-
-  if (actual) {
-    document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
-    document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
-    conectarAInterprete(actual.codigo, actual.inicioSegundo);
-    if (siguiente) {
-      conectarEspera(siguiente);
-    } else {
-      conectarEspera(null);
-    }
-  } else {
-    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
-    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
-    // Si no hay intérprete, mostramos π en el vídeo
-    const container = document.getElementById('videoPlaceholderPrincipal');
-    if (container && container.innerHTML === '') {
-      container.innerHTML = '<div class="simbolo-pi">π</div>';
-    }
-    audioInterpreteActivo = false;
-  }
-}
-setInterval(actualizarUIInterpretes, 15000);
-
-// ============================================================
-// 10. CUENTA ATRÁS
-// ============================================================
-function actualizarCountdown() {
-  const diff = INICIO_MELODIA - ahoraReal();
-  if (diff <= 0) {
-    document.querySelectorAll('#dias,#horas,#minutos,#segundos').forEach(el => el.textContent = '00');
-    return;
-  }
-  const dias = Math.floor(diff / 86400000);
-  const horas = Math.floor((diff % 86400000) / 3600000);
-  const mins = Math.floor((diff % 3600000) / 60000);
-  const segs = Math.floor((diff % 60000) / 1000);
-  document.getElementById('dias').textContent = dias;
-  document.getElementById('horas').textContent = horas.toString().padStart(2,'0');
-  document.getElementById('minutos').textContent = mins.toString().padStart(2,'0');
-  document.getElementById('segundos').textContent = segs.toString().padStart(2,'0');
-}
-setInterval(actualizarCountdown, 1000);
-actualizarCountdown();
-
-// ============================================================
-// 11. PENTAGRAMA (con worker)
+// 6. GENERADOR DE π (worker)
 // ============================================================
 let worker = null;
 try {
@@ -332,7 +122,6 @@ try {
   console.warn('Worker no cargado');
   document.getElementById('tiempoActual').innerHTML = '⚠️ Modo limitado (sin cálculo en tiempo real)';
 }
-
 let modoVivo = false;
 let intervaloPentagrama = null;
 
@@ -414,7 +203,169 @@ function generarPentagramaInicial() {
 }
 
 // ============================================================
-// 12. ACCESO INTÉRPRETE (con apertura robusta)
+// 7. AUDIO (PIANO)
+// ============================================================
+let audioCtx = null, piano = null, sonidoActivado = false;
+
+async function loadSoundfont() {
+  if (window.Soundfont) return;
+  return new Promise(resolve => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/soundfont-player/dist/soundfont-player.min.js';
+    script.onload = resolve;
+    document.head.appendChild(script);
+  });
+}
+
+async function iniciarAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  await audioCtx.resume();
+  if (!piano) {
+    await loadSoundfont();
+    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
+  }
+  sonidoActivado = true;
+  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+  if (textos[idiomaActual] && textos[idiomaActual][key]) {
+    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+  }
+}
+function tocarNota(nota) {
+  if (!sonidoActivado || !piano || !nota) return;
+  const mapa = {
+    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
+    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
+  };
+  const midi = mapa[nota];
+  if (!midi) return;
+  const gain = audioInterpreteActivo ? 0.2 : 0.8;
+  piano.play(midi, audioCtx.currentTime, { duration: 0.9, gain, attack: 0.01, release: 0.3 });
+}
+document.getElementById('btnAudio')?.addEventListener('click', async () => {
+  if (!piano) {
+    await iniciarAudio();
+  } else {
+    sonidoActivado = !sonidoActivado;
+  }
+  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+  if (textos[idiomaActual] && textos[idiomaActual][key]) {
+    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+  } else {
+    document.getElementById('btnAudio').textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
+  }
+});
+
+// ============================================================
+// 8. LIVEKIT – CONEXIÓN ESPECTADOR
+// ============================================================
+async function obtenerTokenEspectador(roomName) {
+  const url = `${TOKEN_URL}?room=${encodeURIComponent(roomName)}&identity=viewer-${Math.random()}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.token;
+}
+async function conectarAInterprete(codigo, inicioSegundo) {
+  if (!TOKEN_URL || !LIVEKIT_URL) return;
+  const roomName = `turno-${inicioSegundo}`;
+  if (room && room.name === roomName) return;
+  if (room) { room.disconnect(); room = null; }
+  try {
+    const token = await obtenerTokenEspectador(roomName);
+    const newRoom = new Livekit.Room();
+    await newRoom.connect(LIVEKIT_URL, token);
+    newRoom.on('trackSubscribed', (track, publication, participant) => {
+      if (track.kind === 'video') {
+        const container = document.getElementById('videoPlaceholderPrincipal');
+        if (container) {
+          container.innerHTML = '';
+          const el = track.attach();
+          el.style.width = '100%';
+          el.style.height = '100%';
+          container.appendChild(el);
+        }
+      }
+      if (track.kind === 'audio') {
+        audioInterpreteActivo = true;
+      }
+    });
+    room = newRoom;
+  } catch (err) { console.error('Error conectando a LiveKit:', err); }
+}
+async function conectarEspera(siguiente) {
+  if (!siguiente || !siguiente.inicioSegundo) {
+    const container = document.getElementById('videoPlaceholderEspera');
+    if (container) container.innerHTML = '<div class="simbolo-pi">π</div>';
+    return;
+  }
+  const roomName = `turno-${siguiente.inicioSegundo}`;
+  const container = document.getElementById('videoPlaceholderEspera');
+  if (!container) return;
+  try {
+    const token = await obtenerTokenEspectador(roomName);
+    const waitRoom = new Livekit.Room();
+    await waitRoom.connect(LIVEKIT_URL, token);
+    waitRoom.on('trackSubscribed', (track) => {
+      if (track.kind === 'video') {
+        container.innerHTML = '';
+        const el = track.attach();
+        el.muted = true;
+        el.style.width = '100%';
+        el.style.height = '100%';
+        container.appendChild(el);
+      }
+    });
+    if (currentEspera && currentEspera !== waitRoom) currentEspera.disconnect();
+    currentEspera = waitRoom;
+  } catch (err) { console.warn('Error en sala de espera', err); }
+}
+
+// ============================================================
+// 9. UI DE INTÉRPRETES (actualiza cada 15s)
+// ============================================================
+async function actualizarUIInterpretes() {
+  if (!API_URL) return;
+  const interpretes = await obtenerInterpretes();
+  const segundo = getSegundoGlobal();
+  const actual = interpretes.find(i => segundo >= i.inicioSegundo && segundo < i.inicioSegundo + 300);
+  const siguiente = interpretes.find(i => i.inicioSegundo === (actual?.inicioSegundo + 300));
+  if (actual) {
+    document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
+    document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
+    conectarAInterprete(actual.codigo, actual.inicioSegundo);
+    conectarEspera(siguiente || null);
+  } else {
+    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
+    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
+    audioInterpreteActivo = false;
+    const container = document.getElementById('videoPlaceholderPrincipal');
+    if (container && container.innerHTML === '') container.innerHTML = '<div class="simbolo-pi">π</div>';
+  }
+}
+setInterval(actualizarUIInterpretes, 15000);
+
+// ============================================================
+// 10. CUENTA ATRÁS
+// ============================================================
+function actualizarCountdown() {
+  const diff = INICIO_MELODIA - ahoraReal();
+  if (diff <= 0) {
+    document.querySelectorAll('#dias,#horas,#minutos,#segundos').forEach(el => el.textContent = '00');
+    return;
+  }
+  const dias = Math.floor(diff / 86400000);
+  const horas = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const segs = Math.floor((diff % 60000) / 1000);
+  document.getElementById('dias').textContent = dias;
+  document.getElementById('horas').textContent = horas.toString().padStart(2,'0');
+  document.getElementById('minutos').textContent = mins.toString().padStart(2,'0');
+  document.getElementById('segundos').textContent = segs.toString().padStart(2,'0');
+}
+setInterval(actualizarCountdown, 1000);
+actualizarCountdown();
+
+// ============================================================
+// 11. ACCESO INTÉRPRETE (apertura robusta)
 // ============================================================
 document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -429,7 +380,6 @@ document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) 
     return;
   }
   const url = `interprete.html?code=${encodeURIComponent(codigo)}&turno=${encodeURIComponent(turno)}`;
-  // Abrir de forma robusta (evita bloqueo de popups)
   const a = document.createElement('a');
   a.href = url;
   a.target = '_blank';
@@ -438,10 +388,11 @@ document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) 
 });
 
 // ============================================================
-// 13. INICIALIZACIÓN (al cargar el DOM)
+// 12. INICIALIZACIÓN (al cargar el DOM)
 // ============================================================
 document.addEventListener("DOMContentLoaded", async () => {
-  await cargarTraducciones();
+  await cargarTraducciones(); // esperamos a que carguen los textos
+  // Asignar eventos a los botones de idioma
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       cambiarIdioma(btn.dataset.lang, btn);
