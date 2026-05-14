@@ -1,17 +1,20 @@
 // ============================================================
 // 1. CONFIGURACIÓN GLOBAL
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbzlSvJYRmnr3cm6ZavpaFOYBG-pl7A8GPoy5s_QskUJWh2nJ_cLsLf6Ajf_JPAVspH4pg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzlSvJYRmnr3cm6ZavpaFOYBG-pl7A8GPoy5s_QskUJWh2nJ_cLsLf6Ajf_JPAVspH4pg/exec'; // ← tu URL actual
 const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
 const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
-const GLOBAL_ROOM = 'melodia-global';  // Nueva: sala única
+const GLOBAL_ROOM = 'melodia-global';
 
 let room = null;
 let offsetServidor = 0;
 let audioInterpreteActivo = false;
 
+// Detectar si es la página principal (index.html)
+const esPaginaPrincipal = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '';
+
 // ============================================================
-// 2. SINCRONIZACIÓN DE TIEMPO
+// 2. SINCRONIZACIÓN DE TIEMPO (siempre necesaria)
 // ============================================================
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
 
@@ -50,7 +53,7 @@ async function obtenerInterpretes() {
 }
 
 // ============================================================
-// 4. TRADUCCIONES (data-i18n + JSON) – exactamente igual que antes
+// 4. TRADUCCIONES (data-i18n + JSON)
 // ============================================================
 let textos = {};
 let idiomaActual = 'es';
@@ -100,7 +103,7 @@ if (idiomaGuardado && ['es','en','fr','de','it','pt','ja','zh','ar'].includes(id
 }
 
 // ============================================================
-// 5. NOTAS Y ALTURAS (pentagrama)
+// 5. NOTAS Y ALTURAS (solo para página principal)
 // ============================================================
 const NOTAS = {
   '0': 'Mi⁸', '1': 'Do', '2': 'Re', '3': 'Mi', '4': 'Fa',
@@ -112,14 +115,16 @@ const ALTURAS = {
 };
 
 // ============================================================
-// 6. GENERADOR DE π (worker) – igual
+// 6. GENERADOR DE π (worker) y PENTAGRAMA
 // ============================================================
 let worker = null;
 try {
   worker = new Worker('worker/worker-pi.js');
 } catch(e) {
   console.warn('Worker no cargado');
-  document.getElementById('tiempoActual').innerHTML = '⚠️ Modo limitado (sin cálculo en tiempo real)';
+  if (document.getElementById('tiempoActual')) {
+    document.getElementById('tiempoActual').innerHTML = '⚠️ Modo limitado (sin cálculo en tiempo real)';
+  }
 }
 let modoVivo = false;
 let intervaloPentagrama = null;
@@ -138,17 +143,22 @@ function iniciarActualizacionViva() {
 function activarModoVivo() {
   if (modoVivo) return;
   modoVivo = true;
-  document.getElementById('countdownContainer').style.display = 'none';
-  document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
-  document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
+  const countdownContainer = document.getElementById('countdownContainer');
+  if (countdownContainer) countdownContainer.style.display = 'none';
+  const estadoPrincipal = document.getElementById('estadoPrincipal');
+  if (estadoPrincipal) estadoPrincipal.innerHTML = textos[idiomaActual]?.live || 'LIVE';
+  const lugarPrincipal = document.getElementById('lugarPrincipal');
+  if (lugarPrincipal) lugarPrincipal.innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
   iniciarActualizacionViva();
 }
 
-setInterval(() => {
-  if (!modoVivo && ahoraReal() >= INICIO_MELODIA) {
-    activarModoVivo();
-  }
-}, 1000);
+if (esPaginaPrincipal) {
+  setInterval(() => {
+    if (!modoVivo && ahoraReal() >= INICIO_MELODIA) {
+      activarModoVivo();
+    }
+  }, 1000);
+}
 
 if (worker) {
   worker.onmessage = function(e) {
@@ -198,11 +208,13 @@ function generarPentagramaInicial() {
     </div>`;
   });
   container.innerHTML = html;
-  document.getElementById('tiempoActual').innerHTML = `⏱️ segundo #0 · π: 3 · 60 bpm (esperando inicio)`;
+  if (document.getElementById('tiempoActual')) {
+    document.getElementById('tiempoActual').innerHTML = `⏱️ segundo #0 · π: 3 · 60 bpm (esperando inicio)`;
+  }
 }
 
 // ============================================================
-// 7. AUDIO (PIANO)
+// 7. AUDIO (PIANO) – solo si existe btnAudio
 // ============================================================
 let audioCtx = null, piano = null, sonidoActivado = false;
 
@@ -226,7 +238,8 @@ async function iniciarAudio() {
   sonidoActivado = true;
   const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
   if (textos[idiomaActual] && textos[idiomaActual][key]) {
-    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+    const btn = document.getElementById('btnAudio');
+    if (btn) btn.innerHTML = textos[idiomaActual][key];
   }
 }
 function tocarNota(nota) {
@@ -240,22 +253,25 @@ function tocarNota(nota) {
   const gain = audioInterpreteActivo ? 0.2 : 0.8;
   piano.play(midi, audioCtx.currentTime, { duration: 0.9, gain, attack: 0.01, release: 0.3 });
 }
-document.getElementById('btnAudio')?.addEventListener('click', async () => {
-  if (!piano) {
-    await iniciarAudio();
-  } else {
-    sonidoActivado = !sonidoActivado;
-  }
-  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
-  if (textos[idiomaActual] && textos[idiomaActual][key]) {
-    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
-  } else {
-    document.getElementById('btnAudio').textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
-  }
-});
+const btnAudio = document.getElementById('btnAudio');
+if (btnAudio) {
+  btnAudio.addEventListener('click', async () => {
+    if (!piano) {
+      await iniciarAudio();
+    } else {
+      sonidoActivado = !sonidoActivado;
+    }
+    const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+    if (textos[idiomaActual] && textos[idiomaActual][key]) {
+      btnAudio.innerHTML = textos[idiomaActual][key];
+    } else {
+      btnAudio.textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
+    }
+  });
+}
 
 // ============================================================
-// 8. LIVEKIT – CONEXIÓN A SALA GLOBAL (espectador)
+// 8. LIVEKIT – CONEXIÓN A SALA GLOBAL (solo en principal)
 // ============================================================
 async function obtenerTokenEspectador(roomName) {
   const url = `${TOKEN_URL}?room=${encodeURIComponent(roomName)}&identity=viewer-${Math.random()}`;
@@ -288,9 +304,7 @@ async function actualizarPantallasSegunTiempo() {
   const interpretes = await obtenerInterpretes();
   const ahora = getSegundoGlobal();
 
-  // Buscar intérprete en ventana de directo (actual)
   const actual = interpretes.find(i => ahora >= i.inicioBloque + 300 && ahora < i.inicioBloque + 600);
-  // Buscar intérprete en ventana de espera (siguiente)
   const siguiente = interpretes.find(i => ahora >= i.inicioBloque && ahora < i.inicioBloque + 300);
 
   room.participants.forEach(participant => {
@@ -310,8 +324,10 @@ async function actualizarPantallasSegunTiempo() {
         }
         if (track.kind === 'audio') audioInterpreteActivo = true;
       });
-      document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
-      document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
+      const estado = document.getElementById('estadoPrincipal');
+      const lugar = document.getElementById('lugarPrincipal');
+      if (estado) estado.innerText = `🎵 ${actual.nombre}`;
+      if (lugar) lugar.innerHTML = `Desde ${actual.lugar}`;
     } else if (esSiguiente) {
       const container = document.getElementById('videoPlaceholderEspera');
       if (container) container.innerHTML = '';
@@ -341,7 +357,7 @@ async function actualizarPantallasSegunTiempo() {
 }
 
 // ============================================================
-// 9. UI DE INTÉRPRETES (para textos, sin vídeo)
+// 9. UI DE INTÉRPRETES (textos, sin vídeo)
 // ============================================================
 async function actualizarUIInterpretes() {
   if (!API_URL) return;
@@ -349,68 +365,79 @@ async function actualizarUIInterpretes() {
   const segundo = getSegundoGlobal();
   const actual = interpretes.find(i => segundo >= i.inicioBloque + 300 && segundo < i.inicioBloque + 600);
   if (actual) {
-    document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
-    document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
+    const estado = document.getElementById('estadoPrincipal');
+    const lugar = document.getElementById('lugarPrincipal');
+    if (estado) estado.innerText = `🎵 ${actual.nombre}`;
+    if (lugar) lugar.innerHTML = `Desde ${actual.lugar}`;
   } else {
-    document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
-    document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
+    const estado = document.getElementById('estadoPrincipal');
+    const lugar = document.getElementById('lugarPrincipal');
+    if (estado) estado.innerHTML = textos[idiomaActual]?.live || 'LIVE';
+    if (lugar) lugar.innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
     audioInterpreteActivo = false;
   }
 }
-setInterval(actualizarUIInterpretes, 15000);
+if (esPaginaPrincipal) {
+  setInterval(actualizarUIInterpretes, 15000);
+}
 
 // ============================================================
-// 10. CUENTA ATRÁS
+// 10. CUENTA ATRÁS (solo si existen elementos)
 // ============================================================
 function actualizarCountdown() {
   const diff = INICIO_MELODIA - ahoraReal();
+  const diasSpan = document.getElementById('dias');
+  const horasSpan = document.getElementById('horas');
+  const minutosSpan = document.getElementById('minutos');
+  const segundosSpan = document.getElementById('segundos');
+  if (!diasSpan) return; // si no está, salir
   if (diff <= 0) {
-    document.querySelectorAll('#dias,#horas,#minutos,#segundos').forEach(el => el.textContent = '00');
+    diasSpan.textContent = '00';
+    horasSpan.textContent = '00';
+    minutosSpan.textContent = '00';
+    segundosSpan.textContent = '00';
     return;
   }
   const dias = Math.floor(diff / 86400000);
   const horas = Math.floor((diff % 86400000) / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
   const segs = Math.floor((diff % 60000) / 1000);
-  document.getElementById('dias').textContent = dias;
-  document.getElementById('horas').textContent = horas.toString().padStart(2,'0');
-  document.getElementById('minutos').textContent = mins.toString().padStart(2,'0');
-  document.getElementById('segundos').textContent = segs.toString().padStart(2,'0');
+  diasSpan.textContent = dias;
+  horasSpan.textContent = horas.toString().padStart(2,'0');
+  minutosSpan.textContent = mins.toString().padStart(2,'0');
+  segundosSpan.textContent = segs.toString().padStart(2,'0');
 }
 setInterval(actualizarCountdown, 1000);
 actualizarCountdown();
 
 // ============================================================
-// 11. PENTAGRAMA + WORKER – igual que antes
+// 11. ACCESO INTÉRPRETE (solo si existe el formulario)
 // ============================================================
-// (ya está incluido arriba, pero no lo repito)
-// Nota: las funciones de pentagrama ya están definidas antes.
+const formAcceso = document.getElementById('formAccesoInterprete');
+if (formAcceso) {
+  formAcceso.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let codigo = document.getElementById('codigoAcceso').value.trim();
+    const turno = document.getElementById('turnoAcceso').value.trim();
+    if (!codigo || !turno) {
+      alert('Por favor, introduce tu código y el inicio de tu bloque.');
+      return;
+    }
+    if (!/π-[A-Z0-9]{4,}/.test(codigo)) {
+      alert('El código parece inválido. Debe empezar con π- seguido de letras y números.');
+      return;
+    }
+    const url = `interprete.html?code=${encodeURIComponent(codigo)}&inicioBloque=${encodeURIComponent(turno)}`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.click();
+  });
+}
 
 // ============================================================
-// 12. ACCESO INTÉRPRETE (con inicioBloque)
-// ============================================================
-document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  let codigo = document.getElementById('codigoAcceso').value.trim();
-  const turno = document.getElementById('turnoAcceso').value.trim(); // será inicioBloque
-  if (!codigo || !turno) {
-    alert('Por favor, introduce tu código y el inicio de tu bloque.');
-    return;
-  }
-  if (!/π-[A-Z0-9]{4,}/.test(codigo)) {
-    alert('El código parece inválido. Debe empezar con π- seguido de letras y números.');
-    return;
-  }
-  const url = `interprete.html?code=${encodeURIComponent(codigo)}&inicioBloque=${encodeURIComponent(turno)}`;
-  const a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  a.click();
-});
-
-// ============================================================
-// 13. INICIALIZACIÓN
+// 12. INICIALIZACIÓN (siempre cargar traducciones y botones)
 // ============================================================
 document.addEventListener("DOMContentLoaded", async () => {
   await cargarTraducciones();
@@ -420,7 +447,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
   });
-  generarPentagramaInicial();
-  conectarSalaGlobal();       // Conectar a la sala global
-  actualizarUIInterpretes();   // Actualizar textos de la UI
+  if (esPaginaPrincipal) {
+    generarPentagramaInicial();
+    conectarSalaGlobal();
+    actualizarUIInterpretes();
+  }
 });
