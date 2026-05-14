@@ -13,8 +13,8 @@
   </style>
 </head>
 <body>
-  <h1>🎤 Esperando tu turno...</h1>
-  <div id="status" class="status">Verificando turno...</div>
+  <h1>🎤 Tu turno en La melodía de π</h1>
+  <div id="status" class="status">Verificando tu bloque...</div>
   <video id="localVideo" autoplay muted playsinline></video>
   <button id="btnStart">📹 Activar cámara y micrófono</button>
 
@@ -22,25 +22,40 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const CODIGO = params.get('code') || params.get('codigo');
-    const TURNO_STR = params.get('turno');
-    if (!CODIGO || !TURNO_STR) {
-      document.getElementById('status').innerHTML = '❌ Enlace inválido. Falta el código o el turno.';
+    const INICIO_BLOQUE_STR = params.get('inicioBloque');
+    if (!CODIGO || !INICIO_BLOQUE_STR) {
+      document.getElementById('status').innerHTML = '❌ Enlace inválido.';
       throw new Error('Missing parameters');
     }
-    const TURNO = parseInt(TURNO_STR);
+    const INICIO_BLOQUE = parseInt(INICIO_BLOQUE_STR);
     const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0)).getTime();
     function getSegundoGlobal() { return Math.floor((Date.now() - INICIO_MELODIA) / 1000); }
-    function enTurno() { const ahora = getSegundoGlobal(); return ahora >= TURNO && ahora < TURNO + 300; }
+    const ahora = getSegundoGlobal();
+    const segundosDesdeInicio = ahora - INICIO_BLOQUE;
+    const dentroDelBloque = segundosDesdeInicio >= 0 && segundosDesdeInicio < 600;
 
-    const TOKEN_URL = null;   // Pon tu URL del worker cuando la tengas
-    const LIVEKIT_URL = null; // Pon tu URL de LiveKit cuando la tengas
+    let publicarAudio = false;
+    let estado = '';
+    if (!dentroDelBloque) {
+      estado = '❌ Fuera de tu bloque de 10 minutos. Has perdido tu turno.';
+    } else if (segundosDesdeInicio < 300) {
+      estado = '⏳ Estás en espera. Te verán en silencio.';
+      publicarAudio = false;
+    } else {
+      estado = '🎤 Estás en directo. ¡Empieza a tocar!';
+      publicarAudio = true;
+    }
+    document.getElementById('status').innerHTML = estado;
+
+    const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
+    const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
+    const GLOBAL_ROOM = 'melodia-global';
 
     let room = null;
     let localStream = null;
 
-    async function solicitarToken() {
+    async function solicitarToken(roomName) {
       if (!TOKEN_URL) throw new Error('Token URL no configurada');
-      const roomName = `turno-${TURNO}`;
       const res = await fetch(`${TOKEN_URL}?room=${roomName}&identity=${CODIGO}`);
       if (!res.ok) throw new Error('Error al obtener token');
       const data = await res.json();
@@ -48,8 +63,8 @@
     }
 
     async function iniciarTransmision() {
-      if (!enTurno()) {
-        document.getElementById('status').innerHTML = '⏳ Aún no es tu turno. Espera unos minutos y recarga la página.';
+      if (!dentroDelBloque) {
+        alert('Estás fuera de tu bloque de 10 minutos. No puedes transmitir.');
         return;
       }
       if (!localStream) {
@@ -61,38 +76,40 @@
           return;
         }
       }
-      if (!TOKEN_URL || !LIVEKIT_URL) {
-        document.getElementById('status').innerHTML = '⚠️ El sistema de vídeo no está configurado aún. Si es tu turno, avisa al administrador.';
-        return;
-      }
       try {
-        const token = await solicitarToken();
+        const token = await solicitarToken(GLOBAL_ROOM);
         room = new Livekit.Room();
         await room.connect(LIVEKIT_URL, token);
-        await room.localParticipant.publishTracks(localStream.getTracks());
-        document.getElementById('status').innerHTML = '🎙️ Estás al aire. Tu actuación durará 5 minutos.';
-        setTimeout(() => desconectar(), 300000);
+        // Publicar vídeo siempre, audio solo si corresponde
+        const tracksToPublish = localStream.getTracks().filter(track => {
+          if (track.kind === 'video') return true;
+          if (track.kind === 'audio') return publicarAudio;
+          return false;
+        });
+        await room.localParticipant.publishTracks(tracksToPublish);
+        document.getElementById('status').innerHTML = publicarAudio ? '🎙️ Estás al aire. Suenas durante 5 minutos.' : '📹 Te están viendo en espera (sin audio).';
+        // Desconectar automáticamente al final del bloque (en 600 segundos desde inicio)
+        const tiempoRestante = 600 - segundosDesdeInicio;
+        if (tiempoRestante > 0) {
+          setTimeout(() => desconectar(), tiempoRestante * 1000);
+        }
       } catch(err) {
         console.error(err);
-        document.getElementById('status').innerHTML = '❌ Error de conexión. Inténtalo de nuevo.';
+        document.getElementById('status').innerHTML = '❌ Error de conexión.';
       }
     }
 
     async function desconectar() {
       if (room) await room.disconnect();
       room = null;
-      document.getElementById('status').innerHTML = 'Turno finalizado. Gracias por participar.';
+      document.getElementById('status').innerHTML = 'Conexión finalizada. Gracias por participar.';
     }
 
     document.getElementById('btnStart').addEventListener('click', iniciarTransmision);
-    if (enTurno()) {
-      document.getElementById('status').innerHTML = '✅ Estás en tu turno. Pulsa el botón para empezar a transmitir.';
-    } else {
-      const segundosRestantes = TURNO - getSegundoGlobal();
-      document.getElementById('status').innerHTML = `⏳ Tu turno comienza en ${segundosRestantes} segundos. Mantén esta página abierta.`;
+    // Si ya está en directo y tiene audio, podría comenzar automáticamente
+    if (publicarAudio) {
+      iniciarTransmision();
     }
   </script>
 </body>
 </html>
-
-
