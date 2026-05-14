@@ -1,14 +1,15 @@
 
 // ============================================================
-// 1. CONFIGURACIÓN GLOBAL (cambia estas URLs cuando las tengas)
+// 1. CONFIGURACIÓN GLOBAL
 // ============================================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbxdrVld3fqUXdsk-k-l2KOxq82AmqoHOxbheaogr9a78UcjdeeO7NrTIFvBvmX35xeKtw/exec';
-const TOKEN_URL = null;      // Ej: 'https://tu-worker.workers.dev'
-const LIVEKIT_URL = null;    // Ej: 'wss://tu-dominio-livekit.com'
+const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
+const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
+const GLOBAL_ROOM = 'melodia-global';  // Nombre fijo de la sala
 
 let room = null;
-let currentEspera = null;
 let offsetServidor = 0;
+let audioInterpreteActivo = false;
 
 // ============================================================
 // 2. SINCRONIZACIÓN DE TIEMPO
