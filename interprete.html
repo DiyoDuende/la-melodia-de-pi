@@ -24,7 +24,7 @@
     const CODIGO = params.get('code') || params.get('codigo');
     const INICIO_BLOQUE_STR = params.get('inicioBloque');
     if (!CODIGO || !INICIO_BLOQUE_STR) {
-      document.getElementById('status').innerHTML = '❌ Enlace inválido.';
+      document.getElementById('status').innerHTML = '❌ Enlace inválido. Falta el código o el inicio de bloque.';
       throw new Error('Missing parameters');
     }
     const INICIO_BLOQUE = parseInt(INICIO_BLOQUE_STR);
@@ -39,7 +39,7 @@
     if (!dentroDelBloque) {
       estado = '❌ Fuera de tu bloque de 10 minutos. Has perdido tu turno.';
     } else if (segundosDesdeInicio < 300) {
-      estado = '⏳ Estás en espera. Te verán en silencio.';
+      estado = '⏳ Estás en espera. Te verán en silencio (próximos 5 minutos).';
       publicarAudio = false;
     } else {
       estado = '🎤 Estás en directo. ¡Empieza a tocar!';
@@ -80,14 +80,34 @@
         const token = await solicitarToken(GLOBAL_ROOM);
         room = new Livekit.Room();
         await room.connect(LIVEKIT_URL, token);
-        // Publicar vídeo siempre, audio solo si corresponde
         const tracksToPublish = localStream.getTracks().filter(track => {
           if (track.kind === 'video') return true;
           if (track.kind === 'audio') return publicarAudio;
           return false;
         });
         await room.localParticipant.publishTracks(tracksToPublish);
-        document.getElementById('status').innerHTML = publicarAudio ? '🎙️ Estás al aire. Suenas durante 5 minutos.' : '📹 Te están viendo en espera (sin audio).';
+        document.getElementById('status').innerHTML = publicarAudio ?
+          '🎙️ Estás al aire. Suenas durante 5 minutos.' :
+          '📹 Te están viendo en espera (sin audio). Cuando comience tu directo, el audio se activará automáticamente.';
+        // Si está en espera, comprobar periódicamente si ha pasado a directo
+        if (!publicarAudio) {
+          const checkInterval = setInterval(async () => {
+            const ahora2 = getSegundoGlobal();
+            if (ahora2 >= INICIO_BLOQUE + 300 && ahora2 < INICIO_BLOQUE + 600) {
+              // Ya está en directo, publicar audio
+              try {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                  await room.localParticipant.publishTrack(audioTrack);
+                  document.getElementById('status').innerHTML = '🎤 Has pasado a directo. ¡Ahora sí te oyen!';
+                  clearInterval(checkInterval);
+                }
+              } catch(e) { console.warn(e); }
+            } else if (ahora2 >= INICIO_BLOQUE + 600) {
+              clearInterval(checkInterval);
+            }
+          }, 1000);
+        }
         // Desconectar automáticamente al final del bloque (en 600 segundos desde inicio)
         const tiempoRestante = 600 - segundosDesdeInicio;
         if (tiempoRestante > 0) {
@@ -95,7 +115,7 @@
         }
       } catch(err) {
         console.error(err);
-        document.getElementById('status').innerHTML = '❌ Error de conexión.';
+        document.getElementById('status').innerHTML = '❌ Error de conexión. Inténtalo de nuevo.';
       }
     }
 
@@ -106,8 +126,8 @@
     }
 
     document.getElementById('btnStart').addEventListener('click', iniciarTransmision);
-    // Si ya está en directo y tiene audio, podría comenzar automáticamente
-    if (publicarAudio) {
+    // Si ya está en directo, iniciar automáticamente
+    if (publicarAudio && dentroDelBloque) {
       iniciarTransmision();
     }
   </script>
