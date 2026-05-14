@@ -4,14 +4,14 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbxdrVld3fqUXdsk-k-l2KOxq82AmqoHOxbheaogr9a78UcjdeeO7NrTIFvBvmX35xeKtw/exec';
 const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
 const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
-const GLOBAL_ROOM = 'melodia-global';  // Nombre fijo de la sala
+const GLOBAL_ROOM = 'melodia-global';  // Sala única para todos los intérpretes
 
-let room = null;
+let room = null;               // Conexión a la sala global
 let offsetServidor = 0;
 let audioInterpreteActivo = false;
 
 // ============================================================
-// 2. SINCRONIZACIÓN DE TIEMPO
+// 2. SINCRONIZACIÓN DE TIEMPO (con servidor)
 // ============================================================
 const INICIO_MELODIA = new Date(Date.UTC(2027, 2, 14, 0, 0, 0));
 
@@ -33,7 +33,7 @@ setInterval(sincronizarTiempo, 60000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizarTiempo(); });
 
 // ============================================================
-// 3. OBTENER INTÉRPRETES (CACHE)
+// 3. OBTENER INTÉRPRETES (CACHE CON TIEMPO)
 // ============================================================
 let cacheInterpretes = [];
 let lastFetch = 0;
@@ -50,26 +50,57 @@ async function obtenerInterpretes() {
 }
 
 // ============================================================
-// 4. TRADUCCIONES (data-i18n + JSON) – igual que antes
+// 4. TRADUCCIONES (data-i18n + JSON)
 // ============================================================
 let textos = {};
 let idiomaActual = 'es';
+
 async function cargarTraducciones() {
   try {
     const res = await fetch('traducciones.json');
     textos = await res.json();
     aplicarTraduccion();
-  } catch (e) { console.warn('No se pudieron cargar las traducciones'); }
+  } catch (e) {
+    console.warn('No se pudieron cargar las traducciones');
+  }
 }
-function aplicarTraduccion() { /* igual */ }
-function cambiarIdioma(idioma, btn) { /* igual */ }
+
+function aplicarTraduccion() {
+  if (!textos[idiomaActual]) return;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (textos[idiomaActual][key]) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = textos[idiomaActual][key];
+      } else if (el.tagName === 'TITLE') {
+        document.title = textos[idiomaActual][key];
+      } else {
+        el.innerHTML = textos[idiomaActual][key];
+      }
+    }
+  });
+  const btnAudio = document.getElementById('btnAudio');
+  if (btnAudio && sonidoActivado !== undefined) {
+    const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+    if (textos[idiomaActual][key]) btnAudio.innerHTML = textos[idiomaActual][key];
+  }
+}
+
+function cambiarIdioma(idioma, btn) {
+  idiomaActual = idioma;
+  aplicarTraduccion();
+  localStorage.setItem('idioma', idioma);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('activo'));
+  if (btn) btn.classList.add('activo');
+}
+
 const idiomaGuardado = localStorage.getItem('idioma');
 if (idiomaGuardado && ['es','en','fr','de','it','pt','ja','zh','ar'].includes(idiomaGuardado)) {
   idiomaActual = idiomaGuardado;
 }
 
 // ============================================================
-// 5. NOTAS Y ALTURAS
+// 5. NOTAS Y ALTURAS (pentagrama)
 // ============================================================
 const NOTAS = {
   '0': 'Mi⁸', '1': 'Do', '2': 'Re', '3': 'Mi', '4': 'Fa',
@@ -81,7 +112,7 @@ const ALTURAS = {
 };
 
 // ============================================================
-// 6. GENERADOR DE π (worker) – sin cambios
+// 6. GENERADOR DE π (worker)
 // ============================================================
 let worker = null;
 try {
@@ -103,6 +134,7 @@ function iniciarActualizacionViva() {
     }
   }, 1000);
 }
+
 function activarModoVivo() {
   if (modoVivo) return;
   modoVivo = true;
@@ -111,6 +143,7 @@ function activarModoVivo() {
   document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
   iniciarActualizacionViva();
 }
+
 setInterval(() => {
   if (!modoVivo && ahoraReal() >= INICIO_MELODIA) {
     activarModoVivo();
@@ -146,6 +179,7 @@ if (worker) {
     if (sonidoActivado) tocarNota(NOTAS[digitos[2]]);
   };
 }
+
 function generarPentagramaInicial() {
   const digitosDemo = ['·', '·', '3', '1', '4'];
   const container = document.getElementById('notasPentagrama');
@@ -168,16 +202,60 @@ function generarPentagramaInicial() {
 }
 
 // ============================================================
-// 7. AUDIO (PIANO)
+// 7. AUDIO (PIANO) - lógica corregida
 // ============================================================
 let audioCtx = null, piano = null, sonidoActivado = false;
-async function loadSoundfont() { /* igual */ }
-async function iniciarAudio() { /* igual */ }
-function tocarNota(nota) { /* igual */ }
-document.getElementById('btnAudio')?.addEventListener('click', async () => { /* igual */ });
+
+async function loadSoundfont() {
+  if (window.Soundfont) return;
+  return new Promise(resolve => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/soundfont-player/dist/soundfont-player.min.js';
+    script.onload = resolve;
+    document.head.appendChild(script);
+  });
+}
+
+async function iniciarAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  await audioCtx.resume();
+  if (!piano) {
+    await loadSoundfont();
+    piano = await Soundfont.instrument(audioCtx, 'acoustic_grand_piano');
+  }
+  sonidoActivado = true;
+  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+  if (textos[idiomaActual] && textos[idiomaActual][key]) {
+    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+  }
+}
+function tocarNota(nota) {
+  if (!sonidoActivado || !piano || !nota) return;
+  const mapa = {
+    'Do':'C4','Re':'D4','Mi':'E4','Fa':'F4','Sol':'G4',
+    'La':'A4','Si':'B4','Do⁸':'C5','Re⁸':'D5','Mi⁸':'E5'
+  };
+  const midi = mapa[nota];
+  if (!midi) return;
+  const gain = audioInterpreteActivo ? 0.2 : 0.8;
+  piano.play(midi, audioCtx.currentTime, { duration: 0.9, gain, attack: 0.01, release: 0.3 });
+}
+document.getElementById('btnAudio')?.addEventListener('click', async () => {
+  if (!piano) {
+    await iniciarAudio();
+  } else {
+    sonidoActivado = !sonidoActivado;
+  }
+  const key = sonidoActivado ? 'btn_audio_on' : 'btn_audio';
+  if (textos[idiomaActual] && textos[idiomaActual][key]) {
+    document.getElementById('btnAudio').innerHTML = textos[idiomaActual][key];
+  } else {
+    document.getElementById('btnAudio').textContent = sonidoActivado ? '🔇 Silenciar' : '🔊 Activar sonido';
+  }
+});
 
 // ============================================================
-// 8. LIVEKIT – CONEXIÓN A SALA GLOBAL
+// 8. LIVEKIT – CONEXIÓN A SALA GLOBAL (espectador)
 // ============================================================
 async function obtenerTokenEspectador(roomName) {
   const url = `${TOKEN_URL}?room=${encodeURIComponent(roomName)}&identity=viewer-${Math.random()}`;
@@ -195,16 +273,9 @@ async function conectarSalaGlobal() {
     const newRoom = new Livekit.Room();
     await newRoom.connect(LIVEKIT_URL, token);
     room = newRoom;
-    room.on('trackSubscribed', (track, publication, participant) => {
-      actualizarPantallasSegunTiempo();
-    });
-    room.on('participantConnected', (participant) => {
-      actualizarPantallasSegunTiempo();
-    });
-    room.on('participantDisconnected', (participant) => {
-      actualizarPantallasSegunTiempo();
-    });
-    // Actualizar cada segundo también por si cambia el tiempo
+    room.on('trackSubscribed', () => actualizarPantallasSegunTiempo());
+    room.on('participantConnected', () => actualizarPantallasSegunTiempo());
+    room.on('participantDisconnected', () => actualizarPantallasSegunTiempo());
     setInterval(() => actualizarPantallasSegunTiempo(), 1000);
     actualizarPantallasSegunTiempo();
   } catch (err) {
@@ -222,14 +293,12 @@ async function actualizarPantallasSegunTiempo() {
   // Buscar intérprete en ventana de espera (siguiente)
   const siguiente = interpretes.find(i => ahora >= i.inicioBloque && ahora < i.inicioBloque + 300);
 
-  // Recorrer participantes de la sala
   room.participants.forEach(participant => {
     const identidad = participant.identity;
     const esActual = actual && identidad === actual.codigo;
     const esSiguiente = siguiente && identidad === siguiente.codigo;
 
     if (esActual) {
-      // Mostrar en pantalla grande con audio
       const container = document.getElementById('videoPlaceholderPrincipal');
       container.innerHTML = '';
       participant.tracks.forEach(track => {
@@ -239,14 +308,11 @@ async function actualizarPantallasSegunTiempo() {
           el.style.height = '100%';
           container.appendChild(el);
         }
-        if (track.kind === 'audio') {
-          audioInterpreteActivo = true;
-        }
+        if (track.kind === 'audio') audioInterpreteActivo = true;
       });
       document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
       document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
     } else if (esSiguiente) {
-      // Mostrar en pantalla pequeña, vídeo silenciado
       const container = document.getElementById('videoPlaceholderEspera');
       container.innerHTML = '';
       participant.tracks.forEach(track => {
@@ -263,21 +329,19 @@ async function actualizarPantallasSegunTiempo() {
     }
   });
 
-  // Si no hay actual, limpiar pantalla grande y poner π
   if (!actual) {
     const container = document.getElementById('videoPlaceholderPrincipal');
-    container.innerHTML = '<div class="simbolo-pi">π</div>';
+    if (container) container.innerHTML = '<div class="simbolo-pi">π</div>';
     audioInterpreteActivo = false;
   }
-  // Si no hay siguiente, limpiar pantalla pequeña
   if (!siguiente) {
     const container = document.getElementById('videoPlaceholderEspera');
-    container.innerHTML = '<div class="simbolo-pi">π</div>';
+    if (container) container.innerHTML = '<div class="simbolo-pi">π</div>';
   }
 }
 
 // ============================================================
-// 9. UI DE INTÉRPRETES (para textos, no para vídeo)
+// 9. UI DE INTÉRPRETES (textos y nombres, sin vídeo)
 // ============================================================
 async function actualizarUIInterpretes() {
   if (!API_URL) return;
@@ -287,10 +351,10 @@ async function actualizarUIInterpretes() {
   if (actual) {
     document.getElementById('estadoPrincipal').innerText = `🎵 ${actual.nombre}`;
     document.getElementById('lugarPrincipal').innerHTML = `Desde ${actual.lugar}`;
-    // El vídeo ya lo gestiona la sala global
   } else {
     document.getElementById('estadoPrincipal').innerHTML = textos[idiomaActual]?.live || 'LIVE';
     document.getElementById('lugarPrincipal').innerHTML = textos[idiomaActual]?.desde_fecha || 'π está sonando ahora';
+    audioInterpreteActivo = false;
   }
 }
 setInterval(actualizarUIInterpretes, 15000);
@@ -317,18 +381,18 @@ setInterval(actualizarCountdown, 1000);
 actualizarCountdown();
 
 // ============================================================
-// 11. ACCESO INTÉRPRETE (con inicioBloque)
+// 11. ACCESO INTÉRPRETE (apertura robusta con inicioBloque)
 // ============================================================
 document.getElementById('formAccesoInterprete')?.addEventListener('submit', (e) => {
   e.preventDefault();
   let codigo = document.getElementById('codigoAcceso').value.trim();
-  const turno = document.getElementById('turnoAcceso').value.trim(); // aquí sería inicioBloque
+  const turno = document.getElementById('turnoAcceso').value.trim(); // debe ser inicioBloque
   if (!codigo || !turno) {
     alert('Por favor, introduce tu código y el inicio de tu bloque.');
     return;
   }
   if (!/π-[A-Z0-9]{4,}/.test(codigo)) {
-    alert('Código inválido.');
+    alert('El código parece inválido. Debe empezar con π- seguido de letras y números.');
     return;
   }
   const url = `interprete.html?code=${encodeURIComponent(codigo)}&inicioBloque=${encodeURIComponent(turno)}`;
@@ -351,6 +415,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btn.dataset.lang === idiomaActual) btn.classList.add('activo');
   });
   generarPentagramaInicial();
-  conectarSalaGlobal(); // Conectar a la sala global
-  actualizarUIInterpretes();
+  conectarSalaGlobal();       // Conectar a la sala global
+  actualizarUIInterpretes();   // Actualizar textos de la UI
 });
