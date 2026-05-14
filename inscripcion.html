@@ -73,7 +73,7 @@
     '5': 'Sol', '6': 'La', '7': 'Si', '8': 'Do⁸', '9': 'Re⁸'
   };
 
-  function generarPDF(nombre, codigo, inicioSegundo, turnoUTC, turnoLocal) {
+  function generarPDF(nombre, codigo, inicioBloque, turnoUTC, turnoLocal) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const gen = generarPi();
@@ -88,14 +88,16 @@
     doc.setFontSize(10);
     doc.text(`Intérprete: ${nombre}`, 20, 30);
     doc.text(`Código: ${codigo}`, 20, 36);
-    doc.text(`Inicio (UTC): ${turnoUTC}`, 20, 42);
-    doc.text(`Inicio (local): ${turnoLocal}`, 20, 48);
-    doc.text("Tus 300 notas (5 minutos):", 20, 58);
+    doc.text(`Inicio del bloque (UTC): ${turnoUTC}`, 20, 42);
+    doc.text(`Inicio local: ${turnoLocal}`, 20, 48);
+    doc.text("Tus 300 notas (5 minutos de directo):", 20, 58);
 
     let y = 68;
     let linea = '';
+    // Las notas empiezan 300 segundos después del inicio del bloque
+    const inicioDirecto = inicioBloque + 300;
     for (let i = 0; i < 300; i++) {
-      const digito = getDigito(inicioSegundo + i);
+      const digito = getDigito(inicioDirecto + i);
       const nota = NOTAS[digito] || '·';
       linea += `${digito}(${nota}) `;
       if ((i + 1) % 15 === 0 || i === 299) {
@@ -137,9 +139,10 @@
       });
       const data = await res.json();
       if (data.success) {
-        const turnoUTC = new Date(data.inicioSegundo * 1000).toUTCString();
-        const turnoLocal = new Date(data.inicioSegundo * 1000).toLocaleString();
-        generarPDF(nombre, codigo, data.inicioSegundo, turnoUTC, turnoLocal);
+        const inicioBloque = data.inicioBloque; // Debe venir del backend
+        const turnoUTC = new Date(inicioBloque * 1000).toUTCString();
+        const turnoLocal = new Date(inicioBloque * 1000).toLocaleString();
+        generarPDF(nombre, codigo, inicioBloque, turnoUTC, turnoLocal);
 
         const respuestaDiv = document.getElementById('respuesta');
         respuestaDiv.style.display = 'block';
@@ -147,11 +150,12 @@
           <h3>✅ Inscripción completada</h3>
           <p><strong>${nombre}</strong></p>
           <p>🎼 Código: <strong style="color:#ffd966">${codigo}</strong></p>
-          <p>⏱️ Turno #${Math.floor(data.inicioSegundo / 300) + 1}</p>
+          <p>⏱️ Turno #${Math.floor(inicioBloque / 600) + 1}</p>
           <p>🌍 Hora UTC: ${turnoUTC}</p>
           <p>🌍 Hora local: ${turnoLocal}</p>
-          <p>π empezará en el segundo global <strong>${data.inicioSegundo}</strong></p>
-          <p><a href="interprete.html?code=${codigo}&turno=${data.inicioSegundo}" target="_blank" style="color:#ffd966;">👉 Entrar como intérprete</a></p>
+          <p>Tu bloque de 10 minutos comienza en el segundo global <strong>${inicioBloque}</strong>.<br>
+          Los primeros 5 minutos te verán en espera (sin audio). Los siguientes 5 minutos estarás en directo.</p>
+          <p><a href="interprete.html?code=${codigo}&inicioBloque=${inicioBloque}" target="_blank" style="color:#ffd966;">👉 Entrar como intérprete</a></p>
           <p style="font-size:.9rem; opacity:.7">Tu PDF se ha descargado. Guarda este código.</p>
         `;
         document.getElementById('formInscripcion').reset();
