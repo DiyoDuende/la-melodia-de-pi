@@ -1,7 +1,7 @@
 // ============================================================
 // 1. CONFIGURACIÓN GLOBAL
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbxdrVld3fqUXdsk-k-l2KOxq82AmqoHOxbheaogr9a78UcjdeeO7NrTIFvBvmX35xeKtw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzlSvJYRmnr3cm6ZavpaFOYBG-pl7A8GPoy5s_QskUJWh2nJ_cLsLf6Ajf_JPAVspH4pg/exec';
 const TOKEN_URL = 'https://orange-sun-a67e.elgrandiyo.workers.dev/';
 const LIVEKIT_URL = 'wss://melodia-pi-3mw6tr42.livekit.cloud';
 const GLOBAL_ROOM = 'melodia-global';  // Nueva: sala única
