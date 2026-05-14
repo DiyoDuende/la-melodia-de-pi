@@ -4,11 +4,11 @@ Una melodía infinita, tocada por personas finitas, unidas por un mismo pulso, e
 
 ## ✨ ¿Qué es esto?
 
-"La melodía de π" es una obra musical colaborativa e infinita. Convertimos los dígitos decimales del número π en notas musicales y las reproducimos en tiempo real, una por segundo. El tiempo no se negocia. π no espera.
+"La melodía de π" es una obra musical colaborativa e infinita. Convertimos los dígitos decimales del número π en notas musicales y las reproducimos en tiempo real, una por segundo. El tiempo no se detiene, π tampoco.
 
 ## 🎹 ¿Cómo funciona?
 
-Los intérpretes se inscriben y se les asigna un turno de 5 minutos en orden de llegada. Durante su turno, tocan en vivo la secuencia de π que les corresponde, mientras la web emite la secuencia de notas que deben tocar.
+Los intérpretes se inscriben y se les asigna un turno de 5 minutos en orden de llegada. Durante su turno, tocan en vivo la secuencia de π que les corresponde, mientras la web emite la secuencia de sonido de fondo. El resultado es una sinfonía continua, única, imposible de repetir.
 
 ## 🌍 ¿Quién puede participar?
 
@@ -16,11 +16,11 @@ Cualquier persona del mundo, sin límite de edad ni nivel musical. Solo necesita
 
 ## 🎼 ¿Qué debo tocar?
 
-Cada dígito (0-9) se asigna a una nota musical: Do, Re, Mi, Fa, Sol, La, Si, y sus octavas. Recibirás por correo la partitura exacta de tus 300 notas (5 minutos × 60 segundos) antes de tu turno.
+Cada dígito (0-9) se asigna a una nota musical: Do, Re, Mi, Fa, Sol, La, Si, y sus octavas. Recibirás por correo la partitura exacta de tus 300 notas (5 minutos × 60 segundos) antes de tu turno. Tu PC te mostrará las notas en tiempo real.
 
 ## ⚙️ Tecnología
 
-La web genera los dígitos de π sobre la marcha con un algoritmo spigot infinito. El sonido se sintetiza con Soundfont Player (piano acústico). Los turnos se gestionan con una cola FIFO. La web está traducida a 9 idiomas (español, inglés, francés, alemán, italiano, portugués, japonés, chino y árabe).
+La web genera los dígitos de π sobre la marcha con un algoritmo spigot infinito. El sonido se sintetiza con Soundfont Player (piano acústico). Los turnos se gestionan con una cola FIFO. La web utiliza LiveKit para las transmisiones en directo.
 
 ## 📜 Licencia
 
