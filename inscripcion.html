@@ -39,7 +39,7 @@
 <script src="script.js"></script>
 <script>
   // ============================================================
-  // 1. CONFIGURACIÓN (cambia esta URL cuando tengas tu Apps Script)
+  // 1. CONFIGURACIÓN (cambia esta URL si es necesario)
   // ============================================================
   const API_URL = 'https://script.google.com/macros/s/AKfycbzlSvJYRmnr3cm6ZavpaFOYBG-pl7A8GPoy5s_QskUJWh2nJ_cLsLf6Ajf_JPAVspH4pg/exec';
 
@@ -94,7 +94,6 @@
 
     let y = 68;
     let linea = '';
-    // Las notas empiezan 300 segundos después del inicio del bloque
     const inicioDirecto = inicioBloque + 300;
     for (let i = 0; i < 300; i++) {
       const digito = getDigito(inicioDirecto + i);
@@ -139,7 +138,7 @@
       });
       const data = await res.json();
       if (data.success) {
-        const inicioBloque = data.inicioBloque; // Debe venir del backend
+        const inicioBloque = data.inicioBloque;
         const turnoUTC = new Date(inicioBloque * 1000).toUTCString();
         const turnoLocal = new Date(inicioBloque * 1000).toLocaleString();
         generarPDF(nombre, codigo, inicioBloque, turnoUTC, turnoLocal);
