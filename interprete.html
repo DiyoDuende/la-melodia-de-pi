@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Intérprete - La melodía de π</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     body { background:#0a0c10; color:#eef3f9; font-family:'Inter',sans-serif; text-align:center; padding:20px; }
@@ -24,7 +24,7 @@
     const CODIGO = params.get('code') || params.get('codigo');
     const INICIO_BLOQUE_STR = params.get('inicioBloque');
     if (!CODIGO || !INICIO_BLOQUE_STR) {
-      document.getElementById('status').innerHTML = '❌ Enlace inválido. Falta el código o el inicio de bloque.';
+      document.getElementById('status').innerHTML = '❌ Enlace inválido.';
       throw new Error('Missing parameters');
     }
     const INICIO_BLOQUE = parseInt(INICIO_BLOQUE_STR);
@@ -53,6 +53,7 @@
 
     let room = null;
     let localStream = null;
+    let reconnectTimer = null;
 
     async function solicitarToken(roomName) {
       if (!TOKEN_URL) throw new Error('Token URL no configurada');
@@ -60,6 +61,19 @@
       if (!res.ok) throw new Error('Error al obtener token');
       const data = await res.json();
       return data.token;
+    }
+
+    async function publicarTracks(roomObj, stream, publicarAudioFlag) {
+      const tracks = stream.getTracks();
+      const publicaciones = [];
+      for (const track of tracks) {
+        if (track.kind === 'video') {
+          publicaciones.push(roomObj.localParticipant.publishTrack(track));
+        } else if (track.kind === 'audio' && publicarAudioFlag) {
+          publicaciones.push(roomObj.localParticipant.publishTrack(track));
+        }
+      }
+      await Promise.all(publicaciones);
     }
 
     async function iniciarTransmision() {
@@ -70,7 +84,8 @@
       if (!localStream) {
         try {
           localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-          document.getElementById('localVideo').srcObject = localStream;
+          const videoEl = document.getElementById('localVideo');
+          if (videoEl) videoEl.srcObject = localStream;
         } catch(err) {
           document.getElementById('status').innerHTML = '❌ Error al acceder a cámara o micrófono.';
           return;
@@ -78,24 +93,45 @@
       }
       try {
         const token = await solicitarToken(GLOBAL_ROOM);
-        room = new Livekit.Room();
-        await room.connect(LIVEKIT_URL, token);
-        const tracksToPublish = localStream.getTracks().filter(track => {
-          if (track.kind === 'video') return true;
-          if (track.kind === 'audio') return publicarAudio;
-          return false;
+        const newRoom = new Livekit.Room();
+        // Configurar eventos de reconexión
+        newRoom.on('disconnected', () => {
+          console.warn('Desconectado, intentando reconectar...');
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(() => iniciarTransmision(), 5000);
         });
-        await room.localParticipant.publishTracks(tracksToPublish);
+        await newRoom.connect(LIVEKIT_URL, token);
+        room = newRoom;
+        await publicarTracks(room, localStream, publicarAudio);
         document.getElementById('status').innerHTML = publicarAudio ?
           '🎙️ Estás al aire. Suenas durante 5 minutos.' :
           '📹 Te están viendo en espera (sin audio).';
+        // Si está en espera, monitorear cambio a directo
+        if (!publicarAudio) {
+          const checkInterval = setInterval(async () => {
+            const ahora2 = getSegundoGlobal();
+            if (ahora2 >= INICIO_BLOQUE + 300 && ahora2 < INICIO_BLOQUE + 600) {
+              // Pasar a directo: publicar audio
+              const audioTrack = localStream.getAudioTracks()[0];
+              if (audioTrack) {
+                await room.localParticipant.publishTrack(audioTrack);
+                clearInterval(checkInterval);
+                document.getElementById('status').innerHTML = '🎤 Has pasado a directo. ¡Ahora sí te oyen!';
+              }
+            } else if (ahora2 >= INICIO_BLOQUE + 600) {
+              clearInterval(checkInterval);
+            }
+          }, 1000);
+        }
         const tiempoRestante = 600 - segundosDesdeInicio;
         if (tiempoRestante > 0) {
           setTimeout(() => desconectar(), tiempoRestante * 1000);
         }
       } catch(err) {
         console.error(err);
-        document.getElementById('status').innerHTML = '❌ Error de conexión. Inténtalo de nuevo.';
+        document.getElementById('status').innerHTML = '❌ Error de conexión. Reintentando...';
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(() => iniciarTransmision(), 5000);
       }
     }
 
