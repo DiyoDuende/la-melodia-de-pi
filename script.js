@@ -78,8 +78,9 @@ async function cargarTraducciones() {
     const res = await fetch('traducciones.json');
     textos = await res.json();
     aplicarTraduccion();
-    if (!modoVivo) generarPentagramaInicial();
-    else if (worker) {
+    // No llamar a generarPentagramaInicial aquí (ya se hace en DOMContentLoaded)
+    // Solo regenerar si estamos en modo vivo
+    if (modoVivo && worker) {
       const segundo = getSegundoGlobal();
       worker.postMessage({ id: 'pentagrama', inicio: segundo - 2, cantidad: 5 });
     }
